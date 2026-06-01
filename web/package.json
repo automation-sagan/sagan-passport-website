@@ -5,12 +5,13 @@
   "engines": {
     "node": ">=22.12.0"
   },
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
-  },
+ "scripts": {
+  "dev": "astro dev",
+  "build": "astro build",
+  "preview": "astro preview",
+  "astro": "astro",
+  "typecheck": "astro check"
+},
   "dependencies": {
     "@sanity/astro": "^3.4.0",
     "@sanity/client": "^7.22.1",
@@ -20,5 +21,9 @@
     "react-is": "^19.2.6",
     "sanity": "^5.28.0",
     "styled-components": "^6.4.2"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "typescript": "^5.9.3"
   }
 }
