@@ -25,6 +25,7 @@
 .res-newsletter__btn { padding: 12px 24px; border: 0; border-radius: 999px; background: var(--glacier); color: #fff; font-family: var(--pp); font-size: 15px; cursor: pointer; }
 
 .res-grid { width: 100%; max-width: 1200px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.res-card.is-hidden { display: none; }
 .res-card { display: flex; flex-direction: column; gap: 16px; text-decoration: none; color: inherit; border-radius: 24px; transition: transform 0.25s ease; }
 .res-card:hover { transform: translateY(-4px); }
 .res-card__img { position: relative; width: 100%; aspect-ratio: 16 / 10; border-radius: 24px; background-color: var(--space-200); background-size: cover; background-position: center; overflow: hidden; }

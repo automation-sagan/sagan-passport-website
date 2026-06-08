@@ -1,12 +1,24 @@
 ---
-/* /resources — Resources index: intro + newsletter over a 3-up card grid. */
+/* /resources — Resources index: intro + newsletter, category filter tabs, and a
+ * 3-up card grid. Content comes from the `resource` documents in Sanity. */
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import Footer from '../../components/Footer.astro';
 import ResourceCard from '../../components/resources/ResourceCard.astro';
 import NewsletterForm from '../../components/resources/NewsletterForm.astro';
-import { RESOURCES } from '../../data/resources';
+import { getResourceList } from '../../lib/resources';
 import '../../styles/resources.css';
+
+const resources = await getResourceList();
+
+// Filter tabs: "All" + the categories actually present, in a stable order.
+const ORDER = ['Case Studies', 'Podcasts', 'Testimonials'];
+const present = [...new Set(resources.map((r) => r.category).filter(Boolean) as string[])];
+const categories = [
+  ...ORDER.filter((c) => present.includes(c)),
+  ...present.filter((c) => !ORDER.includes(c)),
+];
+const tabs = ['All', ...categories];
 ---
 
 <Layout title="Resources — Sagan Passport">
@@ -23,10 +35,77 @@ import '../../styles/resources.css';
         <NewsletterForm />
       </div>
 
+      <div class="res-tabs" role="tablist">
+        {
+          tabs.map((t, i) => (
+            <button
+              type="button"
+              class={`res-tab${i === 0 ? ' is-active' : ''}`}
+              data-filter={t === 'All' ? 'all' : t}>
+              {t}
+            </button>
+          ))
+        }
+      </div>
+
       <div class="res-grid">
-        {RESOURCES.map((r) => <ResourceCard resource={r} />)}
+        {resources.map((r) => <ResourceCard resource={r} />)}
       </div>
     </section>
   </div>
   <Footer />
 </Layout>
+
+<style>
+  /* Category filter tabs (pill row above the grid). */
+  .res-tabs {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .res-tab {
+    padding: 10px 20px;
+    font-family: var(--pp);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--glacier);
+    background: transparent;
+    border: 1px solid rgb(227, 222, 216);
+    border-radius: 100px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease,
+      border-color 0.25s ease;
+  }
+  .res-tab:hover {
+    background: var(--space-100);
+  }
+  .res-tab.is-active {
+    background: var(--glacier);
+    border-color: var(--glacier);
+    color: var(--white);
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('.res-list');
+  if (root) {
+    const tabs = Array.from(root.querySelectorAll<HTMLElement>('.res-tab'));
+    const cards = Array.from(root.querySelectorAll<HTMLElement>('.res-card'));
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const filter = tab.dataset.filter || 'all';
+        tabs.forEach((t) => t.classList.toggle('is-active', t === tab));
+        cards.forEach((c) => {
+          const show = filter === 'all' || c.dataset.category === filter;
+          c.classList.toggle('is-hidden', !show);
+        });
+      });
+    });
+  }
+</script>

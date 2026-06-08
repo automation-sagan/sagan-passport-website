@@ -1,22 +1,26 @@
 ---
 /* ResourceCard — a single card in the Resources grid. Styling comes from the
- * global .res-card classes in resources.css. */
-import { formatDate, type Resource } from '../../data/resources';
+ * global .res-card classes in resources.css. data-category drives the
+ * client-side category filter on the listing page. */
+import { formatDate, type ResourceSummary } from '../../lib/resources';
+import { imgUrl } from '../../lib/sanityImage';
 interface Props {
-  resource: Resource;
+  resource: ResourceSummary;
 }
 const { resource: r } = Astro.props;
+const mainImage = imgUrl(r.mainImage);
+const authorImage = imgUrl(r.authorImage);
 ---
 
-<a href={`/resources/${r.slug}`} class="res-card">
-  <div class="res-card__img" style={`background-image:url(${r.mainImage})`}>
+<a href={`/resources/${r.slug}`} class="res-card" data-category={r.category ?? ''}>
+  <div class="res-card__img" style={`background-image:url(${mainImage})`}>
     <span class="res-card__cat">{r.category}</span>
   </div>
   <div class="res-card__body">
     <h3 class="res-card__title">{r.title}</h3>
     <div class="res-card__meta">
-      <span class="res-card__avatar" style={`background-image:url(${r.authorImage})`}></span>
-      <span class="res-card__author">{r.author}</span>
+      <span class="res-card__avatar" style={`background-image:url(${authorImage})`}></span>
+      <span class="res-card__author">{r.authorName}</span>
       {r.date && <span class="res-card__date">· {formatDate(r.date)}</span>}
     </div>
   </div>

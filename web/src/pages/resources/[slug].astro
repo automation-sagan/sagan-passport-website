@@ -7,14 +7,20 @@ import Footer from '../../components/Footer.astro';
 import CopyButton from '../../components/resources/CopyButton.astro';
 import ButtonFill from '../../components/homepage/ButtonFill.astro';
 import SplineEmbed from '../../components/homepage/SplineEmbed.astro';
-import { RESOURCES, formatDate, type Resource } from '../../data/resources';
+import { getResourceSlugs, getResource, formatDate } from '../../lib/resources';
+import { imgUrl } from '../../lib/sanityImage';
 import '../../styles/resources.css';
 
-export function getStaticPaths() {
-  return RESOURCES.map((r) => ({ params: { slug: r.slug }, props: { resource: r } }));
+export async function getStaticPaths() {
+  const slugs = await getResourceSlugs();
+  return Promise.all(
+    slugs.map(async (slug) => ({ params: { slug }, props: { resource: (await getResource(slug))! } })),
+  );
 }
 
-const { resource } = Astro.props as { resource: Resource };
+const { resource } = Astro.props;
+const mainImage = imgUrl(resource.mainImage);
+const authorImage = imgUrl(resource.authorImage);
 const shareUrl = `https://saganpassport.com/resources/${resource.slug}`;
 const SCHEDULE_URL =
   'https://calendly.com/d/5j7-3xv-p5k/global-talent-hiring-consultation?utm_source=saganpassportdotcom&utm_term=talent';
@@ -25,13 +31,13 @@ const SCHEDULE_URL =
   <div class="home">
     <!-- Hero -->
     <section class="section res-hero">
-      <div class="res-hero__image" style={`background-image:url(${resource.mainImage})`}></div>
+      <div class="res-hero__image" style={`background-image:url(${mainImage})`}></div>
       <div class="res-hero__content">
         <h1 class="t-h1" style="margin:0">{resource.title}</h1>
         <div class="res-hero__bottom">
           <div class="res-hero__author">
-            <span class="res-hero__avatar" style={`background-image:url(${resource.authorImage})`}></span>
-            <span class="res-hero__name">{resource.author}</span>
+            <span class="res-hero__avatar" style={`background-image:url(${authorImage})`}></span>
+            <span class="res-hero__name">{resource.authorName}</span>
             {resource.date && <span class="res-hero__date">· {formatDate(resource.date)}</span>}
           </div>
           <CopyButton url={shareUrl} />
@@ -41,13 +47,13 @@ const SCHEDULE_URL =
 
     <!-- Body sections (two-column: title | content) -->
     <section class="section res-body">
-      {resource.sections.map((s) => (
+      {(resource.sections ?? []).map((s) => (
         <div class="res-sec">
           <div class="res-sec__left">
             {s.tag && <p class="t-eyebrow">{s.tag}</p>}
             {s.title && <h2 class="t-h3" style="margin:0">{s.title}</h2>}
           </div>
-          <div class="res-sec__right article-content" set:html={s.content}></div>
+          <div class="res-sec__right article-content" set:html={s.content ?? ''}></div>
         </div>
       ))}
     </section>

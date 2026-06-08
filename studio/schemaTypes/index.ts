@@ -25,6 +25,9 @@ import {customer} from './customer'
 import {serviceCard} from './serviceCard'
 import {talentPerson} from './talentPerson'
 import {roleEntry} from './roleEntry'
+import {resource} from './resource'
+import {resourceSection} from './resourceSection'
+import {resourceTestimonial} from './resourceTestimonial'
 
 export const schemaTypes = [
   navigation,
@@ -54,4 +57,7 @@ export const schemaTypes = [
   serviceCard,
   talentPerson,
   roleEntry,
+  resource,
+  resourceSection,
+  resourceTestimonial,
 ]

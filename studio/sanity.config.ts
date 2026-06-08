@@ -47,6 +47,10 @@ export default defineConfig({
               .id('customer')
               .child(S.documentTypeList('customer').title('Customers')),
             S.listItem()
+              .title('Resources')
+              .id('resource')
+              .child(S.documentTypeList('resource').title('Resources')),
+            S.listItem()
               .title('Navigation')
               .id('navigation')
               .child(S.document().schemaType('navigation').documentId('navigation')),
@@ -60,6 +64,7 @@ export default defineConfig({
                   'saganUniversity',
                   'notFound',
                   'customer',
+                  'resource',
                   'navigation',
                 ].includes(li.getId()!),
             ),
