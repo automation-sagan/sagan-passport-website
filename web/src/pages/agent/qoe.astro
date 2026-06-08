@@ -1,0 +1,17 @@
+---
+/* /agent/qoe — own route so only this page's CSS/scripts bundle. */
+import LandingLayout from '../../layouts/LandingLayout.astro';
+import QoeAgent from '../../components/agent/QoeAgent.astro';
+import { getAgentDemoBySlug } from '../../lib/agentDemos';
+
+export const prerender = true;
+const data = (await getAgentDemoBySlug('qoe'))!;
+---
+
+<LandingLayout
+  title={data.seoTitle ?? 'QoE — a Sagan AI agent'}
+  description={data.seoDescription}
+  canonical={data.canonical}
+>
+  <QoeAgent data={data} />
+</LandingLayout>

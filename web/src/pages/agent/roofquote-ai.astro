@@ -1,0 +1,17 @@
+---
+/* /agent/roofquote-ai — own route so only this page's CSS/scripts bundle. */
+import LandingLayout from '../../layouts/LandingLayout.astro';
+import RoofquoteAiAgent from '../../components/agent/RoofquoteAiAgent.astro';
+import { getAgentDemoBySlug } from '../../lib/agentDemos';
+
+export const prerender = true;
+const data = (await getAgentDemoBySlug('roofquote-ai'))!;
+---
+
+<LandingLayout
+  title={data.seoTitle ?? 'RoofQuote AI — a Sagan AI agent'}
+  description={data.seoDescription}
+  canonical={data.canonical}
+>
+  <RoofquoteAiAgent data={data} />
+</LandingLayout>

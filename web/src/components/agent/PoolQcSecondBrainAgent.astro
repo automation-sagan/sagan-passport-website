@@ -1,0 +1,411 @@
+---
+/* Faithful port of /agent/pool-qc-second-brain. Mirrors the agent/ group idioms
+ * (see FreightAgent.astro): Tailwind CDN + inline config + the page's custom
+ * <style>, bespoke body verbatim, hero copy + CTA URL driven by the `agentDemo`
+ * Sanity doc. Isolated via its own route file so generic class names don't collide.
+ * NOTE: this source page has NO logo image — nav/footer are text-only, reproduced verbatim. */
+import type { AgentDemoData } from '../../lib/agentDemos';
+
+interface Props {
+  data: AgentDemoData;
+}
+const { data } = Astro.props;
+const cta = data.ctaUrl ?? 'https://www.shipyourweekendproject.com/';
+---
+
+<!-- Tailwind CDN + theme config (kept verbatim from the source page) -->
+<script is:inline src="https://cdn.tailwindcss.com"></script>
+<script is:inline>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          ink: '#0A0A0A',
+          paper: '#FAFAF7',
+          char: '#1C1C1C',
+          tide: '#0B5F7A',
+          wave: '#1A8EB5',
+          ash:   '#8A8A85',
+          line:  '#E5E2DA'
+        },
+        fontFamily: {
+          sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace']
+        }
+      }
+    }
+  }
+</script>
+
+<!-- NAV -->
+<nav class="sticky top-0 z-50 backdrop-blur bg-paper/85 border-b border-line">
+  <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+    <a href="#" class="font-mono text-sm text-char/70">an AI agent · by Sagan</a>
+    <div class="hidden md:flex items-center gap-8 text-sm text-char/80">
+      <a href="#pain" class="hover:text-ink">the risk</a>
+      <a href="#how" class="hover:text-ink">how it works</a>
+      <a href="#pricing" class="hover:text-ink">pricing</a>
+      <a href="#for" class="hover:text-ink">is this for you</a>
+    </div>
+    <a href={cta} class="group inline-flex items-center gap-2 bg-ink text-paper px-4 py-2 text-sm font-medium">
+      Join the waitlist
+      <span aria-hidden class="transition-transform group-hover:translate-x-0.5">→</span>
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="border-b border-line relative overflow-hidden">
+  <div class="ripple"></div>
+  <div class="max-w-7xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32 relative">
+    <div class="reveal">
+      <div class="eyebrow text-wave mb-8"><span class="dot"></span>{data.heroEyebrow}</div>
+      <h1 class="display text-6xl md:text-8xl font-semibold text-ink" set:html={data.heroHeadlineHtml}></h1>
+    </div>
+
+    <div class="reveal mt-10 max-w-2xl text-lg md:text-xl text-char/80 leading-relaxed" style="--d:150ms" set:html={data.heroLeadHtml}></div>
+
+    <div class="reveal mt-10 flex flex-col sm:flex-row gap-4" style="--d:300ms">
+      <a href={cta} class="inline-flex items-center justify-center gap-2 bg-ink text-paper px-6 py-4 text-base font-medium hover:bg-tide transition-colors">
+        Join the waitlist
+        <span aria-hidden>→</span>
+      </a>
+      <a href="#pain" class="inline-flex items-center justify-center gap-2 border border-ink text-ink px-6 py-4 text-base font-medium hover:bg-ink hover:text-paper transition-colors">
+        What breaks first
+      </a>
+    </div>
+
+    <!-- risk panel -->
+    <div class="reveal mt-20 border border-line bg-white p-6 md:p-10" style="--d:450ms">
+      <div class="grid md:grid-cols-4 gap-8 md:gap-10">
+        <div>
+          <div class="eyebrow text-ash mb-3">business at stake</div>
+          <div class="font-mono text-4xl md:text-5xl ticker">$7–8M</div>
+          <div class="mt-2 text-char/70 text-sm">annual revenue riding on one guy's callbacks</div>
+        </div>
+        <div>
+          <div class="eyebrow text-ash mb-3">years of expertise</div>
+          <div class="font-mono text-4xl md:text-5xl ticker">30</div>
+          <div class="mt-2 text-char/70 text-sm">in his head, nowhere else</div>
+        </div>
+        <div>
+          <div class="eyebrow text-ash mb-3">time to train a replacement</div>
+          <div class="font-mono text-4xl md:text-5xl ticker">~5 yrs</div>
+          <div class="mt-2 text-char/70 text-sm">you don't have</div>
+        </div>
+        <div>
+          <div class="eyebrow text-wave mb-3">rework cost per miss</div>
+          <div class="font-mono text-4xl md:text-5xl ticker text-tide">$25k+</div>
+          <div class="mt-2 text-char/70 text-sm">one bad cure, one missed plumbing check</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ambient marquee -->
+  <div class="border-t border-line py-4 overflow-hidden font-mono text-xs text-ash">
+    <div class="marquee whitespace-nowrap">
+      <span>gunite inspection · rebar spacing · plumbing pressure · skimmer placement · bond beam · tile line · deck pitch · equipment pad · startup chem · gunite inspection · rebar spacing · plumbing pressure · skimmer placement · bond beam · tile line · deck pitch · equipment pad · startup chem ·&nbsp;</span>
+      <span>gunite inspection · rebar spacing · plumbing pressure · skimmer placement · bond beam · tile line · deck pitch · equipment pad · startup chem · gunite inspection · rebar spacing · plumbing pressure · skimmer placement · bond beam · tile line · deck pitch · equipment pad · startup chem ·&nbsp;</span>
+    </div>
+  </div>
+</header>
+
+<!-- THE RISK -->
+<section id="pain" class="border-b border-line">
+  <div class="max-w-7xl mx-auto px-6 py-20 md:py-28">
+    <div class="grid md:grid-cols-12 gap-10">
+      <div class="md:col-span-5 reveal">
+        <div class="eyebrow text-ash mb-4">the real risk</div>
+        <h2 class="display text-4xl md:text-5xl font-semibold">
+          The business<br />can't outrun<br />one man's&nbsp;phone.
+        </h2>
+      </div>
+      <div class="md:col-span-7 reveal" style="--d:150ms">
+        <p class="text-xl md:text-2xl text-char/85 leading-relaxed">
+          He built the standard. Every subcontractor calls him before they pour. Every foreman texts him photos before signoff. He knows exactly what "right" looks like, and nobody else does.
+        </p>
+        <p class="mt-8 text-lg text-char/75 leading-relaxed">
+          On a good week this is a mild annoyance. On a bad week — he gets sick, he takes his first vacation in a decade, his truck won't start Tuesday morning — this is a business that slows to a stop. Or worse, a business that keeps moving without the check.
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-16 grid md:grid-cols-3 gap-px bg-line border border-line reveal stagger">
+      <div class="bg-paper p-8 hover-lift" style="--d:0ms">
+        <div class="font-mono text-wave text-sm mb-2">01</div>
+        <div class="font-semibold text-lg mb-2">Every judgment call routes to him</div>
+        <p class="text-char/75 text-sm leading-relaxed">The rebar looks close. Is it? The gunite cure looks grey. Is that normal? Every answer is in one head. The crew waits.</p>
+      </div>
+      <div class="bg-paper p-8 hover-lift" style="--d:100ms">
+        <div class="font-mono text-wave text-sm mb-2">02</div>
+        <div class="font-semibold text-lg mb-2">Training a successor is impossible</div>
+        <p class="text-char/75 text-sm leading-relaxed">He can't write it down because it's situational. You can't pair a junior with him long enough, because he's the one keeping jobs moving.</p>
+      </div>
+      <div class="bg-paper p-8 hover-lift" style="--d:200ms">
+        <div class="font-mono text-wave text-sm mb-2">03</div>
+        <div class="font-semibold text-lg mb-2">Rework quietly eats margin</div>
+        <p class="text-char/75 text-sm leading-relaxed">One skipped check, one missed plumbing test, one off-spec bond beam. The fix lands on your P&amp;L two months later and the customer stops referring.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THE STAKES -->
+<section class="border-b border-line bg-ink text-paper relative overflow-hidden">
+  <div class="ripple" style="background: radial-gradient(800px 400px at 20% 20%, rgba(26,142,181,0.25), transparent 60%);"></div>
+  <div class="max-w-7xl mx-auto px-6 py-20 md:py-28 relative">
+    <div class="reveal">
+      <div class="eyebrow text-wave mb-4">the stakes, in numbers</div>
+      <h2 class="display text-4xl md:text-6xl font-semibold max-w-4xl">
+        The bus factor<br />
+        on a $7–8M business<br />
+        <span class="text-wave">is one.</span>
+      </h2>
+    </div>
+
+    <p class="reveal mt-10 text-paper/75 text-lg max-w-3xl" style="--d:150ms">
+      If one person doesn't pick up, work stops or work ships wrong. Another hire doesn't solve it. A replacement takes five years to train, and he decides in under two minutes what happens on every active job.
+    </p>
+
+    <div class="reveal mt-16 grid md:grid-cols-4 gap-px bg-paper/10 border border-paper/10 stagger">
+      <div class="bg-ink p-8" style="--d:0ms">
+        <div class="font-mono text-xs text-paper/50 mb-2">BUS FACTOR</div>
+        <div class="font-mono text-5xl ticker text-wave">1</div>
+        <p class="text-paper/70 text-sm mt-3">The count of people who can sign off on a pour. If that number goes to zero, the business does too.</p>
+      </div>
+      <div class="bg-ink p-8" style="--d:100ms">
+        <div class="font-mono text-xs text-paper/50 mb-2">JOBS IN FLIGHT</div>
+        <div class="font-mono text-5xl ticker">100%</div>
+        <p class="text-paper/70 text-sm mt-3">Every active build routes a judgment call through him. Every foreman, every sub, every phase gate.</p>
+      </div>
+      <div class="bg-ink p-8" style="--d:200ms">
+        <div class="font-mono text-xs text-paper/50 mb-2">YEARS TO REBUILD</div>
+        <div class="font-mono text-5xl ticker">~5</div>
+        <p class="text-paper/70 text-sm mt-3">Thirty years of pattern recognition, compressed into a trainable successor. You don't have the runway.</p>
+      </div>
+      <div class="bg-ink p-8" style="--d:300ms">
+        <div class="font-mono text-xs text-paper/50 mb-2">PER SILENT MISS</div>
+        <div class="font-mono text-5xl ticker">$25k+</div>
+        <p class="text-paper/70 text-sm mt-3">One missed plumbing check, one off-spec bond beam. Lands on the P&amp;L two months later.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section id="how" class="border-b border-line">
+  <div class="max-w-7xl mx-auto px-6 py-20 md:py-28">
+    <div class="reveal">
+      <div class="eyebrow text-ash mb-4">how it works</div>
+      <h2 class="display text-4xl md:text-6xl font-semibold max-w-4xl">
+        We don't replace him.<br />
+        We <span class="text-tide">clone his checklists</span>, his rules of thumb,<br />
+        and the questions he'd ask before&nbsp;signing off.
+      </h2>
+    </div>
+
+    <p class="reveal mt-10 text-char/75 text-lg max-w-3xl" style="--d:150ms">
+      Over a two-week capture phase, an operator sits with him on-site and on the phone. Every time the crew sends a photo, the operator records how he reads it. Every correction, every "that's a no-go because," every "actually that one's fine because." That becomes the model.
+    </p>
+
+    <div class="reveal mt-16 grid md:grid-cols-4 gap-px bg-line border border-line stagger" style="--d:200ms">
+      <div class="bg-paper p-8" style="--d:0ms">
+        <div class="font-mono text-xs text-ash mb-2">CAPTURE</div>
+        <div class="text-lg font-semibold">His QC, transcribed</div>
+        <p class="text-char/75 text-sm mt-2">Two weeks on-site with him. Every callback becomes training data.</p>
+      </div>
+      <div class="bg-paper p-8" style="--d:100ms">
+        <div class="font-mono text-xs text-ash mb-2">ENCODE</div>
+        <div class="text-lg font-semibold">Protocols, not guesses</div>
+        <p class="text-char/75 text-sm mt-2">Structured checklists per phase. The house standard, machine-readable.</p>
+      </div>
+      <div class="bg-paper p-8" style="--d:200ms">
+        <div class="font-mono text-xs text-ash mb-2">DEPLOY</div>
+        <div class="text-lg font-semibold">Crew-facing app</div>
+        <p class="text-char/75 text-sm mt-2">Foreman uploads photo and question. Gets a house-standard answer in under 30 seconds.</p>
+      </div>
+      <div class="bg-paper p-8" style="--d:300ms">
+        <div class="font-mono text-xs text-ash mb-2">ESCALATE</div>
+        <div class="text-lg font-semibold">Only the edge cases</div>
+        <p class="text-char/75 text-sm mt-2">Low-confidence calls route to you. Everything else ships with the standard applied, automatically.</p>
+      </div>
+    </div>
+
+    <div class="reveal mt-20" style="--d:350ms">
+      <div class="eyebrow text-ash mb-4">what the crew sees</div>
+      <h3 class="display text-3xl md:text-5xl font-semibold max-w-4xl">
+        A foreman in the field,<br />
+        <span class="text-char/60">Tuesday at 6:47am.</span>
+      </h3>
+    </div>
+
+    <!-- mock dialog -->
+    <div class="mt-10 reveal" style="--d:500ms">
+      <div class="border border-line bg-ink text-paper font-mono text-sm">
+        <div class="border-b border-paper/10 px-5 py-3 flex items-center gap-2 text-paper/60 text-xs">
+          <span class="w-2.5 h-2.5 rounded-full bg-paper/20"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-paper/20"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-paper/20"></span>
+          <span class="ml-4">ai agent · field console · job #2417</span>
+        </div>
+        <div class="p-6 space-y-4 leading-7">
+          <div class="text-paper/70">foreman@site:</div>
+          <div>sent 4 photos · "gunite looks grey, it's been 22 hours, crew wants to tile. ok?"</div>
+          <div class="text-paper/50">—</div>
+          <div class="text-wave">agent:</div>
+          <div class="text-paper">
+            hold. this gunite is under-cured for the house standard. greying at 22h on a 6/12 pour is normal, but the QC lead calls 28h minimum before tile prep — <span class="text-wave">per the 2023 rule after the peeling job on LaGrange Rd</span>. recheck at 14:00. if surface is still cool to the touch and moisture dark, push to tomorrow AM.
+          </div>
+          <div class="text-paper/50">—</div>
+          <div class="text-wave">agent:</div>
+          <div class="text-paper">
+            flagging for the owner: photo 3 shows a visible honeycomb at the skimmer throat. <span class="text-wave">automatic callback under the house standard</span>. crew should patch before tile. sending the photo now.
+          </div>
+          <div class="text-paper/50">—</div>
+          <div><span class="text-wave">elapsed</span>: 00:00:14<span class="blink text-wave">_</span> · <span class="text-paper/60">owner notified: yes · crew signoff: held</span></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="reveal mt-10 text-char/75 text-lg max-w-3xl" style="--d:650ms">
+      That question used to be a 6:47am phone call. Now the crew has a house-standard answer in fourteen seconds, the foreman's next move is clear, and you see a notification only when something actually needs the owner.
+    </p>
+  </div>
+</section>
+
+<!-- FOR / NOT FOR -->
+<section id="for" class="border-b border-line">
+  <div class="max-w-7xl mx-auto px-6 py-20 md:py-28">
+    <div class="reveal">
+      <div class="eyebrow text-ash mb-4">honest qualification</div>
+      <h2 class="display text-4xl md:text-6xl font-semibold">Is this for you?</h2>
+    </div>
+
+    <div class="mt-16 grid md:grid-cols-2 gap-0 border border-line">
+      <div class="p-8 md:p-10 border-b md:border-b-0 md:border-r border-line reveal">
+        <div class="eyebrow text-wave mb-5">built for you if</div>
+        <ul class="space-y-4 text-lg">
+          <li class="flex gap-3"><span class="text-wave font-mono mt-1">✓</span><span>You own a $7M+ a year custom build business</span></li>
+          <li class="flex gap-3"><span class="text-wave font-mono mt-1">✓</span><span>Every QC judgment routes through one irreplaceable person</span></li>
+          <li class="flex gap-3"><span class="text-wave font-mono mt-1">✓</span><span>You've tried to train a successor and it didn't stick</span></li>
+          <li class="flex gap-3"><span class="text-wave font-mono mt-1">✓</span><span>He can tell you what "right" looks like — but can't write it down</span></li>
+          <li class="flex gap-3"><span class="text-wave font-mono mt-1">✓</span><span>Rework costs you five figures a year, minimum</span></li>
+        </ul>
+      </div>
+      <div class="p-8 md:p-10 bg-paper reveal" style="--d:100ms">
+        <div class="eyebrow text-ash mb-5">not for you if</div>
+        <ul class="space-y-4 text-lg text-char/75">
+          <li class="flex gap-3"><span class="text-ash font-mono mt-1">—</span><span>You do standardized, commodity work where a template solves it</span></li>
+          <li class="flex gap-3"><span class="text-ash font-mono mt-1">—</span><span>You have a trained QC lead already doing this well</span></li>
+          <li class="flex gap-3"><span class="text-ash font-mono mt-1">—</span><span>You're uncomfortable letting an AI apply a judgment call he'd make</span></li>
+          <li class="flex gap-3"><span class="text-ash font-mono mt-1">—</span><span>The business runs on two or three projects a year</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="border-b border-line">
+  <div class="max-w-7xl mx-auto px-6 py-20 md:py-28">
+    <div class="reveal">
+      <div class="eyebrow text-ash mb-4">pricing</div>
+      <h2 class="display text-4xl md:text-6xl font-semibold max-w-4xl">
+        Straightforward.<br />
+        <span class="text-char/60">No retainer. No surprises.</span>
+      </h2>
+    </div>
+
+    <div class="mt-16 grid md:grid-cols-2 gap-0 border border-line reveal">
+      <div class="p-8 md:p-12 border-b md:border-b-0 md:border-r border-line">
+        <div class="eyebrow text-wave mb-4">to build</div>
+        <div class="font-mono text-6xl ticker">$500</div>
+        <div class="mt-3 text-char/75">One-time. Scoped, built, and deployed in about two weeks.</div>
+      </div>
+      <div class="p-8 md:p-12">
+        <div class="eyebrow text-ash mb-4">then</div>
+        <div class="font-mono text-6xl ticker">usage-based</div>
+        <div class="mt-3 text-char/75">You pay when the agent runs. No seats, no subscription floor.</div>
+      </div>
+    </div>
+
+    <p class="reveal mt-8 text-sm text-char/70" style="--d:150ms">
+      Full rate card and terms live on the program site →
+      <a class="underline hover:text-ink" href={cta}>shipyourweekendproject.com</a>
+    </p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="bg-tide text-paper">
+  <div class="max-w-7xl mx-auto px-6 py-24 md:py-32">
+    <div class="grid md:grid-cols-12 gap-10 items-end">
+      <div class="md:col-span-8 reveal">
+        <div class="eyebrow text-wave mb-4">waitlist · private beta</div>
+        <h2 class="display text-5xl md:text-7xl font-semibold">
+          The business<br />
+          doesn't wait<br />
+          <span class="text-paper/70">on one phone call.</span>
+        </h2>
+      </div>
+      <div class="md:col-span-4 reveal" style="--d:150ms">
+        <p class="text-lg mb-6 text-paper/85">
+          A small cohort of owners is being onboarded this quarter. Join the waitlist and you'll hear back when a slot opens.
+        </p>
+        <a href={cta} class="inline-flex items-center gap-2 bg-ink text-paper px-6 py-4 text-base font-medium hover:bg-char transition-colors">
+          Join the waitlist
+          <span aria-hidden>→</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-ink text-paper/70 text-sm">
+  <div class="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <div>
+      <div class="font-mono text-paper">an AI agent · pool QC</div>
+      <div class="mt-1 text-paper/50">a build program from <a class="underline hover:text-paper" href={cta}>Sagan</a></div>
+    </div>
+    <div class="flex gap-8 text-paper/60">
+      <a href={cta} class="hover:text-paper">waitlist</a>
+      <a href="https://getsagan.com" class="hover:text-paper">getsagan.com</a>
+    </div>
+  </div>
+</footer>
+
+<script is:inline>
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+    }
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  document.querySelectorAll('.stagger').forEach(g => {
+    Array.from(g.children).forEach((c, i) => { if (!c.style.getPropertyValue('--d')) c.style.setProperty('--d', (i * 90) + 'ms'); });
+  });
+</script>
+<script is:inline src="/hubspot-capture.js" data-portal-id="50517161" data-form-guid="daac2804-e5c3-48e7-8ab7-a5b41c9e7c38"></script>
+
+<style is:global>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #FAFAF7; color: #0A0A0A; -webkit-font-smoothing: antialiased; }
+  .display { letter-spacing: -0.035em; line-height: 0.94; }
+  .eyebrow { letter-spacing: 0.16em; text-transform: uppercase; font-size: 11px; font-weight: 500; }
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 900ms cubic-bezier(.2,.7,.2,1), transform 900ms cubic-bezier(.2,.7,.2,1); }
+  .reveal.is-in { opacity: 1; transform: none; }
+  .stagger > * { transition-delay: var(--d, 0ms); }
+  .hover-lift { transition: transform 200ms ease, border-color 200ms ease; }
+  .hover-lift:hover { transform: translateY(-2px); border-color: #0A0A0A; }
+  .ticker { font-variant-numeric: tabular-nums; }
+  .dot::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 999px; background: #1A8EB5; margin-right: 10px; vertical-align: middle; transform: translateY(-2px); }
+  .marquee { display: flex; animation: marquee 45s linear infinite; gap: 3rem; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .blink { animation: blink 1.1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .ripple { position: absolute; inset: 0; background: radial-gradient(600px 300px at 80% 20%, rgba(26,142,181,0.10), transparent 60%); pointer-events: none; }
+</style>

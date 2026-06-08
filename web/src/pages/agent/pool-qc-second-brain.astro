@@ -1,0 +1,17 @@
+---
+/* /agent/pool-qc-second-brain — own route so only this page's CSS/scripts bundle. */
+import LandingLayout from '../../layouts/LandingLayout.astro';
+import PoolQcSecondBrainAgent from '../../components/agent/PoolQcSecondBrainAgent.astro';
+import { getAgentDemoBySlug } from '../../lib/agentDemos';
+
+export const prerender = true;
+const data = (await getAgentDemoBySlug('pool-qc-second-brain'))!;
+---
+
+<LandingLayout
+  title={data.seoTitle ?? 'Pool QC Second Brain — a Sagan AI agent'}
+  description={data.seoDescription}
+  canonical={data.canonical}
+>
+  <PoolQcSecondBrainAgent data={data} />
+</LandingLayout>

@@ -1,0 +1,17 @@
+---
+/* /agent/freight — own route so only this page's CSS/scripts bundle. */
+import LandingLayout from '../../layouts/LandingLayout.astro';
+import FreightAgent from '../../components/agent/FreightAgent.astro';
+import { getAgentDemoBySlug } from '../../lib/agentDemos';
+
+export const prerender = true;
+const data = (await getAgentDemoBySlug('freight'))!;
+---
+
+<LandingLayout
+  title={data.seoTitle ?? 'Freight — a Sagan AI agent'}
+  description={data.seoDescription}
+  canonical={data.canonical}
+>
+  <FreightAgent data={data} />
+</LandingLayout>

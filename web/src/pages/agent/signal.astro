@@ -1,0 +1,17 @@
+---
+/* /agent/signal — own route so only this page's CSS/scripts bundle. */
+import LandingLayout from '../../layouts/LandingLayout.astro';
+import SignalAgent from '../../components/agent/SignalAgent.astro';
+import { getAgentDemoBySlug } from '../../lib/agentDemos';
+
+export const prerender = true;
+const data = (await getAgentDemoBySlug('signal'))!;
+---
+
+<LandingLayout
+  title={data.seoTitle ?? 'Signal — a Sagan AI agent'}
+  description={data.seoDescription}
+  canonical={data.canonical}
+>
+  <SignalAgent data={data} />
+</LandingLayout>

@@ -1,0 +1,17 @@
+---
+/* /agent/ai-answering — own route so only this page's CSS/scripts bundle. */
+import LandingLayout from '../../layouts/LandingLayout.astro';
+import AiAnsweringAgent from '../../components/agent/AiAnsweringAgent.astro';
+import { getAgentDemoBySlug } from '../../lib/agentDemos';
+
+export const prerender = true;
+const data = (await getAgentDemoBySlug('ai-answering'))!;
+---
+
+<LandingLayout
+  title={data.seoTitle ?? 'AI Answering — a Sagan AI agent'}
+  description={data.seoDescription}
+  canonical={data.canonical}
+>
+  <AiAnsweringAgent data={data} />
+</LandingLayout>

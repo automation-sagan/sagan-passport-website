@@ -63,6 +63,10 @@ export default defineConfig({
               .id('comparison')
               .child(S.documentTypeList('comparison').title('Comparisons (vs)')),
             S.listItem()
+              .title('AI Agent demos')
+              .id('agentDemo')
+              .child(S.documentTypeList('agentDemo').title('AI Agent demos')),
+            S.listItem()
               .title('Navigation')
               .id('navigation')
               .child(S.document().schemaType('navigation').documentId('navigation')),
@@ -80,6 +84,7 @@ export default defineConfig({
                   'blog',
                   'guide',
                   'comparison',
+                  'agentDemo',
                   'navigation',
                 ].includes(li.getId()!),
             ),

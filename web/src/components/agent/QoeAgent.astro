@@ -1,0 +1,441 @@
+---
+/* Faithful 1:1 port of /agent/qoe (source: Sagan passport Domain/agent/qoe/index.html).
+ * Tailwind CDN + inline config + the page's custom <style>, bespoke body verbatim,
+ * with hero copy + CTA URL driven by the `agentDemo` Sanity doc. Modeled on
+ * FreightAgent.astro. Isolated via its own route file. */
+import type { AgentDemoData } from '../../lib/agentDemos';
+
+interface Props {
+  data: AgentDemoData;
+}
+const { data } = Astro.props;
+const cta = data.ctaUrl ?? 'https://www.shipyourweekendproject.com/';
+const logo = '/agent/qoe/sagan-logo.png';
+---
+
+<!-- Start of HubSpot Embed Code -->
+<script type="text/javascript" id="hs-script-loader" async defer is:inline src="//js.hs-scripts.com/50517161.js"></script>
+<!-- End of HubSpot Embed Code -->
+
+<!-- Tailwind CDN + theme config (kept verbatim from the source page) -->
+<script is:inline src="https://cdn.tailwindcss.com"></script>
+<script is:inline>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          glacier:     '#093A3E',
+          'glacier-d': '#06282B',
+          muted:       '#4A6B6B',
+          cream:       '#F5F2ED',
+          'cream-d':   '#EDE9E5',
+          white:       '#FFFFFF',
+          dandelion:   '#F5B800',
+          'sagan-blue': '#2197FF',
+          hairline:    'rgba(9,58,62,0.06)'
+        },
+        fontFamily: {
+          display: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+          sans:    ['Space Grotesk', 'system-ui', 'sans-serif'],
+          mono:    ['Fragment Mono', 'ui-monospace', 'SFMono-Regular', 'monospace']
+        }
+      }
+    }
+  }
+</script>
+
+<!-- NAV -->
+<nav class="sticky top-0 z-50 backdrop-blur" style="background: rgba(245,242,237,0.85); border-bottom: 1px solid rgba(9,58,62,0.06);">
+  <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+    <a href="#" class="flex items-center gap-3">
+      <img src={logo} alt="Sagan" style="height: 30px; width: auto;" />
+      <span class="font-mono text-sm" style="color: #4A6B6B;">an AI agent &middot; by Sagan<span aria-hidden="true" style="display:inline-block;width:8px;height:8px;background:#2197FF;border-radius:999px;margin-left:4px;vertical-align:baseline;transform:translateY(-1px);box-shadow:0 0 10px rgba(33,151,255,0.35);"></span></span>
+    </a>
+    <div class="hidden md:flex items-center gap-8 text-sm" style="color: #4A6B6B;">
+      <a href="#pain" class="hover:text-glacier">the problem</a>
+      <a href="#how" class="hover:text-glacier">how it works</a>
+      <a href="#pricing" class="hover:text-glacier">pricing</a>
+      <a href="#for" class="hover:text-glacier">is this for you</a>
+    </div>
+    <a href={cta} class="btn-primary group inline-flex items-center gap-2 px-5 py-2.5 text-sm">
+      Get early access
+      <span aria-hidden class="transition-transform group-hover:translate-x-0.5">&rarr;</span>
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="relative overflow-hidden">
+  <div class="max-w-7xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32 relative">
+    <div class="reveal">
+      <div class="eyebrow mb-8"><span class="dot"></span>{data.heroEyebrow}</div>
+      <h1 class="display text-5xl md:text-7xl lg:text-8xl" style="color: #093A3E;" set:html={data.heroHeadlineHtml}></h1>
+    </div>
+
+    <div class="reveal mt-10 max-w-2xl text-lg md:text-xl leading-relaxed" style="--d:150ms; color: #4A6B6B;" set:html={data.heroLeadHtml}></div>
+
+    <div class="reveal mt-10 flex flex-col sm:flex-row gap-4" style="--d:300ms">
+      <a href={cta} class="btn-primary inline-flex items-center justify-center gap-2 px-7 py-4 text-base">
+        Get early access
+        <span aria-hidden>&rarr;</span>
+      </a>
+      <a href="#pain" class="btn-ghost inline-flex items-center justify-center gap-2 px-7 py-4 text-base">
+        See the math
+      </a>
+    </div>
+
+    <!-- cycle-time diagram -->
+    <div class="reveal mt-20 card p-6 md:p-10" style="--d:450ms">
+      <div class="flex flex-col md:flex-row md:items-center gap-8 md:gap-16">
+        <div class="flex-1">
+          <div class="eyebrow mb-3">before</div>
+          <div class="ticker text-5xl md:text-6xl" style="color: #093A3E;">5 days</div>
+          <div class="mt-2" style="color: #4A6B6B;">Phase 1 cycle time</div>
+        </div>
+        <div class="hidden md:block text-4xl ticker" style="color: #F5B800;">&rarr;</div>
+        <div class="flex-1">
+          <div class="eyebrow mb-3" style="color: #093A3E;">after</div>
+          <div class="ticker text-5xl md:text-6xl" style="color: #F5B800;">2 days</div>
+          <div class="mt-2" style="color: #4A6B6B;">normalized into your databook</div>
+        </div>
+        <div class="flex-1 md:pl-10" style="border-left: 1px solid rgba(9,58,62,0.06);">
+          <div class="eyebrow mb-3">recovered</div>
+          <div class="ticker text-5xl md:text-6xl" style="color: #093A3E;">3 days<span class="text-2xl" style="color: #4A6B6B;">/engagement</span></div>
+          <div class="mt-2" style="color: #4A6B6B;">returned to real diligence</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ambient marquee -->
+  <div class="py-4 overflow-hidden font-mono text-xs" style="color: #4A6B6B; border-top: 1px solid rgba(9,58,62,0.06);">
+    <div class="marquee whitespace-nowrap">
+      <span>QuickBooks export &rarr; parsed &middot; trial balance PDF &rarr; extracted &middot; tax return &rarr; mapped &middot; custom Excel &rarr; normalized &middot; databook &rarr; populated &middot; add-backs &rarr; ready &middot; QuickBooks export &rarr; parsed &middot; trial balance PDF &rarr; extracted &middot; tax return &rarr; mapped &middot; custom Excel &rarr; normalized &middot; databook &rarr; populated &middot; add-backs &rarr; ready &middot;&nbsp;</span>
+      <span>QuickBooks export &rarr; parsed &middot; trial balance PDF &rarr; extracted &middot; tax return &rarr; mapped &middot; custom Excel &rarr; normalized &middot; databook &rarr; populated &middot; add-backs &rarr; ready &middot; QuickBooks export &rarr; parsed &middot; trial balance PDF &rarr; extracted &middot; tax return &rarr; mapped &middot; custom Excel &rarr; normalized &middot; databook &rarr; populated &middot; add-backs &rarr; ready &middot;&nbsp;</span>
+    </div>
+  </div>
+</header>
+
+<!-- THE PROBLEM -->
+<section id="pain">
+  <div class="max-w-7xl mx-auto px-6 py-20 md:py-28">
+    <div class="grid md:grid-cols-12 gap-10">
+      <div class="md:col-span-5 reveal">
+        <div class="eyebrow mb-4">the problem</div>
+        <h2 class="display text-4xl md:text-5xl" style="color: #093A3E;">
+          You can't start<br />real diligence<br />until Phase 1<br />is clean.
+        </h2>
+      </div>
+      <div class="md:col-span-7 reveal" style="--d:150ms">
+        <p class="text-xl md:text-2xl leading-relaxed" style="color: #093A3E;">
+          It's mid-week of a five-week engagement. The client call is Thursday. Phase 1 isn't done. A QuickBooks export, a trial balance PDF, and a custom Excel the seller's controller built in 2019 still don't tie.
+        </p>
+        <p class="mt-8 text-lg leading-relaxed" style="color: #4A6B6B;">
+          Nothing downstream starts until those numbers tie. Add-back review, working-capital reconciliation, earnings normalization &mdash; all of it waits. You burn Thursday's call explaining where you are, instead of asking the questions the deal turns on.
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-16 grid md:grid-cols-3 gap-6 reveal stagger">
+      <div class="card p-8 hover-lift" style="--d:0ms">
+        <div class="ticker text-sm mb-2" style="color: #F5B800;">01</div>
+        <div class="font-display font-semibold text-lg mb-2" style="color: #093A3E;">Phase 1 gates everything</div>
+        <p class="text-sm leading-relaxed" style="color: #4A6B6B;">Client calls, add-back review, working-capital reconciliation, earnings normalization &mdash; nothing starts until the databook is populated and the numbers tie.</p>
+      </div>
+      <div class="card p-8 hover-lift" style="--d:100ms">
+        <div class="ticker text-sm mb-2" style="color: #F5B800;">02</div>
+        <div class="font-display font-semibold text-lg mb-2" style="color: #093A3E;">Senior judgment, spent on format conversion</div>
+        <p class="text-sm leading-relaxed" style="color: #4A6B6B;">Senior analysts burn 40+ hours per engagement re-keying numbers between formats. Time off the analysis, off the client call, off the issues the deal turns on.</p>
+      </div>
+      <div class="card p-8 hover-lift" style="--d:200ms">
+        <div class="ticker text-sm mb-2" style="color: #F5B800;">03</div>
+        <div class="font-display font-semibold text-lg mb-2" style="color: #093A3E;">Every seller's files land in a different shape</div>
+        <p class="text-sm leading-relaxed" style="color: #4A6B6B;">A QuickBooks export one engagement. A tax return the next. A POS extract. A custom Excel a bookkeeper built eight years ago. No two Phase 1s look alike.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THE MATH -->
+<section style="background: #06282B; color: #F5F2ED;">
+  <div class="max-w-7xl mx-auto px-6 py-20 md:py-28">
+    <div class="reveal">
+      <div class="eyebrow mb-4" style="color: #F5B800;">the math, if you want to look</div>
+      <h2 class="display text-4xl md:text-6xl max-w-4xl" style="color: #F5F2ED;">
+        30 engagements. 40 hours of Phase 1 each.<br />
+        <span style="color: #F5B800;">1,200 hours a year</span> you can't get back.<br />
+        <span style="color: rgba(245,242,237,0.6);">$150K of senior capacity, buried in format conversion.</span>
+      </h2>
+    </div>
+
+    <div class="mt-16 grid md:grid-cols-4 gap-6 reveal stagger">
+      <div class="p-8" style="background: rgba(245,242,237,0.04); border: 1px solid rgba(245,242,237,0.08); border-radius: 24px;" data-d="--d:0ms">
+        <div class="font-mono text-xs mb-2" style="color: rgba(245,242,237,0.5);">ENGAGEMENTS / YR</div>
+        <div class="ticker text-5xl" style="color: #F5F2ED;">30</div>
+      </div>
+      <div class="p-8" style="background: rgba(245,242,237,0.04); border: 1px solid rgba(245,242,237,0.08); border-radius: 24px;">
+        <div class="font-mono text-xs mb-2" style="color: rgba(245,242,237,0.5);">HRS / PHASE 1</div>
+        <div class="ticker text-5xl" style="color: #F5B800;">40</div>
+      </div>
+      <div class="p-8" style="background: rgba(245,242,237,0.04); border: 1px solid rgba(245,242,237,0.08); border-radius: 24px;">
+        <div class="font-mono text-xs mb-2" style="color: rgba(245,242,237,0.5);">HRS LOCKED / YR</div>
+        <div class="ticker text-5xl" style="color: #F5F2ED;">1,200</div>
+      </div>
+      <div class="p-8" style="background: rgba(245,242,237,0.04); border: 1px solid rgba(245,242,237,0.08); border-radius: 24px;">
+        <div class="font-mono text-xs mb-2" style="color: rgba(245,242,237,0.5);">$ CAPACITY LOCKED</div>
+        <div class="ticker text-5xl" style="color: #F5B800;">$150K</div>
+      </div>
+    </div>
+
+    <p class="reveal mt-10 max-w-3xl text-lg" style="--d:450ms; color: rgba(245,242,237,0.75);">
+      30 &times; 40 &times; $125/hr loaded = $150K of senior capacity burned on format conversion every year. That's the floor. Compress Phase 1 by a week and each senior ships one more engagement per quarter. At $35K average fee, that's <span style="color: #F5B800;">$140K/yr per partner</span> in recovered throughput.
+    </p>
+  </div>
+</section>
+
+<!-- HOW -->
+<section id="how">
+  <div class="max-w-7xl mx-auto px-6 py-20 md:py-28">
+    <div class="reveal">
+      <div class="eyebrow mb-4">how it works</div>
+      <h2 class="display text-4xl md:text-6xl max-w-4xl" style="color: #093A3E;">
+        Your databook, already standardized.<br />
+        <span style="color: #4A6B6B;">One new step before the analyst touches it.</span>
+      </h2>
+    </div>
+
+    <div class="mt-16 grid md:grid-cols-4 gap-6 reveal stagger">
+      <div class="card p-8 hover-lift" style="--d:0ms">
+        <div class="ticker text-sm mb-4" style="color: #F5B800;">step 01</div>
+        <div class="font-display font-semibold text-xl mb-3" style="color: #093A3E;">Seller materials arrive</div>
+        <p class="text-sm leading-relaxed" style="color: #4A6B6B;">Whatever format lands &mdash; a QuickBooks export, a trial balance PDF, a tax return, the controller's custom Excel.</p>
+      </div>
+      <div class="card p-8 hover-lift" style="--d:100ms">
+        <div class="ticker text-sm mb-4" style="color: #F5B800;">step 02</div>
+        <div class="font-display font-semibold text-xl mb-3" style="color: #093A3E;">The agent normalizes</div>
+        <p class="text-sm leading-relaxed" style="color: #4A6B6B;">Accounts mapped to your databook template. Periods aligned. Tie-outs run. The populated databook lands in your inbox.</p>
+      </div>
+      <div class="card p-8 hover-lift" style="--d:200ms">
+        <div class="ticker text-sm mb-4" style="color: #F5B800;">step 03</div>
+        <div class="font-display font-semibold text-xl mb-3" style="color: #093A3E;">Analyst reviews</div>
+        <p class="text-sm leading-relaxed" style="color: #4A6B6B;">Every cell links back to its source. The analyst spot-checks and signs off. No re-keying.</p>
+      </div>
+      <div class="card p-8 hover-lift" style="--d:300ms">
+        <div class="ticker text-sm mb-4" style="color: #F5B800;">step 04</div>
+        <div class="font-display font-semibold text-xl mb-3" style="color: #093A3E;">Diligence starts on day 3</div>
+        <p class="text-sm leading-relaxed" style="color: #4A6B6B;">Add-back review, working-capital reconciliation, earnings normalization, management discussions. The work that earns the fee.</p>
+      </div>
+    </div>
+
+    <!-- terminal visual -->
+    <div class="mt-16 reveal" style="--d:400ms">
+      <div style="background: #06282B; color: #F5F2ED; font-family: 'Fragment Mono', ui-monospace, monospace; font-size: 14px; border-radius: 24px; overflow: hidden; border: 1px solid rgba(9,58,62,0.06);">
+        <div class="px-5 py-3 flex items-center gap-2 text-xs" style="color: rgba(245,242,237,0.6); border-bottom: 1px solid rgba(245,242,237,0.08);">
+          <span class="w-2.5 h-2.5 rounded-full" style="background: rgba(245,242,237,0.2);"></span>
+          <span class="w-2.5 h-2.5 rounded-full" style="background: rgba(245,242,237,0.2);"></span>
+          <span class="w-2.5 h-2.5 rounded-full" style="background: rgba(245,242,237,0.2);"></span>
+          <span class="ml-4">agent &middot; phase 1 console</span>
+        </div>
+        <div class="p-6 space-y-2 leading-7">
+          <div><span style="color: #F5B800;">agent:</span> engagement #2811 received &middot; 14 files &middot; mixed formats</div>
+          <div><span style="color: rgba(245,242,237,0.5);">&middot;&middot;</span> parsing QB_export_TTM.qbo &middot; 3 years &middot; 412 accounts</div>
+          <div><span style="color: rgba(245,242,237,0.5);">&middot;&middot;</span> extracting trial_balance_FY24.pdf &middot; 2 pages &middot; OCR clean</div>
+          <div><span style="color: rgba(245,242,237,0.5);">&middot;&middot;</span> mapping 2023_tax_return.pdf &middot; depreciation schedule linked</div>
+          <div><span style="color: rgba(245,242,237,0.5);">&middot;&middot;</span> normalizing custom_financials.xlsx &middot; seller controller tabs</div>
+          <div><span style="color: rgba(245,242,237,0.5);">&middot;&middot;</span> aligning to template &middot; databook &middot; 2026 template</div>
+          <div><span style="color: rgba(245,242,237,0.5);">&middot;&middot;</span> running tie-outs <span style="color: #F5B800;">[47]</span> &middot; 47 passing</div>
+          <div><span style="color: #F5B800;">agent:</span> databook populated &middot; sent to analyst@</div>
+          <div style="color: rgba(245,242,237,0.5);">&mdash;</div>
+          <div><span style="color: #F5B800;">cycle time</span>: 2d 04h<span class="blink" style="color: #F5B800;">_</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOR / NOT FOR -->
+<section id="for">
+  <div class="max-w-7xl mx-auto px-6 py-20 md:py-28">
+    <div class="reveal">
+      <div class="eyebrow mb-4">who this is for</div>
+      <h2 class="display text-4xl md:text-6xl" style="color: #093A3E;">Is this for you?</h2>
+    </div>
+
+    <div class="mt-16 grid md:grid-cols-2 gap-6">
+      <div class="card p-8 md:p-10 reveal">
+        <div class="eyebrow mb-5" style="color: #093A3E;">built for you if</div>
+        <ul class="space-y-4 text-lg" style="color: #093A3E;">
+          <li class="flex gap-3"><span class="ticker mt-1" style="color: #F5B800;">&check;</span><span>You run a CPA firm or advisory practice delivering Quality of Earnings (QoE) reports to PE buyers</span></li>
+          <li class="flex gap-3"><span class="ticker mt-1" style="color: #F5B800;">&check;</span><span>5&ndash;25 QoE professionals on staff</span></li>
+          <li class="flex gap-3"><span class="ticker mt-1" style="color: #F5B800;">&check;</span><span>20+ LMM buyer engagements per year</span></li>
+          <li class="flex gap-3"><span class="ticker mt-1" style="color: #F5B800;">&check;</span><span>Your Excel databook template is standardized</span></li>
+          <li class="flex gap-3"><span class="ticker mt-1" style="color: #F5B800;">&check;</span><span>Phase 1 is the bottleneck on how fast engagements move</span></li>
+        </ul>
+      </div>
+      <div class="card p-8 md:p-10 reveal" style="--d:100ms; background: #EDE9E5;">
+        <div class="eyebrow mb-5">not for you if</div>
+        <ul class="space-y-4 text-lg" style="color: #4A6B6B;">
+          <li class="flex gap-3"><span class="ticker mt-1" style="color: #4A6B6B;">&mdash;</span><span>You run a handful of transaction diligence engagements a year</span></li>
+          <li class="flex gap-3"><span class="ticker mt-1" style="color: #4A6B6B;">&mdash;</span><span>Your work is audit or attest, not transaction diligence</span></li>
+          <li class="flex gap-3"><span class="ticker mt-1" style="color: #4A6B6B;">&mdash;</span><span>You rebuild the databook from scratch every engagement</span></li>
+          <li class="flex gap-3"><span class="ticker mt-1" style="color: #4A6B6B;">&mdash;</span><span>You already offshore Phase 1 and it's working</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="max-w-7xl mx-auto px-6 py-20 md:py-28">
+    <div class="reveal">
+      <div class="eyebrow mb-4">pricing</div>
+      <h2 class="display text-4xl md:text-6xl max-w-4xl" style="color: #093A3E;">
+        Straightforward.<br />
+        <span style="color: #4A6B6B;">No retainer. No surprises.</span>
+      </h2>
+    </div>
+
+    <div class="mt-16 card reveal overflow-hidden">
+      <div class="grid md:grid-cols-2">
+        <div class="p-8 md:p-12 border-b md:border-b-0 md:border-r" style="border-color: rgba(9, 58, 62, 0.06);">
+          <div class="eyebrow mb-4" style="color: #F5B800;">to build</div>
+          <div class="ticker text-6xl md:text-7xl" style="color: #093A3E;">$500</div>
+          <div class="mt-3" style="color: #4A6B6B;">One-time. Scoped, built, and deployed in about two weeks.</div>
+        </div>
+        <div class="p-8 md:p-12">
+          <div class="eyebrow mb-4" style="color: #093A3E;">then</div>
+          <div class="ticker text-6xl md:text-7xl" style="color: #093A3E;">usage-based</div>
+          <div class="mt-3" style="color: #4A6B6B;">Pay when the agent runs. No seats, no subscription floor.</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="reveal mt-8 text-sm" style="--d:150ms; color: #4A6B6B;">
+      Full rate card and terms live on the program site &rarr;
+      <a class="underline hover:text-glacier" style="color: #093A3E;" href={cta}>shipyourweekendproject.com</a>
+    </p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section>
+  <div class="max-w-7xl mx-auto px-6 py-24 md:py-32">
+    <div class="card p-10 md:p-16" style="background: #FFFFFF;">
+      <div class="grid md:grid-cols-12 gap-10 items-end">
+        <div class="md:col-span-8 reveal">
+          <div class="eyebrow mb-4" style="color: #F5B800;"><span class="dot"></span>waitlist &middot; private beta</div>
+          <h2 class="display text-5xl md:text-7xl" style="color: #093A3E;">
+            Start diligence<br />on&nbsp;day&nbsp;3.
+          </h2>
+        </div>
+        <div class="md:col-span-4 reveal" style="--d:150ms">
+          <p class="text-lg mb-6" style="color: #4A6B6B;">
+            1,200 hours a year. $150K of senior capacity. One more QoE engagement per quarter per partner. A small cohort of Quality of Earnings teams is onboarding this quarter.
+          </p>
+          <a href={cta} class="btn-primary inline-flex items-center gap-2 px-7 py-4 text-base">
+            Get early access
+            <span aria-hidden>&rarr;</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6" style="border-top: 1px solid rgba(9,58,62,0.06);">
+    <div class="flex items-center gap-3">
+      <img src={logo} alt="Sagan" style="height: 28px; width: auto;" />
+      <div>
+        <div class="font-mono text-sm" style="color: #093A3E;">an AI agent &middot; quality of earnings</div>
+        <div class="mt-1 text-sm" style="color: #4A6B6B;">a build program from <a class="underline" style="color: #093A3E;" href={cta}>Sagan</a></div>
+      </div>
+    </div>
+    <div class="flex gap-8 text-sm" style="color: #4A6B6B;">
+      <a href={cta} class="hover:text-glacier" style="transition: color 200ms ease;">early access</a>
+      <a href="https://getsagan.com" class="hover:text-glacier" style="transition: color 200ms ease;">getsagan.com</a>
+    </div>
+  </div>
+</footer>
+
+<script is:inline>
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+    }
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  document.querySelectorAll('.stagger').forEach(g => {
+    Array.from(g.children).forEach((c, i) => { if (!c.style.getPropertyValue('--d')) c.style.setProperty('--d', (i * 90) + 'ms'); });
+  });
+</script>
+<script is:inline src="/hubspot-capture.js" data-portal-id="50517161" data-form-guid="daac2804-e5c3-48e7-8ab7-a5b41c9e7c38"></script>
+
+<style is:global>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Fragment+Mono&display=swap');
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    background: #F5F2ED;
+    color: #093A3E;
+    -webkit-font-smoothing: antialiased;
+  }
+  .display {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+    font-weight: 700;
+  }
+  .eyebrow {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 500;
+    color: #4A6B6B;
+  }
+  .hairline { background: rgba(9,58,62,0.06); height: 1px; width: 100%; }
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 900ms cubic-bezier(.2,.7,.2,1), transform 900ms cubic-bezier(.2,.7,.2,1); }
+  .reveal.is-in { opacity: 1; transform: none; }
+  .stagger > * { transition-delay: var(--d, 0ms); }
+  .card {
+    background: #FFFFFF;
+    border: 1px solid rgba(9,58,62,0.06);
+    border-radius: 24px;
+  }
+  .hover-lift { transition: transform 200ms ease, border-color 200ms ease; }
+  .hover-lift:hover { transform: translateY(-2px); border-color: rgba(9,58,62,0.18); }
+  .ticker { font-family: 'Fragment Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  .dot::before {
+    content: ''; display: inline-block;
+    width: 6px; height: 6px; border-radius: 999px;
+    background: #F5B800; margin-right: 10px; vertical-align: middle; transform: translateY(-2px);
+  }
+  .marquee { display: flex; animation: marquee 40s linear infinite; gap: 3rem; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .blink { animation: blink 1.1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .pill {
+    border-radius: 9999px;
+  }
+  .btn-primary {
+    background: #093A3E; color: #F5F2ED;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 600;
+    border-radius: 9999px;
+    transition: background 200ms ease, transform 200ms ease;
+  }
+  .btn-primary:hover { background: #06282B; transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent; color: #093A3E;
+    border: 1px solid rgba(9,58,62,0.18);
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 600;
+    border-radius: 9999px;
+    transition: background 200ms ease, border-color 200ms ease;
+  }
+  .btn-ghost:hover { background: #FFFFFF; border-color: #093A3E; }
+</style>
