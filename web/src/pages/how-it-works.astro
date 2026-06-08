@@ -8,16 +8,33 @@ import MembershipSection from '../components/howitworks/MembershipSection.astro'
 import ProofSection from '../components/howitworks/ProofSection.astro';
 import FaqSection from '../components/howitworks/FaqSection.astro';
 import '../styles/howitworks.css';
+import { getHowItWorks } from '../lib/howItWorks';
+import { getMembership } from '../lib/membership';
+
+const data = await getHowItWorks();
+const membership = await getMembership();
 ---
 
-<Layout title="How It Works — Sagan Passport">
+<Layout title={data.seoTitle ?? 'How It Works — Sagan Passport'}>
   <Navbar />
   <div class="home">
-    <HiwHero />
-    <ProcessSection />
-    <MembershipSection />
-    <ProofSection />
-    <FaqSection />
+    <HiwHero heading={data.hero?.heading} body={data.hero?.body} />
+    <ProcessSection
+      heading={data.process?.heading}
+      subcopy={data.process?.subcopy}
+      steps={data.process?.steps}
+    />
+    <MembershipSection data={membership} />
+    <ProofSection
+      eyebrow={data.proof?.eyebrow}
+      heading={data.proof?.heading}
+      avatar={data.proof?.avatar}
+      quote={data.proof?.quote}
+      name={data.proof?.name}
+      org={data.proof?.org}
+      ratingCards={data.proof?.ratingCards}
+    />
+    <FaqSection heading={data.faq?.heading} items={data.faq?.items} />
   </div>
   <Footer />
 </Layout>

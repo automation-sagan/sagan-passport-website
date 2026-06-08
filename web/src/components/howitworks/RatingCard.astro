@@ -8,11 +8,11 @@
 import ButtonOutline from '../homepage/ButtonOutline.astro';
 
 interface Props {
-  logo: string;
-  logoAlt: string;
-  rating: string;
-  buttonLabel: string;
-  buttonHref: string;
+  logo?: string;
+  logoAlt?: string;
+  rating?: string;
+  buttonLabel?: string;
+  buttonHref?: string;
 }
 const { logo, logoAlt, rating, buttonLabel, buttonHref } = Astro.props;
 
@@ -34,5 +34,5 @@ const STAR = 'M12 2l2.9 6.06 6.6.78-4.9 4.52 1.3 6.54L12 17.3 6.1 20.4l1.3-6.54L
     </div>
     <span class="hiw-rating__label">{rating}</span>
   </div>
-  <ButtonOutline label={buttonLabel} href={buttonHref} external />
+  <ButtonOutline label={buttonLabel ?? ''} href={buttonHref ?? ''} external />
 </div>

@@ -1,12 +1,19 @@
 ---
-/* How It Works hero — "Stop Sifting." + Spline animation + subcopy. */
+/* How It Works hero — "Stop Sifting." + Spline animation + subcopy. Heading/body
+ * come from Sanity; the Spline scene URL stays in code. */
 import SplineEmbed from '../homepage/SplineEmbed.astro';
+
+interface Props {
+  heading?: string;
+  body?: string;
+}
+const { heading, body } = Astro.props;
 ---
 
 <section class="section hiw-hero">
   <div class="hiw-hero__content">
     <div class="hiw-hero__title">
-      <h2 class="t-h2" style="text-align:center">Stop Sifting.</h2>
+      <h2 class="t-h2" style="text-align:center">{heading}</h2>
       <div class="hiw-hero__anim">
         <SplineEmbed
           scene="https://prod.spline.design/hnKgxipHE7hU2hJC-JWR/scene.hanacode"
@@ -14,9 +21,6 @@ import SplineEmbed from '../homepage/SplineEmbed.astro';
         />
       </div>
     </div>
-    <p class="t-body" style="text-align:center">
-      Hiring shouldn&rsquo;t be a second job. We do the heavy lifting and deliver a vetted
-      shortlist of high-caliber talent, saving you dozens of hours.
-    </p>
+    <p class="t-body" style="text-align:center">{body}</p>
   </div>
 </section>

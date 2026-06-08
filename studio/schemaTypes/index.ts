@@ -10,6 +10,13 @@ import {testimonialItem} from './testimonialItem'
 import {slide} from './slide'
 import {pricing} from './pricing'
 import {planItem} from './planItem'
+import {howItWorks} from './howItWorks'
+import {processStep} from './processStep'
+import {ratingCard} from './ratingCard'
+import {faqItem} from './faqItem'
+import {membership} from './membership'
+import {membershipTab} from './membershipTab'
+import {membershipItem} from './membershipItem'
 
 export const schemaTypes = [
   navigation,
@@ -24,4 +31,11 @@ export const schemaTypes = [
   slide,
   pricing,
   planItem,
+  howItWorks,
+  processStep,
+  ratingCard,
+  faqItem,
+  membership,
+  membershipTab,
+  membershipItem,
 ]

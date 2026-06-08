@@ -1,20 +1,23 @@
 ---
-/* Membership benefits — eyebrow + heading + subcopy + the interactive toggle. */
+/* Membership benefits — eyebrow + heading + subcopy + the interactive toggle.
+ * Content comes from the shared `membership` singleton in Sanity (this section is
+ * used by both the How It Works and Pricing pages). */
 import MembershipToggle from './MembershipToggle.astro';
+import type { MembershipData } from '../../lib/membership';
+
+interface Props {
+  data?: MembershipData;
+}
+const { data = {} } = Astro.props;
 ---
 
 <section class="section hiw-membership">
   <div class="hiw-centered">
-    <p class="t-eyebrow">Membership Benefits</p>
-    <h2 class="t-h2" style="text-align:center">
-      More Than a Recruiter:&nbsp; A True Talent Partnership
-    </h2>
-    <p class="t-body" style="text-align:center">
-      Your membership is an investment in a rich support ecosystem that ensures retention and
-      success. This is what sets Sagan apart. All benefits extend to your entire team.
-    </p>
+    <p class="t-eyebrow">{data.eyebrow}</p>
+    <h2 class="t-h2" style="text-align:center">{data.heading}</h2>
+    <p class="t-body" style="text-align:center">{data.subcopy}</p>
   </div>
   <div class="hiw-toggle">
-    <MembershipToggle />
+    <MembershipToggle tabs={data.tabs} />
   </div>
 </section>

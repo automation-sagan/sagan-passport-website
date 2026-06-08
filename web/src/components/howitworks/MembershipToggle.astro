@@ -24,63 +24,41 @@ const I_LAYERS = '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
 const I_UMBRELLA = '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none"><path stroke="#093A3E" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.663 33.333H33.33m-13.33-5v5m0-21.666v-5m-3.333 0h6.666m-16.67 20c0-9.167 5.97-15 13.333-15 7.364 0 13.334 5.833 13.334 15v1.666H6.663v-1.666Z"/></svg>';
 const I_GLOBE = '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none"><path stroke="#093A3E" stroke-linecap="square" stroke-width="2" d="M35 20c0 8.284-6.716 15-15 15m15-15c0-8.284-6.716-15-15-15m15 15H5m15 15c-8.284 0-15-6.716-15-15m15 15c-3.682 0-6.667-6.716-6.667-15 0-8.284 2.985-15 6.667-15m0 30c3.682 0 6.667-6.716 6.667-15 0-8.284-2.985-15-6.667-15M5 20c0-8.284 6.716-15 15-15"/></svg>';
 
-interface Item {
-  icon: string;
-  title: string;
-  description: string;
-}
-interface Tab {
-  id: string;
-  label: string;
-  image: string;
-  items: Item[];
-}
+/* Icon lookup — the editable content (label/title/description/photo) lives in the
+ * `membership` Sanity singleton; each benefit stores an `iconKey` that maps to one
+ * of these inlined SVGs (the icons themselves stay in code). */
+const ICONS: Record<string, string> = {
+  tag: I_TAG,
+  hand: I_HAND,
+  map: I_MAP,
+  doc: I_DOC,
+  chat: I_CHAT,
+  star: I_STAR,
+  board: I_BOARD,
+  umbrella: I_UMBRELLA,
+  tools: I_TOOLS,
+  lock: I_LOCK,
+  layers: I_LAYERS,
+  globe: I_GLOBE,
+};
 
-const IMG = (id: string, w: number, h: number) =>
-  `https://framerusercontent.com/images/${id}.jpg?scale-down-to=1024&width=${w}&height=${h}`;
+import { imgUrl } from '../../lib/sanityImage';
+import type { MembershipTab } from '../../lib/membership';
 
-const TABS: Tab[] = [
-  {
-    id: 'hiring',
-    label: 'Hiring & Team Building',
-    image: IMG('s5YEVMPmDbo6ye6I5pfcNqCOKI', 2731, 4096),
-    items: [
-      { icon: I_TAG, title: 'Concierge Headhunting', description: 'Work 1:1 with our expert recruiters to define roles and run tailored searches for your perfect full-time team members.' },
-      { icon: I_HAND, title: 'Pathfinder Strategy Calls', description: 'Get 1-on-1 expert advice to clarify hiring needs, define roles, and structure your process.' },
-      { icon: I_MAP, title: 'Custom Onboarding Support', description: 'Receive a tailored 30-90 day onboarding plan with templates and milestones for every new hire.' },
-      { icon: I_DOC, title: 'Offer Letter Templates', description: 'Streamline the formal hiring process with polished, ready-to-use offer letter templates designed to professionalize your offers.' },
-    ],
-  },
-  {
-    id: 'education',
-    label: 'Education & Community',
-    image: IMG('muCGFTkHW4JvyUrMvykUCx7b0', 4000, 6000),
-    items: [
-      { icon: I_CHAT, title: 'Sagan University Access', description: 'Daily live workshops and office hours covering leadership, knowledge worker organization, AI and automation for you and your entire team.' },
-      { icon: I_STAR, title: 'Private Community', description: 'Connect with other Sagan members in a private network to ask questions, share strategies, and find practical advice on scaling.' },
-      { icon: I_BOARD, title: 'Sales Mastery Course', description: 'Gain free access to a legendary sales training program from John Costigan to master cold calling, objection handling, and closing deals.' },
-      { icon: I_UMBRELLA, title: 'EA Toolkit', description: 'Empower your Executive Assistant with a presentation packed with tools, training, and resources specifically designed to help your Executive Assistant thrive.' },
-    ],
-  },
-  {
-    id: 'tools',
-    label: 'Tools & Operations',
-    image: IMG('DfiYG6f0XS5YLN0vJXe6l3VDKI8', 2048, 1365),
-    items: [
-      { icon: I_TOOLS, title: 'Digital Power Tools', description: 'Access a suite of AI-enabled tools to streamline work, including Call Coach for analyzing sales calls and Road Recap for structured field updates.' },
-      { icon: I_LOCK, title: 'Executive Coaching', description: 'Solve critical operational challenges with hands-on coaching to build systems for prioritization, delegation, and predictable execution.' },
-    ],
-  },
-  {
-    id: 'comp',
-    label: 'Compensation & Payroll',
-    image: IMG('YGJIoW07iy1jRETsXW4zvYbMQ4', 4016, 6016),
-    items: [
-      { icon: I_LAYERS, title: 'Global Compensation Guide', description: 'Eliminate the guesswork with a data-backed reference guide designed to help you set fair, competitive salaries for international talent.' },
-      { icon: I_GLOBE, title: 'Global Payment Solutions', description: 'Simplify contractor payments with our flat-fee Global Pay Direct solution or access exclusive discount rates for our partner payroll platforms.' },
-    ],
-  },
-];
+interface Props {
+  tabs?: MembershipTab[];
+}
+const { tabs = [] } = Astro.props;
+
+const TABS = tabs.map((t) => ({
+  label: t.label,
+  image: imgUrl(t.image),
+  items: (t.items ?? []).map((it) => ({
+    icon: ICONS[it.iconKey ?? ''] ?? '',
+    title: it.title,
+    description: it.description,
+  })),
+}));
 ---
 
 <div class="mtog">

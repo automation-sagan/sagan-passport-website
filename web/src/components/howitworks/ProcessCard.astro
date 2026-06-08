@@ -11,13 +11,13 @@
  * badge radius 100 (color per step), illustration radius 32.
  * ------------------------------------------------------------------------- */
 interface Props {
-  step: string;
-  title: string;
-  body: string;
+  step?: string;
+  title?: string;
+  body?: string;
   /** badge circle color (dandelion / mint / grey per step) */
-  badgeColor: string;
-  icon: string;
-  image: string;
+  badgeColor?: string;
+  icon?: string;
+  image?: string;
 }
 const { step, title, body, badgeColor, icon, image } = Astro.props;
 ---

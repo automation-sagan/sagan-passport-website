@@ -27,11 +27,22 @@ export default defineConfig({
               .id('pricing')
               .child(S.document().schemaType('pricing').documentId('pricing')),
             S.listItem()
+              .title('How It Works')
+              .id('howItWorks')
+              .child(S.document().schemaType('howItWorks').documentId('howItWorks')),
+            S.listItem()
+              .title('Membership')
+              .id('membership')
+              .child(S.document().schemaType('membership').documentId('membership')),
+            S.listItem()
               .title('Navigation')
               .id('navigation')
               .child(S.document().schemaType('navigation').documentId('navigation')),
             ...S.documentTypeListItems().filter(
-              (li) => !['homepage', 'pricing', 'navigation'].includes(li.getId()!),
+              (li) =>
+                !['homepage', 'pricing', 'howItWorks', 'membership', 'navigation'].includes(
+                  li.getId()!,
+                ),
             ),
           ]),
     }),
@@ -47,10 +58,15 @@ export default defineConfig({
     // create/delete/duplicate actions on the singleton documents themselves.
     newDocumentOptions: (prev, {creationContext}) =>
       creationContext.type === 'global'
-        ? prev.filter((t) => !['homepage', 'pricing', 'navigation'].includes(t.templateId))
+        ? prev.filter(
+            (t) =>
+              !['homepage', 'pricing', 'howItWorks', 'membership', 'navigation'].includes(
+                t.templateId,
+              ),
+          )
         : prev,
     actions: (input, context) =>
-      ['homepage', 'pricing', 'navigation'].includes(context.schemaType)
+      ['homepage', 'pricing', 'howItWorks', 'membership', 'navigation'].includes(context.schemaType)
         ? input.filter(({action}) =>
             ['publish', 'discardChanges', 'restore'].includes(action!),
           )
