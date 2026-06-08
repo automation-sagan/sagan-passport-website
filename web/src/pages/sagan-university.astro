@@ -1,0 +1,192 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import Appear from '../components/homepage/Appear.astro';
+import ButtonOutline from '../components/homepage/ButtonOutline.astro';
+import ButtonFill from '../components/homepage/ButtonFill.astro';
+import FeatureCard from '../components/homepage/FeatureCard.astro';
+import CourseCard from '../components/saganuniversity/CourseCard.astro';
+import ProgramCard from '../components/saganuniversity/ProgramCard.astro';
+import CheckmarkCard from '../components/saganuniversity/CheckmarkCard.astro';
+import PlayButton from '../components/saganuniversity/PlayButton.astro';
+import TestimonialSlideshow from '../components/saganuniversity/TestimonialSlideshow.astro';
+import VideoLightbox from '../components/saganuniversity/VideoLightbox.astro';
+import '../styles/saganuniversity.css';
+
+/* Astro build of saganpassport.com/sagan-university. Reuses the homepage
+ * buttons + feature card; leaf cards and the testimonial/video live in
+ * components/saganuniversity/. Image URLs and the case-study video id are the
+ * live Framer CDN assets pulled from the reference site. */
+const IMG = 'https://framerusercontent.com/images/';
+const CASE_STUDY_YOUTUBE_ID = 'BS_UI7E4k2M'; // https://youtu.be/BS_UI7E4k2M
+
+const COURSES = [
+  { title: 'Founder & Executive Advanced Course', image: `${IMG}M9HEgTKIXEVmFypqOXJ1Gw2Q.png?width=1440&height=1092` },
+  { title: 'AI & Automation Basics', image: `${IMG}yYz5a4qC5jzVKgOf6lzOSkqz8.png?width=1440&height=1092` },
+  { title: 'Leadership & Management', image: `${IMG}FkFZKs0zthc8jijstdZYOYmjXVg.png?width=1440&height=1092` },
+  { title: 'Sales Skills Sprint', image: `${IMG}pnAMupdd4VR8PpxVwj4W2tiXE.png?width=1440&height=1092` },
+  { title: 'Global Talent Bootcamp GT 101', image: `${IMG}yvgtnYhcVlbs7N9HbtCFZQmUS4.png?width=1440&height=1092` },
+  { title: 'Accent Reduction for Global Talent', image: `${IMG}FEBQHZBECq3Z5b6ftruoPxPJIt8.png?width=1440&height=1092` },
+  { title: 'Content Skill Sprint', image: `${IMG}CryfaPLnFvEEILTbm47sbfsz8.png?width=1440&height=1092` },
+];
+
+const WHY_FEATURES = [
+  {
+    title: 'Taught by Operators',
+    body: "Every instructor has built or scaled real businesses. Christian Ruff ran special operations teams. Jon runs a global workforce company. You're learning from people who do this work every day.",
+    icon: `${IMG}Ek5Gd72myIK31IeBCl8vYhT3VQ.png?width=40&height=40`,
+  },
+  {
+    title: 'For Business Owners and Their Teams',
+    body: "Whether you're a founder who needs to delegate better or a global team member who wants to lead, Sagan U gives you practical skills that make you more valuable and more effective.",
+    icon: `${IMG}fGLlswTUl3xMehUWiIQjDSPRJOY.png?width=40&height=40`,
+  },
+  {
+    title: 'Immediate Application',
+    body: "No theory lectures. Every session includes implementation assignments you apply to your actual work. You're not just learning concepts, you're building systems that make you more effective tomorrow.",
+    icon: `${IMG}M4Ok34mQA59r46SvA16JT7SHsV8.png?width=40&height=40`,
+  },
+];
+
+const PROGRAMS = [
+  {
+    title: 'Founder & Executive Program',
+    tag: 'For business owners and C-level executives',
+    body: 'Master strategic leadership, global talent integration, and operational excellence. Learn to delegate effectively, scale your business systems, and lead high-performance organizations across time zones and cultures. Our 3-year journey transforms how you think about growth, automation, and building sustainable business operations.',
+    icon: `${IMG}l0yEQ46rzKhkZhDNoXzKOZYj0.png?width=32&height=32`,
+  },
+  {
+    title: 'Team Leader Program',
+    tag: 'For business owners and C-level executives',
+    body: "Develop the skills to lead effectively in a global, remote-first world. From AI-enhanced leadership and project management to building accountability and managing cross-functional teams, you'll gain the tools to drive results while developing your people. Complete your leadership transformation in 2.5 years.",
+    icon: `${IMG}M75SVdAYqm9mU6JNJHXalHyrNE.png?width=32&height=32`,
+  },
+  {
+    title: 'Skilled Specialist Program',
+    tag: 'For business owners and C-level executives',
+    body: 'Excel in Western business environments with cultural fluency, advanced communication skills, and productivity mastery. Learn American business culture, professional development strategies, and how to become an indispensable team member who takes initiative and drives results.',
+    icon: `${IMG}b0l4jDQXV1TjCI7tlgHIFlp0tY.png?width=32&height=32`,
+  },
+];
+
+const CHECKS = [
+  "Live sessions taught by operators who've built real businesses",
+  'Implementation assignments you complete on your actual work',
+  'Weekly office hours for specific questions on hiring, operations, finance, and systems',
+  'AI and automation training focused on tools that actually create leverage',
+  'Ongoing access to community, resources, and recordings',
+];
+
+const TICKER = [...COURSES, ...COURSES];
+---
+
+<Layout title="Sagan University — Sagan Passport">
+  <Navbar />
+  <div class="home">
+    <!-- Hero -->
+    <section class="section su-hero">
+      <Appear class="su-centered">
+        <h2 class="t-h2" style="text-align:center">Learn What Matters. Lead with Confidence.</h2>
+        <h4 class="t-h4" style="text-align:center">Practical Training for Leaders Who Actually Do the Work.</h4>
+        <p class="t-body" style="text-align:center">
+          Sagan University helps business leaders and global teams level up fast, with practical,
+          modern training tailored for the real world.
+        </p>
+        <div class="su-hero__buttons">
+          <ButtonOutline label="Learn More" href="/sagan-university#why" />
+          <ButtonFill label="Start Now" href="/pricing" />
+        </div>
+      </Appear>
+    </section>
+
+    <!-- Featured courses ticker (auto-scrolling marquee) -->
+    <section class="su-ticker">
+      <span class="su-ticker__label">Featured Sagan University Courses</span>
+      <div class="su-ticker__viewport">
+        <div class="su-ticker__track">
+          {TICKER.map((c) => <CourseCard title={c.title} image={c.image} />)}
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Sagan University -->
+    <section class="section su-why" id="why">
+      <Appear class="su-centered">
+        <h2 class="t-h2" style="text-align:center">Why Sagan University?</h2>
+        <p class="t-body-sm" style="text-align:center">
+          We built Sagan U to train the 21st-century workforce, business owners, team leaders, and
+          global hires alike. Our courses are practical, fast-paced, and built for action.
+        </p>
+      </Appear>
+      <Appear class="su-feature-grid" delay={0.1}>
+        {WHY_FEATURES.map((f) => <FeatureCard title={f.title} description={f.body} icon={f.icon} />)}
+      </Appear>
+    </section>
+
+    <!-- Programs -->
+    <section class="section su-programs">
+      <Appear class="su-program-grid">
+        {PROGRAMS.map((p) => <ProgramCard title={p.title} tag={p.tag} body={p.body} icon={p.icon} />)}
+      </Appear>
+    </section>
+
+    <!-- Approach -->
+    <section class="section su-approach">
+      <Appear class="su-centered">
+        <p class="t-eyebrow">Our Unique Approach</p>
+        <h2 class="t-h2" style="text-align:center">Practical Implementation Over Theory</h2>
+      </Appear>
+      <Appear class="su-check-grid" delay={0.1}>
+        {CHECKS.map((c) => <CheckmarkCard text={c} />)}
+      </Appear>
+      <Appear
+        class="su-largecard"
+        blur={false}
+        style={`background-image:url(${IMG}L89UbKY0FjhUiAEC8E9DYVzNcE.png)`}>
+        <div class="su-largecard__overlay"></div>
+        <div class="su-largecard__content">
+          <h2 class="t-h2" style="color:rgb(255,255,255)">Why Sagan University Works</h2>
+          <p class="t-body" style="color:rgb(255,255,255)">
+            Sagan University is built on years of hands-on experience integrating global talent into
+            real businesses. We teach teams how to execute with clear decision rights, strong
+            ownership, and systems that turn strategy into action using AI and automation where they
+            actually create leverage. Whether you&rsquo;re scaling a business, leading a team, or
+            developing as global talent, Sagan University delivers practical skills, operational
+            clarity, and implementation support to help you perform at a higher level.
+          </p>
+        </div>
+      </Appear>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="su-testimonial-wrap">
+      <div class="su-testimonial">
+        <TestimonialSlideshow />
+      </div>
+    </section>
+
+    <!-- Case study / video -->
+    <section class="section su-case">
+      <Appear class="su-case__content">
+        <h2 class="t-h2" style="max-width:580px">Voices at Sagan University</h2>
+        <p class="t-body" style="max-width:900px">
+          Practical, immediately useful training delivered fast. In just an hour, members gain
+          knowledge they&rsquo;d otherwise spend weeks hunting down, with sessions that translate
+          directly into better communication, leadership, and day-to-day execution across both
+          global and U.S.-based teams.
+        </p>
+      </Appear>
+      <VideoLightbox
+        class="su-video"
+        youtubeId={CASE_STUDY_YOUTUBE_ID}
+        style={`background-image:url(${IMG}4zpDK4lFBWCwhexbvuq8dSMtdQ.jpg)`}>
+        <div class="su-video__overlay"></div>
+        <div class="su-video__play">
+          <PlayButton />
+        </div>
+      </VideoLightbox>
+    </section>
+  </div>
+  <Footer />
+</Layout>

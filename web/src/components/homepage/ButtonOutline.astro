@@ -1,0 +1,58 @@
+---
+/* ButtonOutline — secondary pill (Astro port of the React ButtonOutline).
+ *   - 'outline' (default): transparent + glacier border (hero "How It Works")
+ *   - 'white': solid white fill (dark feature card "About Sagan University") */
+interface Props {
+  label: string;
+  href: string;
+  external?: boolean;
+  variant?: 'outline' | 'white';
+}
+const { label, href, external = false, variant = 'outline' } = Astro.props;
+const cls = `btn-outline btn-outline--${variant}`;
+---
+
+<a
+  class={cls}
+  href={href}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noreferrer' : undefined}>{label}</a>
+
+<style>
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    font-family: var(--pp);
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--glacier);
+    border-radius: 100px;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color 0.3s cubic-bezier(0.44, 0, 0.56, 1),
+      color 0.3s cubic-bezier(0.44, 0, 0.56, 1);
+  }
+  .btn-outline:active {
+    transform: translateY(1px);
+  }
+  .btn-outline--outline {
+    background: transparent;
+    border: 1px solid var(--glacier);
+  }
+  .btn-outline--outline:hover {
+    background: var(--space-300);
+  }
+  .btn-outline--white {
+    background: var(--white);
+    border: 1px solid var(--white);
+  }
+  .btn-outline--white:hover {
+    background: var(--space-100);
+    border-color: var(--space-100);
+  }
+</style>

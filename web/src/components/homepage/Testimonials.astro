@@ -1,0 +1,22 @@
+---
+import Slideshow from './Slideshow.astro';
+import TestimonialsGrid from './TestimonialsGrid.astro';
+import type { HomepageData } from '../../lib/homepage';
+
+/* Testimonials — featured carousel above the full "show more" testimonial wall.
+ * Both content sets come from Sanity. */
+interface Props {
+  slides?: HomepageData['slides'];
+  testimonials?: HomepageData['testimonials'];
+}
+const { slides = [], testimonials = [] } = Astro.props;
+---
+
+<section class="section testimonials">
+  <div style="width:100%">
+    <Slideshow slides={slides} />
+  </div>
+  <div class="testimonials__loadmore">
+    <TestimonialsGrid testimonials={testimonials} />
+  </div>
+</section>

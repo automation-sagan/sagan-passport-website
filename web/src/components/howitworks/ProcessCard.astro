@@ -1,0 +1,167 @@
+---
+/* ----------------------------------------------------------------------------
+ * ProcessCard — plain rebuild of the Framer `hijack-scroll-card`. A wide card:
+ * left column holds a colored icon badge (top) and the step label + heading +
+ * body (bottom); right side is a rounded illustration. Used 3× as the
+ * sticky-stacking "From Wishlist to A-Player" steps.
+ *
+ * Values from framer/hijack-scroll-card.jsx: card 1160×~570, padding 56/64,
+ * gap 56, radius 48, 1px rgb(227,222,216) border + triple shadow; heading
+ * PP Mori 42px/-1px, step Space Grotesk Bold 13px uppercase, body PP Mori 17px;
+ * badge radius 100 (color per step), illustration radius 32.
+ * ------------------------------------------------------------------------- */
+interface Props {
+  step: string;
+  title: string;
+  body: string;
+  /** badge circle color (dandelion / mint / grey per step) */
+  badgeColor: string;
+  icon: string;
+  image: string;
+}
+const { step, title, body, badgeColor, icon, image } = Astro.props;
+---
+
+<article class="proc">
+  <div class="proc__left">
+    <div class="proc__badge" style={`background:${badgeColor}`}>
+      <img class="proc__icon" src={icon} alt="" loading="lazy" />
+    </div>
+    <div class="proc__text">
+      <div class="proc__head">
+        <span class="proc__step">{step}</span>
+        <h2 class="proc__title">{title}</h2>
+      </div>
+      <p class="proc__body">{body}</p>
+    </div>
+  </div>
+  <div class="proc__media">
+    <img class="proc__img" src={image} alt="" loading="lazy" />
+  </div>
+</article>
+
+<style>
+  /* ProcessCard — sticky process step card (framer hijack-scroll-card). */
+  .proc {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 56px;
+    width: 100%;
+    padding: 56px 56px 64px;
+    background: var(--white);
+    border: 1px solid rgb(227, 222, 216);
+    border-radius: 48px;
+    box-shadow:
+      0.0602px 0.6022px 0.6052px -1.0833px rgba(0, 0, 0, 0.11),
+      0.2289px 2.2885px 2.2999px -2.1667px rgba(0, 0, 0, 0.1),
+      1px 10px 10.0499px -3.25px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+  }
+
+  .proc__left {
+    flex: 1 0 0;
+    align-self: stretch;
+    min-height: 450px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  /* CONSERVATIVE (flag): badge circle ~72px (Framer icon is 38px, badge size not
+     exported). Tune if it differs from saganpassport.com. */
+  .proc__badge {
+    flex: none;
+    width: 72px;
+    height: 72px;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .proc__icon {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    display: block;
+  }
+  .proc__text {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 496px;
+  }
+  .proc__head {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .proc__step {
+    font-family: var(--grotesk);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    color: var(--glacier);
+  }
+  .proc__title {
+    margin: 0;
+    max-width: 365px;
+    font-family: var(--pp);
+    font-size: 42px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -1px;
+    color: var(--glacier);
+    text-wrap: balance;
+  }
+  .proc__body {
+    margin: 0;
+    max-width: 465px;
+    font-family: var(--pp);
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--glacier);
+  }
+
+  .proc__media {
+    flex: 1 0 0;
+    align-self: stretch;
+    min-height: 450px;
+    border-radius: 32px;
+    overflow: hidden;
+  }
+  .proc__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* ===== Tablet / phone (<= 810px): stack ===== */
+  @media (max-width: 810px) {
+    .proc {
+      flex-direction: column;
+      gap: 24px;
+      padding: 24px 24px 40px;
+      border-radius: 28px;
+    }
+    .proc__left {
+      min-height: auto;
+      width: 100%;
+      gap: 24px;
+    }
+    .proc__media {
+      min-height: 280px;
+      width: 100%;
+      align-self: auto;
+    }
+    .proc__title {
+      font-size: 30px;
+    }
+  }
+</style>

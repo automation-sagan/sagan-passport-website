@@ -1,0 +1,98 @@
+---
+/* CopyButton — Astro port of the Framer `copy-button` (Share variant). Copies
+ * the given url to the clipboard and flips the label to "Copied" for ~2s. */
+interface Props {
+  url: string;
+  label?: string;
+  success?: string;
+}
+const { url, label = 'Share', success = 'Copied' } = Astro.props;
+---
+
+<button type="button" class="copybtn" data-url={url} data-label={label} data-success={success} aria-label="Copy share link">
+  <span class="copybtn__pill">{label}</span>
+  <span class="copybtn__circle" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5"></path>
+      <path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"></path>
+    </svg>
+  </span>
+</button>
+
+<style>
+  .copybtn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font-family: var(--pp);
+  }
+  .copybtn__pill {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 28px;
+    background: var(--white);
+    border: 1.5px solid var(--glacier);
+    border-radius: 100px;
+    font-size: 17px;
+    line-height: 1;
+    color: var(--glacier);
+    white-space: nowrap;
+    transition: background-color 0.25s ease;
+  }
+  .copybtn__circle {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    margin-left: -9px;
+    background: var(--white);
+    border: 1.5px solid var(--glacier);
+    border-radius: 50%;
+    color: var(--glacier);
+    transition: background-color 0.25s ease;
+  }
+  .copybtn__circle svg {
+    width: 16px;
+    height: 16px;
+  }
+  .copybtn:hover .copybtn__pill,
+  .copybtn:hover .copybtn__circle {
+    background: var(--space-300);
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.copybtn').forEach((btn) => {
+    const pill = btn.querySelector<HTMLElement>('.copybtn__pill');
+    const url = btn.dataset.url || '';
+    const label = btn.dataset.label || 'Share';
+    const success = btn.dataset.success || 'Copied';
+    let t: number;
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch { /* ignore */ }
+        ta.remove();
+      }
+      if (pill) pill.textContent = success;
+      clearTimeout(t);
+      t = window.setTimeout(() => { if (pill) pill.textContent = label; }, 2000);
+    });
+  });
+</script>

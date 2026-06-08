@@ -1,0 +1,162 @@
+---
+/* ----------------------------------------------------------------------------
+ * FaqAccordion — Astro port of the Framer `fa-qs` accordion. Each row
+ * expands/collapses on click; closed rows sit on the beige section, open rows
+ * turn white. Plus icon rotates to a minus. Q&A content is passed in as props.
+ * Open/close is driven by the vanilla <script> at the bottom.
+ *
+ * Values from framer/fa-qs.jsx: row padding 24, gap 16, radius 32, closed bg
+ * rgb(245,242,237) → open bg white; question PP Mori SemiBold 18px/140%, answer
+ * PP Mori 17px/140%; 28px plus/minus icon.
+ * ------------------------------------------------------------------------- */
+export interface QA {
+  question: string;
+  answer: string;
+}
+interface Props {
+  items: QA[];
+}
+const { items } = Astro.props;
+
+/* Split each answer into non-empty paragraphs (the React build did the same). */
+const rows = items.map((qa) => ({
+  question: qa.question,
+  paragraphs: qa.answer.split('\n').filter((p) => p.trim().length > 0),
+}));
+---
+
+<div class="faqx">
+  {
+    rows.map((qa) => (
+      <div class="faqx__item">
+        <button class="faqx__q" type="button" aria-expanded="false">
+          <span class="faqx__qtext">{qa.question}</span>
+          <span class="faqx__icon" aria-hidden="true">
+            <span />
+            <span />
+          </span>
+        </button>
+        <div class="faqx__abody">
+          <div class="faqx__ainner">
+            {qa.paragraphs.map((p) => (
+              <p class="faqx__p">{p}</p>
+            ))}
+          </div>
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  /* FaqAccordion — FAQ accordion (framer fa-qs). */
+  .faqx {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+  }
+  .faqx__item {
+    background: rgb(245, 242, 237);
+    border: 1px solid rgba(9, 58, 62, 0.06);
+    border-radius: 32px;
+    overflow: hidden;
+    transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .faqx__item.is-open {
+    background: var(--white);
+  }
+  .faqx__q {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+  }
+  .faqx__qtext {
+    font-family: var(--pp-semibold);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--glacier);
+  }
+
+  /* plus → minus icon (two bars; the vertical one rotates flat on open) */
+  .faqx__icon {
+    position: relative;
+    flex: none;
+    width: 28px;
+    height: 28px;
+  }
+  .faqx__icon span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 14px;
+    height: 1.5px;
+    border-radius: 2px;
+    background: var(--glacier);
+    transform: translate(-50%, -50%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .faqx__icon span:nth-child(2) {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+  .faqx__item.is-open .faqx__icon span:nth-child(2) {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  /* grid-rows expand for smooth open/close */
+  .faqx__abody {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .faqx__item.is-open .faqx__abody {
+    grid-template-rows: 1fr;
+  }
+  .faqx__ainner {
+    overflow: hidden;
+  }
+  .faqx__p {
+    margin: 0;
+    padding: 0 24px;
+    font-family: var(--pp);
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--glacier);
+  }
+  .faqx__p:last-child {
+    padding-bottom: 24px;
+  }
+  .faqx__p + .faqx__p {
+    padding-top: 12px;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.faqx').forEach((root) => {
+    const items = Array.from(root.querySelectorAll<HTMLElement>('.faqx__item'));
+    items.forEach((item) => {
+      const btn = item.querySelector<HTMLButtonElement>('.faqx__q');
+      btn?.addEventListener('click', () => {
+        const willOpen = !item.classList.contains('is-open');
+        // single-open accordion: close every row first (matches the React build)
+        items.forEach((other) => {
+          other.classList.remove('is-open');
+          other.querySelector('.faqx__q')?.setAttribute('aria-expanded', 'false');
+        });
+        if (willOpen) {
+          item.classList.add('is-open');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+  });
+</script>

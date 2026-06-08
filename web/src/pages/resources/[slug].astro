@@ -1,0 +1,84 @@
+---
+/* /resources/[slug] — resource article template. Static-generated from the
+ * RESOURCES data; hero + author/share, two-column body, optional YouTube, CTA. */
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+import CopyButton from '../../components/resources/CopyButton.astro';
+import ButtonFill from '../../components/homepage/ButtonFill.astro';
+import SplineEmbed from '../../components/homepage/SplineEmbed.astro';
+import { RESOURCES, formatDate, type Resource } from '../../data/resources';
+import '../../styles/resources.css';
+
+export function getStaticPaths() {
+  return RESOURCES.map((r) => ({ params: { slug: r.slug }, props: { resource: r } }));
+}
+
+const { resource } = Astro.props as { resource: Resource };
+const shareUrl = `https://saganpassport.com/resources/${resource.slug}`;
+const SCHEDULE_URL =
+  'https://calendly.com/d/5j7-3xv-p5k/global-talent-hiring-consultation?utm_source=saganpassportdotcom&utm_term=talent';
+---
+
+<Layout title={`${resource.title} — Sagan Passport`}>
+  <Navbar />
+  <div class="home">
+    <!-- Hero -->
+    <section class="section res-hero">
+      <div class="res-hero__image" style={`background-image:url(${resource.mainImage})`}></div>
+      <div class="res-hero__content">
+        <h1 class="t-h1" style="margin:0">{resource.title}</h1>
+        <div class="res-hero__bottom">
+          <div class="res-hero__author">
+            <span class="res-hero__avatar" style={`background-image:url(${resource.authorImage})`}></span>
+            <span class="res-hero__name">{resource.author}</span>
+            {resource.date && <span class="res-hero__date">· {formatDate(resource.date)}</span>}
+          </div>
+          <CopyButton url={shareUrl} />
+        </div>
+      </div>
+    </section>
+
+    <!-- Body sections (two-column: title | content) -->
+    <section class="section res-body">
+      {resource.sections.map((s) => (
+        <div class="res-sec">
+          <div class="res-sec__left">
+            {s.tag && <p class="t-eyebrow">{s.tag}</p>}
+            {s.title && <h2 class="t-h3" style="margin:0">{s.title}</h2>}
+          </div>
+          <div class="res-sec__right article-content" set:html={s.content}></div>
+        </div>
+      ))}
+    </section>
+
+    <!-- YouTube -->
+    {resource.youtubeId && (
+      <section class="section res-video-sec">
+        <div class="res-video">
+          <iframe
+            src={`https://www.youtube.com/embed/${resource.youtubeId}?rel=0`}
+            title={resource.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+            allowfullscreen></iframe>
+        </div>
+      </section>
+    )}
+
+    <!-- CTA -->
+    <section class="section res-cta">
+      <div class="res-cta__content">
+        <div class="res-cta__scene">
+          <SplineEmbed scene="https://prod.spline.design/hnKgxipHE7hU2hJC-Pua/scene.hanacode" version="1.2.29" />
+        </div>
+        <h2 class="t-h1" style="text-align:center;margin:0">Ready to unlock your growth?</h2>
+        <p class="t-body" style="text-align:center;margin:0">
+          Stop compromising and start building. Schedule a call to learn how our global talent network
+          can help you achieve your most ambitious goals.
+        </p>
+        <ButtonFill label="Schedule a Call" href={SCHEDULE_URL} external={true} />
+      </div>
+    </section>
+  </div>
+  <Footer />
+</Layout>

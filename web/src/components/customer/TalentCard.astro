@@ -1,0 +1,52 @@
+---
+/* TalentCard — Astro port of the Framer `talent-card`: a white pill with a round
+ * icon + a role label. Used in the scrolling talent marquees. */
+interface Props {
+  label: string;
+  icon?: string;
+}
+const DEFAULT_ICON = 'https://framerusercontent.com/images/C3vAoYJYsF4rpvNVqxbIEXsRGaE.png?width=72&height=72';
+const { label, icon = DEFAULT_ICON } = Astro.props;
+---
+
+<div class="tcard">
+  <span class="tcard__icon"><img src={icon} alt="" loading="lazy" /></span>
+  <span class="tcard__label">{label}</span>
+</div>
+
+<style>
+  .tcard {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    width: max-content;
+    padding: 10px 16px 10px 14px;
+    background: var(--white);
+    border-radius: 100px;
+  }
+  .tcard__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--space-200);
+    overflow: hidden;
+  }
+  .tcard__icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .tcard__label {
+    font-family: var(--pp);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--glacier);
+    white-space: nowrap;
+  }
+</style>

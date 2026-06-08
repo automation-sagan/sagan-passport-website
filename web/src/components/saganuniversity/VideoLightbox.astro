@@ -1,0 +1,78 @@
+---
+/* VideoLightbox — Astro port of the React VideoLightbox. Wraps a trigger (the
+ * video poster + play button); clicking it opens a fullscreen YouTube lightbox.
+ * The overlay is built in JS on demand and removed on close / Escape / backdrop
+ * click. Modal styles live in saganuniversity.css (global, since the overlay is
+ * created dynamically and would not receive Astro's scoped attributes). */
+interface Props {
+  youtubeId: string;
+  class?: string;
+  style?: string;
+}
+const { youtubeId, class: className, style } = Astro.props;
+---
+
+<div
+  class:list={['su-vlb', className]}
+  style={style}
+  data-youtube={youtubeId}
+  role="button"
+  tabindex="0"
+  aria-label="Play video">
+  <slot />
+</div>
+
+<script>
+  const openLightbox = (id: string) => {
+    const modal = document.createElement('div');
+    modal.className = 'su-vlb-modal';
+
+    const close = () => {
+      modal.remove();
+      document.body.style.overflow = prevOverflow;
+      document.removeEventListener('keydown', onKey);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close();
+    };
+
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'su-vlb-modal__close';
+    closeBtn.setAttribute('aria-label', 'Close video');
+    closeBtn.textContent = '×';
+    closeBtn.addEventListener('click', close);
+
+    const inner = document.createElement('div');
+    inner.className = 'su-vlb-modal__inner';
+    inner.addEventListener('click', (e) => e.stopPropagation());
+
+    const frame = document.createElement('iframe');
+    frame.className = 'su-vlb-modal__frame';
+    frame.src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
+    frame.title = 'Video';
+    frame.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture';
+    frame.allowFullscreen = true;
+
+    inner.appendChild(frame);
+    modal.appendChild(closeBtn);
+    modal.appendChild(inner);
+    modal.addEventListener('click', close);
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', onKey);
+    document.body.appendChild(modal);
+  };
+
+  document.querySelectorAll<HTMLElement>('.su-vlb').forEach((trigger) => {
+    const id = trigger.dataset.youtube;
+    if (!id) return;
+    trigger.addEventListener('click', () => openLightbox(id));
+    trigger.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openLightbox(id);
+      }
+    });
+  });
+</script>

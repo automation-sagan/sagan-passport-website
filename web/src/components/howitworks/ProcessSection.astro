@@ -1,0 +1,66 @@
+---
+/* Process — "From Wishlist to A-Player": heading + 3 sticky-stacking ProcessCards.
+ * The .hiw-sticky wrappers (position: sticky at staggered tops) are styled in
+ * howitworks.css; the per-step `top` is set inline below. */
+import ProcessCard from './ProcessCard.astro';
+
+const IMG = (id: string, q: string) => `https://framerusercontent.com/images/${id}${q}`;
+
+const STEPS = [
+  {
+    step: '1. Define & Search',
+    title: 'We Build Your Scorecard',
+    body: 'One strategy call. We define the exact skills and traits of your perfect hire, build a detailed scorecard, and run a tailored search. No resume sifting required.',
+    badgeColor: 'rgb(245, 184, 0)',
+    icon: IMG('tMPTWbJMmWz7kgod9viysJbJ0Q4.png', '?width=116&height=91'),
+    image: IMG('bFO4Z0NE1pTuVFwa9fZBV5pYfYM.jpg', '?width=584&height=389'),
+    top: 100,
+  },
+  {
+    step: '2. Review & Interview',
+    title: 'See the Full Picture, Not Just a Resume',
+    body: 'Every candidate comes with a 360 profile: resume, video intro, strengths assessment, and recruiter evaluation. Review, pick your favorites, and go straight to final interviews.',
+    badgeColor: 'rgb(92, 227, 176)',
+    icon: IMG('0eXn9Gi0YXPQvSgyorPcfmCXQ8.png', '?width=135&height=95'),
+    image: IMG('8mSHknuaPCTtSfyG3aEqc9jo.png', '?width=992&height=982'),
+    top: 124,
+  },
+  {
+    step: '3. Hire & Onboard',
+    title: 'Hit the Ground Running',
+    body: 'Make the offer with our ready-to-go templates. Then we hand you a custom 30 to 90 day onboarding plan with clear milestones so your new hire ramps fast and stays long.',
+    badgeColor: 'rgb(158, 152, 143)',
+    icon: IMG('y748aq8arJEUxGeIq3UlUVboY.png', '?width=102&height=128'),
+    image: IMG('G16I7eeZsAqgZOBPLwyMQwjJuo.png', '?width=992&height=982'),
+    top: 148,
+  },
+];
+---
+
+<section class="section hiw-process-wrap">
+  <div class="hiw-process">
+    <div class="hiw-process__head">
+      <h2 class="t-h2" style="max-width:365px;margin:0">From Wishlist to A-Player</h2>
+      <p class="t-body" style="max-width:440px;margin:0">
+        Our proven process finds, vets, and delivers your next great hire. You never have to
+        touch a job board again.
+      </p>
+    </div>
+    <div class="hiw-process__cards">
+      {
+        STEPS.map((s) => (
+          <div class="hiw-sticky" style={`top:${s.top}px`}>
+            <ProcessCard
+              step={s.step}
+              title={s.title}
+              body={s.body}
+              badgeColor={s.badgeColor}
+              icon={s.icon}
+              image={s.image}
+            />
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

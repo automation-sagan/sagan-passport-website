@@ -1,0 +1,212 @@
+---
+/* TestimonialsGrid — masonry testimonial wall (Astro port, vanilla JS). Starts
+ * clamped; the bottom fades out with a blur + gradient (matches saganpassport.com),
+ * and "See More Love For Sagan" expands the full set. Each avatar carries a small
+ * platform badge (X / G2) in its bottom-right corner. Content comes from Sanity. */
+import { imgUrl } from '../../lib/sanityImage';
+import type { HomepageData } from '../../lib/homepage';
+
+interface Props {
+  testimonials?: HomepageData['testimonials'];
+}
+const { testimonials = [] } = Astro.props;
+const TESTIMONIALS = (testimonials ?? []).map((t) => ({
+  name: t.name,
+  subtitle: t.subtitle ?? '',
+  quote: t.quote,
+  avatar: imgUrl(t.avatar),
+  logo: t.logo ? imgUrl(t.logo) : '',
+}));
+---
+
+<div class="tgrid is-collapsed" data-tgrid>
+  <div class="tgrid__masonry">
+    {
+      TESTIMONIALS.map((t) => (
+        <article class="tgrid__card">
+          <div class="tgrid__head">
+            <span class="tgrid__avatarwrap">
+              <img class="tgrid__avatar" src={t.avatar} alt={t.name} loading="lazy" />
+              {t.logo ? <img class="tgrid__badge" src={t.logo} alt="" loading="lazy" /> : null}
+            </span>
+            <span class="tgrid__who">
+              <span class="tgrid__name">{t.name}</span>
+              <span class="tgrid__sub">{t.subtitle}</span>
+            </span>
+          </div>
+          <p class="tgrid__quote">{t.quote}</p>
+        </article>
+      ))
+    }
+  </div>
+
+  <div class="tgrid__fade" aria-hidden="true"></div>
+
+  <button class="tgrid__more" type="button" data-more>See More Love For Sagan</button>
+</div>
+
+<style>
+  .tgrid {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+  .tgrid__masonry {
+    width: 100%;
+    columns: 3;
+    column-gap: 16px;
+  }
+  .tgrid.is-collapsed .tgrid__masonry {
+    max-height: 820px;
+    overflow: hidden;
+  }
+
+  /* Blur + gradient fade over the bottom of the clamped grid (saganpassport.com).
+     The mask ramps the backdrop-blur + beige tint in from transparent (top) to
+     full (bottom), so the lower cards blur out and dissolve into the page. */
+  .tgrid__fade {
+    display: none;
+  }
+  .tgrid.is-collapsed .tgrid__fade {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 380px;
+    pointer-events: none;
+    background: linear-gradient(to bottom, rgba(245, 242, 237, 0) 0%, var(--bg) 88%);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 55%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 55%);
+  }
+
+  .tgrid__card {
+    break-inside: avoid;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 32px;
+    background: var(--white);
+    border: 1px solid var(--space-200);
+    border-radius: 24px;
+  }
+  .tgrid__head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .tgrid__avatarwrap {
+    position: relative;
+    flex: none;
+    width: 56px;
+    height: 56px;
+  }
+  .tgrid__avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+  }
+  .tgrid__badge {
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--white);
+    border: 2px solid var(--white);
+  }
+  .tgrid__who {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .tgrid__name {
+    font-family: var(--pp-semibold);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--glacier);
+  }
+  .tgrid__sub {
+    font-family: var(--pp);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--text-muted);
+  }
+  .tgrid__quote {
+    margin: 0;
+    font-family: var(--pp);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--glacier);
+  }
+
+  /* Show more / less — white outline pill. When collapsed it floats over the
+     blurred fade; when expanded it sits below the grid. */
+  .tgrid__more {
+    padding: 14px 28px;
+    font-family: var(--pp);
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--glacier);
+    background: var(--white);
+    border: 1px solid var(--space-300);
+    border-radius: 100px;
+    cursor: pointer;
+    transition:
+      background-color 0.3s cubic-bezier(0.44, 0, 0.56, 1),
+      box-shadow 0.3s;
+  }
+  .tgrid__more:hover {
+    box-shadow: 0 6px 20px rgba(9, 58, 62, 0.08);
+  }
+  .tgrid.is-collapsed .tgrid__more {
+    position: absolute;
+    left: 50%;
+    bottom: 48px;
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+
+  @media (max-width: 810px) {
+    .tgrid__masonry {
+      columns: 2;
+    }
+    .tgrid.is-collapsed .tgrid__masonry {
+      max-height: 1100px;
+    }
+  }
+  @media (max-width: 480px) {
+    .tgrid__masonry {
+      columns: 1;
+    }
+    .tgrid__card {
+      padding: 28px 24px;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-tgrid]').forEach((root) => {
+    const btn = root.querySelector<HTMLButtonElement>('[data-more]');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const collapsed = root.classList.toggle('is-collapsed');
+      btn.textContent = collapsed ? 'See More Love For Sagan' : 'Show Less';
+    });
+  });
+</script>

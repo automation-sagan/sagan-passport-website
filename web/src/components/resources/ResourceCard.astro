@@ -1,0 +1,23 @@
+---
+/* ResourceCard — a single card in the Resources grid. Styling comes from the
+ * global .res-card classes in resources.css. */
+import { formatDate, type Resource } from '../../data/resources';
+interface Props {
+  resource: Resource;
+}
+const { resource: r } = Astro.props;
+---
+
+<a href={`/resources/${r.slug}`} class="res-card">
+  <div class="res-card__img" style={`background-image:url(${r.mainImage})`}>
+    <span class="res-card__cat">{r.category}</span>
+  </div>
+  <div class="res-card__body">
+    <h3 class="res-card__title">{r.title}</h3>
+    <div class="res-card__meta">
+      <span class="res-card__avatar" style={`background-image:url(${r.authorImage})`}></span>
+      <span class="res-card__author">{r.author}</span>
+      {r.date && <span class="res-card__date">· {formatDate(r.date)}</span>}
+    </div>
+  </div>
+</a>

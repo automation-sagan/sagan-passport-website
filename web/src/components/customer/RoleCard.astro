@@ -1,0 +1,93 @@
+---
+/* RoleCard — Astro port of the Framer `role-card`: a white card with role title
+ * + country at top, and a country-flag disc + rate pill at the bottom. Used in
+ * the "Roles That Power…" scrolling marquee. */
+interface Props {
+  title: string;
+  country: string;
+  rate: string;
+  flag?: string;
+}
+const DEFAULT_FLAG = 'https://framerusercontent.com/images/80tGl76lgut9WBZKtZIOEFsvhbI.png?width=195&height=195';
+const { title, country, rate, flag = DEFAULT_FLAG } = Astro.props;
+---
+
+<div class="role">
+  <div class="role__text">
+    <h4 class="role__title">{title}</h4>
+    <p class="role__country">{country}</p>
+  </div>
+  <div class="role__bottom">
+    <span class="role__flag"><img src={flag} alt="" loading="lazy" /></span>
+    <span class="role__rate">{rate}</span>
+  </div>
+</div>
+
+<style>
+  .role {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 436px;
+    max-width: 100%;
+    height: 245px;
+    padding: 24px;
+    box-sizing: border-box;
+    background: var(--white);
+    border-radius: 40px;
+  }
+  .role__text {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .role__title {
+    margin: 0;
+    max-width: 300px;
+    font-family: var(--pp-semibold);
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--glacier);
+  }
+  .role__country {
+    margin: 0;
+    font-family: var(--pp);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--glacier);
+  }
+  .role__bottom {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .role__flag {
+    display: block;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex: none;
+  }
+  .role__flag img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .role__rate {
+    background: var(--space-200);
+    color: var(--glacier);
+    border-radius: 100px;
+    padding: 12px 16px;
+    font-family: var(--pp);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+  }
+</style>

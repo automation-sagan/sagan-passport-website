@@ -1,0 +1,242 @@
+---
+/* ----------------------------------------------------------------------------
+ * Footer — Astro port of the hand-written React Footer (Footer.tsx + Footer.css)
+ * from example-unframer-app. No Framer code: it's a plain rebuild of the design
+ * (Dandelion-yellow background, glacier text, tagline + 3 link columns, hover
+ * fade, full-width "Sagan" wordmark anchored at the bottom).
+ *
+ * React-isms replaced with Astro idiom:
+ *   - react-router <Link to>      → plain <a href>
+ *   - internal vs external links  → `external` flag adds target/rel
+ *
+ * Shared tokens (--dandelion, --glacier, --grotesk, --pp) come from
+ * src/styles/global.css — this component declares no design tokens of its own.
+ * ------------------------------------------------------------------------- */
+
+// Full-width "Sagan" wordmark (4165×983, ~4.24:1) at the footer bottom.
+const WORDMARK =
+  'https://framerusercontent.com/images/jBgV1WJ5AIUfSz7porI87LWTNXk.png?width=4165&height=983';
+
+const PORTAL_URL = 'https://portal.saganpassport.com';
+const CALENDLY_URL =
+  'https://calendly.com/d/5j7-3xv-p5k/global-talent-hiring-consultation?utm_source=saganpassportdotcom&utm_term=talent';
+
+interface FooterLink {
+  label: string;
+  href: string;
+  external?: boolean;
+}
+interface FooterCol {
+  heading: string;
+  links: FooterLink[];
+}
+
+const COLUMNS: FooterCol[] = [
+  {
+    heading: 'Sagan',
+    links: [
+      { label: 'How it Works', href: '/how-it-works' },
+      { label: 'Pricing', href: '/pricing' },
+      { label: 'Sagan University', href: '/sagan-university' },
+      { label: 'Resources', href: '/resources' },
+      { label: 'Blog', href: '/blog' },
+    ],
+  },
+  {
+    heading: 'Services',
+    links: [
+      { label: 'Home Services', href: '/customers/home-services' },
+      { label: 'Private Equity & Holding', href: '/customers/private-equity' },
+      { label: 'Small Businesses', href: '/customers/small-businesses' },
+      { label: 'Franchises', href: '/customers/franchises' },
+      { label: 'Professional Services', href: '/customers/professional-services' },
+      { label: 'Real Estate', href: '/customers/real-estate' },
+      { label: 'Health & Wellness', href: '/customers/health-wellness' },
+    ],
+  },
+  {
+    heading: 'Contact',
+    links: [
+      { label: 'Schedule a Call', href: CALENDLY_URL, external: true },
+      { label: 'Member Portal', href: PORTAL_URL, external: true },
+    ],
+  },
+];
+---
+
+<footer class="footerx">
+  <div class="footerx__content">
+    <div class="footerx__brand">
+      <h3 class="footerx__tagline">Source and scale with Sagan.</h3>
+    </div>
+
+    <div class="footerx__cols">
+      {COLUMNS.map((col) => (
+        <div class="footerx__col">
+          <h4 class="footerx__heading">{col.heading}</h4>
+          <div class="footerx__links">
+            {col.links.map((link) => (
+              <a
+                class="footerx__link"
+                href={link.href}
+                {...(link.external ? { target: '_blank', rel: 'noreferrer' } : {})}
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div class="footerx__wordmark">
+    <img src={WORDMARK} alt="Sagan" loading="lazy" />
+  </div>
+</footer>
+
+<style>
+  /* Footer — exact rebuild of the Framer footer. Layout values verbatim from
+     the React Footer.css; colors/fonts now reference global tokens. */
+  .footerx {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    width: 100%;
+    min-height: 800px; /* Framer desktop footer is 800px tall */
+    padding: 48px;
+    background: var(--dandelion);
+    color: var(--glacier);
+    font-family: var(--pp);
+    overflow: clip;
+  }
+
+  /* ---- Top content row: tagline (left) + columns (right) ---- */
+  .footerx__content {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    max-width: 1200px;
+  }
+  .footerx__brand {
+    display: flex;
+    flex: 1 0 0;
+    align-items: center;
+  }
+  .footerx__tagline {
+    margin: 0;
+    max-width: 250px;
+    font-family: var(--pp);
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: -1px;
+    color: var(--glacier);
+  }
+
+  /* ---- Link columns ---- */
+  .footerx__cols {
+    display: flex;
+    flex-direction: row;
+    flex: 1 0 0;
+    max-width: 810px;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .footerx__col {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 0;
+    max-width: 233px;
+    gap: 15px;
+  }
+  .footerx__heading {
+    margin: 0;
+    font-family: var(--grotesk);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    color: var(--glacier);
+  }
+  .footerx__links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .footerx__link {
+    font-family: var(--pp);
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0;
+    color: var(--glacier);
+    text-decoration: none;
+    /* Framer anchor preset: fade to glacier-70% over 0.4s on hover. */
+    transition: color 0.4s cubic-bezier(0.44, 0, 0.56, 1);
+  }
+  .footerx__link:hover {
+    color: rgba(9, 57, 61, 0.7); /* glacier @ 70% (one-off hover tint) */
+  }
+
+  /* ---- Full-bleed "Sagan" wordmark, flush to the footer's bottom edge ----
+   * Framer's "Text Wrapper" is absolutely positioned bottom/left/right: 0, so it
+   * ignores the 48px padding and spans the full footer width. We replicate that
+   * with align-self: stretch + negative margins (sides + bottom = the padding),
+   * and margin-top: auto to push it to the bottom (the big gap above it). */
+  .footerx__wordmark {
+    align-self: stretch;
+    margin: auto -48px -48px -48px;
+  }
+  .footerx__wordmark img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* ===== Tablet (810–1199px) ===== */
+  @media (max-width: 1199px) {
+    .footerx {
+      min-height: 640px;
+      padding: 48px 32px;
+    }
+    .footerx__brand {
+      max-width: 320px;
+    }
+    .footerx__cols {
+      justify-content: center;
+      gap: 12px;
+    }
+    .footerx__wordmark {
+      margin: auto -32px -48px -32px; /* sides match the 32px padding */
+    }
+  }
+
+  /* ===== Phone (≤810px): Framer hides the columns — only the tagline and the
+   *  wordmark remain. Flip `display: flex` back on .footerx__cols to keep links. */
+  @media (max-width: 810px) {
+    .footerx {
+      min-height: 240px;
+      padding: 24px 16px;
+      gap: 24px;
+    }
+    .footerx__content {
+      justify-content: flex-start;
+    }
+    .footerx__cols {
+      display: none;
+    }
+    .footerx__tagline {
+      max-width: 204px;
+      font-size: 24px;
+    }
+    .footerx__wordmark {
+      margin: auto -16px -24px -16px; /* sides/bottom match the 16/24 padding */
+    }
+  }
+</style>

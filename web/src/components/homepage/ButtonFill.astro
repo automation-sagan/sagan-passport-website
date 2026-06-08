@@ -1,0 +1,83 @@
+---
+/* ButtonFill — primary button (Astro port): dark glacier text pill + a touching
+ * glacier arrow circle, white label/arrow. Hover darkens to deep-glacier and
+ * the arrow turns mint. */
+interface Props {
+  label: string;
+  href: string;
+  external?: boolean;
+}
+const { label, href, external = false } = Astro.props;
+---
+
+<a
+  class="btn-fill"
+  href={href}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noreferrer' : undefined}>
+  <span class="btn-fill__label">{label}</span>
+  <span class="btn-fill__circle">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
+      <path d="M5 12h13M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+  </span>
+</a>
+
+<style>
+  .btn-fill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0; /* arrow circle touches the pill — no gap */
+    padding: 0;
+    background: transparent;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: var(--pp);
+  }
+  .btn-fill__label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+    padding: 0 28px;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--white);
+    background: var(--glacier);
+    border-radius: 100px;
+    white-space: nowrap;
+    transition: background-color 0.3s cubic-bezier(0.44, 0, 0.56, 1);
+  }
+  .btn-fill__circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    color: var(--white);
+    background: var(--glacier);
+    transition:
+      background-color 0.3s cubic-bezier(0.44, 0, 0.56, 1),
+      color 0.3s cubic-bezier(0.44, 0, 0.56, 1);
+  }
+  .btn-fill__circle svg {
+    transition: transform 0.25s ease;
+  }
+  .btn-fill:hover .btn-fill__label {
+    background: var(--deep-glacier);
+  }
+  .btn-fill:hover .btn-fill__circle {
+    background: var(--deep-glacier);
+    color: var(--mint);
+  }
+  .btn-fill:hover .btn-fill__circle svg {
+    transform: translateX(2px);
+  }
+  .btn-fill:active {
+    transform: translateY(1px);
+  }
+</style>

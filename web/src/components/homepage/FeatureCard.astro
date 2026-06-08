@@ -1,0 +1,56 @@
+---
+/* FeatureCard — feature grid item (Astro port). Icon + title + description,
+ * left-aligned. Falls back to the Framer default icon. */
+interface Props {
+  title: string;
+  description: string;
+  icon?: string;
+}
+const DEFAULT_ICON =
+  'https://framerusercontent.com/images/tcVzccaJoexsAP6OlrjoixmE1Q.png?width=40&height=40';
+const { title, description, icon = DEFAULT_ICON } = Astro.props;
+---
+
+<div class="featx">
+  <img class="featx__icon" src={icon} alt="" loading="lazy" />
+  <div class="featx__text">
+    <h4 class="featx__title">{title}</h4>
+    <p class="featx__desc">{description}</p>
+  </div>
+</div>
+
+<style>
+  .featx {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .featx__icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    display: block;
+  }
+  .featx__text {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .featx__title {
+    margin: 0;
+    font-family: var(--pp-semibold);
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--glacier);
+  }
+  .featx__desc {
+    margin: 0;
+    font-family: var(--pp);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--glacier);
+  }
+</style>

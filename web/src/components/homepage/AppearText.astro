@@ -1,0 +1,28 @@
+---
+/* AppearText — word-by-word on-scroll reveal for headings (Astro port of the
+ * React AppearText). Splits `text` into words server-side; each gets a per-word
+ * transition-delay. The observer in Layout.astro adds `.is-in` to the container
+ * once it enters view, cascading the staggered reveal across the words. */
+interface Props {
+  text: string;
+  as?: string;
+  class?: string;
+  delay?: number;
+  stagger?: number;
+  style?: string;
+}
+const { text, as = 'span', class: className = '', delay = 0.4, stagger = 0.06, style = '' } = Astro.props;
+const Tag = as as any;
+const words = text.trim().split(/\s+/);
+const cls = ['appear-text', className].filter(Boolean).join(' ');
+---
+
+<Tag class={cls} data-appear style={style}>
+  {
+    words.map((w: string, i: number) => (
+      <Fragment>
+        {i > 0 ? ' ' : ''}<span class="appear-word" style={`transition-delay:${(delay + i * stagger).toFixed(3)}s`}>{w}</span>
+      </Fragment>
+    ))
+  }
+</Tag>

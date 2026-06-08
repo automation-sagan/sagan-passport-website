@@ -1,0 +1,40 @@
+---
+import AppearText from './AppearText.astro';
+import Appear from './Appear.astro';
+import ButtonOutline from './ButtonOutline.astro';
+import ButtonFill from './ButtonFill.astro';
+import type { HomepageData } from '../../lib/homepage';
+
+interface Props {
+  data?: HomepageData['hero'];
+}
+const { data } = Astro.props;
+const headline = data?.headline ?? '';
+const body = data?.body ?? '';
+const buttons = data?.buttons ?? [];
+---
+
+<section class="section hero">
+  <div class="hero__content">
+    <div class="hero__text">
+      <AppearText as="h1" class="t-display" text={headline} />
+      <Appear as="p" class="t-body" delay={0.15}>{body}</Appear>
+    </div>
+    <Appear class="hero__buttons" delay={0.28}>
+      {
+        buttons.map((b) =>
+          b.variant === 'fill' ? (
+            <ButtonFill label={b.label} href={b.href} external={b.external} />
+          ) : (
+            <ButtonOutline
+              label={b.label}
+              href={b.href}
+              external={b.external}
+              variant={b.variant === 'white' ? 'white' : 'outline'}
+            />
+          ),
+        )
+      }
+    </Appear>
+  </div>
+</section>

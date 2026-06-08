@@ -1,0 +1,261 @@
+/* howitworks.css — layout for the How It Works sections (ported from the React
+ * home.css `.hiw-*` block). Global (not scoped) because several layout classes
+ * sit on child components. Imported once by src/pages/how-it-works.astro.
+ * Tokens are the global ones in global.css (--glacier, --bg, --pp, …). Shared
+ * helpers (.home, .section, type utilities) live in global.css. */
+
+/* ---- Hero — Stop Sifting ---- */
+.hiw-hero {
+  background: var(--white);
+  padding: 140px 64px 80px;
+}
+.hiw-hero__content {
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+.hiw-hero__title {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.hiw-hero__anim {
+  width: 584px;
+  max-width: 100%;
+  height: 180px;
+  overflow: hidden;
+}
+
+/* ---- Process — sticky stacking cards ---- */
+.hiw-process-wrap {
+  background: var(--white);
+  padding: 0 64px 80px;
+  overflow: visible;
+}
+.hiw-process {
+  width: 100%;
+  background: var(--bg);
+  border-radius: 48px;
+  padding: 80px 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+  overflow: visible;
+}
+.hiw-process__head {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 32px;
+}
+.hiw-process__cards {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+.hiw-sticky {
+  position: sticky;
+  width: 100%;
+}
+
+/* ---- Membership ---- */
+.hiw-membership {
+  background: var(--white);
+  padding: 80px 64px;
+  gap: 48px;
+}
+.hiw-centered {
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+.hiw-toggle {
+  width: 100%;
+  max-width: 1400px;
+}
+
+/* ---- Proof — testimonial + ratings ---- */
+.hiw-proof {
+  background: var(--white);
+  padding: 80px 64px;
+  gap: 48px;
+}
+.hiw-proof__grid {
+  width: 100%;
+  max-width: 1160px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-auto-rows: 301px;
+  gap: 32px;
+}
+.hiw-testimonial {
+  grid-column: span 3;
+  grid-row: span 2;
+  background: var(--white);
+  border: 1px solid rgb(227, 222, 216);
+  border-radius: 48px;
+  padding: 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 56px;
+}
+.hiw-testimonial__avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 100px;
+  background-size: cover;
+  background-position: center;
+  flex: 0 0 auto;
+}
+.hiw-testimonial__body {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 616px;
+}
+.hiw-nametag {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.hiw-name {
+  font-family: var(--pp);
+  font-size: 18px;
+  color: var(--glacier);
+}
+.hiw-org {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  color: rgb(121, 116, 110);
+}
+
+.hiw-rating {
+  grid-column: span 2;
+  background: var(--bg);
+  border-radius: 32px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+}
+.hiw-rating__logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+.hiw-rating__stars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.hiw-stars {
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+}
+.hiw-rating__label {
+  font-family: var(--pp);
+  font-size: 18px;
+  color: var(--glacier);
+}
+
+/* ---- FAQ ---- */
+.hiw-faq {
+  background: var(--bg);
+  padding: 80px 64px;
+}
+.hiw-faq__inner {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 32px;
+}
+.hiw-faq__head {
+  flex: 1;
+  max-width: 470px;
+}
+.hiw-faq__list {
+  flex: 1;
+  max-width: 700px;
+  width: 100%;
+}
+
+/* ===== Tablet (<= 810px) ===== */
+@media (max-width: 810px) {
+  .hiw-hero {
+    padding: 112px 32px 56px;
+  }
+  .hiw-process-wrap {
+    padding: 0 32px 56px;
+  }
+  .hiw-process {
+    padding: 56px 32px;
+    border-radius: 32px;
+  }
+  .hiw-process__head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .hiw-membership,
+  .hiw-proof,
+  .hiw-faq {
+    padding: 56px 32px;
+  }
+  .hiw-proof__grid {
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+  }
+  .hiw-testimonial {
+    grid-column: auto;
+    grid-row: auto;
+    padding: 40px;
+    border-radius: 32px;
+  }
+  .hiw-rating {
+    grid-column: auto;
+    min-height: 260px;
+  }
+  .hiw-faq__inner {
+    flex-direction: column;
+    gap: 24px;
+  }
+}
+
+/* ===== Phone (<= 480px) ===== */
+@media (max-width: 480px) {
+  .hiw-hero,
+  .hiw-membership,
+  .hiw-proof,
+  .hiw-faq {
+    padding: 40px 20px;
+  }
+  .hiw-process-wrap {
+    padding: 0 20px 40px;
+  }
+  .hiw-process {
+    padding: 40px 20px;
+  }
+  .hiw-testimonial {
+    padding: 28px;
+  }
+}

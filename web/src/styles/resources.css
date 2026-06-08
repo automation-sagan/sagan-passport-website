@@ -1,0 +1,93 @@
+/* ============================================================================
+ * resources.css — Resources index + article template. Ported from the React
+ * build's `.res-*` / `.article-content` classes (home.css) using the Astro
+ * design tokens (--white, --glacier, --space-100/200/300, --pp, --grotesk,
+ * --text-muted). The CopyButton owns its own styles in the component.
+ * ========================================================================== */
+
+/* Article-size heading utility (the React build's .t-h1, == display size). */
+.t-h1 {
+  font-family: var(--pp);
+  font-size: clamp(32px, 4.4vw, 56px);
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: -1px;
+}
+
+/* ---- index list ---- */
+.res-list { background: var(--white); padding: 140px 64px 120px; gap: 56px; }
+.res-list__head { width: 100%; max-width: 1200px; display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end; gap: 32px; flex-wrap: wrap; }
+.res-list__intro { display: flex; flex-direction: column; gap: 16px; max-width: 560px; }
+.res-newsletter { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 340px; }
+.res-newsletter__row { display: flex; flex-direction: row; gap: 8px; }
+.res-newsletter__input { flex: 1; min-width: 0; padding: 12px 16px; border: 1px solid var(--space-300); border-radius: 999px; font-family: var(--pp); font-size: 15px; outline: none; }
+.res-newsletter__input:focus { border-color: var(--glacier); }
+.res-newsletter__btn { padding: 12px 24px; border: 0; border-radius: 999px; background: var(--glacier); color: #fff; font-family: var(--pp); font-size: 15px; cursor: pointer; }
+
+.res-grid { width: 100%; max-width: 1200px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.res-card { display: flex; flex-direction: column; gap: 16px; text-decoration: none; color: inherit; border-radius: 24px; transition: transform 0.25s ease; }
+.res-card:hover { transform: translateY(-4px); }
+.res-card__img { position: relative; width: 100%; aspect-ratio: 16 / 10; border-radius: 24px; background-color: var(--space-200); background-size: cover; background-position: center; overflow: hidden; }
+.res-card__cat { position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,0.92); color: var(--glacier); font-family: var(--grotesk); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 6px 12px; border-radius: 999px; }
+.res-card__body { display: flex; flex-direction: column; gap: 14px; padding: 0 4px; }
+.res-card__title { font-family: var(--pp); font-size: 20px; line-height: 1.3; letter-spacing: -0.5px; color: var(--glacier); margin: 0; }
+.res-card__meta { display: flex; flex-direction: row; align-items: center; gap: 8px; font-family: var(--pp); font-size: 14px; color: var(--text-muted); }
+.res-card__avatar { width: 28px; height: 28px; border-radius: 50%; background-size: cover; background-position: center; background-color: var(--space-200); flex: 0 0 auto; }
+.res-card__author { color: var(--glacier); }
+.res-card__date { color: var(--text-muted); }
+
+/* ---- article page ---- */
+.res-back { font-family: var(--pp); font-size: 15px; color: var(--text-muted); text-decoration: none; width: fit-content; }
+.res-back:hover { color: var(--glacier); }
+
+.res-hero { background: var(--space-100); padding: 140px 64px 80px; gap: 44px; }
+.res-hero__image { width: 100%; max-width: 1200px; aspect-ratio: 1.76; border-radius: 40px; background-color: var(--space-200); background-size: cover; background-position: center; }
+.res-hero__content { width: 100%; max-width: 1200px; display: flex; flex-direction: column; align-items: flex-start; gap: 24px; }
+.res-hero__bottom { width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.res-hero__author { display: flex; flex-direction: row; align-items: center; gap: 8px; }
+.res-hero__avatar { width: 40px; height: 40px; border-radius: 50%; background-size: cover; background-position: center; background-color: var(--space-200); flex: 0 0 auto; }
+.res-hero__name { font-family: var(--grotesk); font-weight: 600; font-size: 16px; color: var(--glacier); }
+.res-hero__date { font-family: var(--pp); font-size: 15px; color: var(--text-muted); }
+
+.res-body { background: var(--white); padding: 80px 64px; gap: 56px; }
+.res-sec { width: 100%; max-width: 1200px; display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start; gap: 64px; }
+.res-sec__left { flex: 1; max-width: 440px; display: flex; flex-direction: column; gap: 16px; }
+.res-sec__right { flex: 1.3; max-width: 580px; }
+
+.res-video-sec { background: var(--white); padding: 0 64px 80px; }
+.res-video { width: 100%; max-width: 1200px; aspect-ratio: 1.778; border-radius: 40px; overflow: hidden; background: #000; }
+.res-video iframe { width: 100%; height: 100%; border: 0; }
+
+.res-cta { background: rgba(255, 255, 255, 0.81); padding: 160px 64px; }
+.res-cta__content { width: 100%; max-width: 824px; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+.res-cta__scene { width: 330px; max-width: 100%; height: 66px; overflow: hidden; }
+
+/* ---- CMS rich text ---- */
+.article-content { font-family: var(--pp); color: var(--glacier); font-size: 18px; line-height: 1.7; }
+.article-content p { margin: 0 0 16px; }
+.article-content p:last-child { margin-bottom: 0; }
+.article-content ul { margin: 0 0 16px; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; }
+.article-content li { line-height: 1.6; }
+.article-content strong { font-weight: 600; }
+.article-content h3 { font-family: var(--pp); font-size: 22px; letter-spacing: -0.5px; margin: 24px 0 12px; }
+
+/* ---- responsive ---- */
+@media (max-width: 810px) {
+  .res-list { padding: 112px 32px 80px; }
+  .res-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+  .res-hero { padding: 112px 32px 56px; }
+  .res-hero__image { aspect-ratio: 16/10; }
+  .res-body { padding: 56px 32px; gap: 40px; }
+  .res-sec { flex-direction: column; gap: 16px; }
+  .res-sec__left, .res-sec__right { max-width: none; width: 100%; }
+  .res-video-sec { padding: 0 32px 56px; }
+  .res-cta { padding: 96px 32px; }
+}
+@media (max-width: 480px) {
+  .res-list { padding: 96px 20px 64px; }
+  .res-grid { grid-template-columns: 1fr; }
+  .res-hero { padding: 96px 20px 48px; }
+  .res-body { padding: 40px 20px; }
+  .res-video-sec { padding: 0 20px 40px; }
+  .res-cta { padding: 64px 20px; }
+}

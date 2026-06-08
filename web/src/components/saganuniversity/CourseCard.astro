@@ -1,0 +1,80 @@
+---
+/* CourseCard — Astro port of the React/Framer `course-component` (Event Card).
+ * A rounded image card with a bottom gradient and a title (+ optional date)
+ * below it. Used in the auto-scrolling Featured Courses ticker. */
+interface Props {
+  title: string;
+  date?: string;
+  image?: string;
+}
+const DEFAULT_IMAGE =
+  'https://framerusercontent.com/images/fwXvNEkxwq2uHuPe7Po7HHbOtTA.png?width=1440&height=1092';
+const { title, date, image = DEFAULT_IMAGE } = Astro.props;
+---
+
+<div class="su-course">
+  <div class="su-course__img" style={`background-image:url(${image})`}>
+    <div class="su-course__grad"></div>
+  </div>
+  <div class="su-course__stack">
+    <p class="su-course__title">{title}</p>
+    {date && <p class="su-course__date">{date}</p>}
+  </div>
+</div>
+
+<style>
+  .su-course {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 520px;
+    max-width: 100%;
+  }
+  .su-course__img {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1.4285714285714286 / 1;
+    border-radius: 40px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+  }
+  .su-course__grad {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 148px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%);
+    pointer-events: none;
+  }
+  .su-course__stack {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 24px;
+    width: 100%;
+  }
+  .su-course__title {
+    margin: 0;
+    font-family: var(--pp-semibold);
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--glacier);
+  }
+  .su-course__date {
+    margin: 0;
+    font-family: var(--pp);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--glacier);
+  }
+  @media (max-width: 810px) {
+    .su-course { width: 335px; }
+    .su-course__img { border-radius: 24px; }
+  }
+</style>

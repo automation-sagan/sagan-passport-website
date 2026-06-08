@@ -1,0 +1,19 @@
+---
+/* NewsletterForm — "Join the Sagan Newsletter" capture in the Resources header.
+ * Submission is prevented (wire to a real endpoint later). Styling from the
+ * global .res-newsletter classes in resources.css. */
+---
+
+<form class="res-newsletter">
+  <span class="t-eyebrow">Join the Sagan Newsletter</span>
+  <div class="res-newsletter__row">
+    <input class="res-newsletter__input" type="email" placeholder="Enter your email" aria-label="Email" />
+    <button class="res-newsletter__btn" type="submit">Join</button>
+  </div>
+</form>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>('.res-newsletter').forEach((f) =>
+    f.addEventListener('submit', (e) => e.preventDefault()),
+  );
+</script>

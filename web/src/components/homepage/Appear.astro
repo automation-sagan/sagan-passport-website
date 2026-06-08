@@ -1,0 +1,18 @@
+---
+/* Appear — whole-element on-scroll reveal (Astro port of the React Appear).
+ * Adds the global `.appear-el` class + a data-appear hook; the observer in
+ * Layout.astro toggles `.is-in` when it enters view. `delay` staggers it. */
+interface Props {
+  as?: string;
+  class?: string;
+  delay?: number;
+  blur?: boolean;
+  style?: string;
+}
+const { as = 'div', class: className = '', delay = 0, blur = true, style = '' } = Astro.props;
+const Tag = as as any;
+const cls = ['appear-el', blur ? '' : 'appear-el--noblur', className].filter(Boolean).join(' ');
+const styleAttr = `transition-delay:${delay}s;${style}`;
+---
+
+<Tag class={cls} data-appear style={styleAttr}><slot /></Tag>

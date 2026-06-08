@@ -1,0 +1,45 @@
+---
+import AppearText from './AppearText.astro';
+import Appear from './Appear.astro';
+import ButtonOutline from './ButtonOutline.astro';
+import FeatureCard from './FeatureCard.astro';
+import { imgUrl } from '../../lib/sanityImage';
+import type { HomepageData } from '../../lib/homepage';
+
+/* Card section — large image feature card + a 3-up feature grid (content from Sanity). */
+interface Props {
+  bigCard?: HomepageData['bigCard'];
+  features?: HomepageData['features'];
+}
+const { bigCard, features = [] } = Astro.props;
+const bigCardBg = imgUrl(bigCard?.image);
+const btn = bigCard?.button;
+---
+
+<section class="section cards">
+  <div class="bigcard" style={`background-image:url(${bigCardBg})`}>
+    <div class="bigcard__overlay"></div>
+    <div class="bigcard__content">
+      <AppearText as="h2" class="t-h2" style="color:rgb(255,255,255)" delay={0} text={bigCard?.heading ?? ''} />
+      <Appear as="p" class="t-body" style="color:rgb(255,255,255)" delay={0.12}>
+        {bigCard?.body ?? ''}
+      </Appear>
+      {
+        btn ? (
+          <Appear delay={0.2}>
+            <ButtonOutline
+              label={btn.label}
+              href={btn.href}
+              external={btn.external}
+              variant={btn.variant === 'white' ? 'white' : 'outline'}
+            />
+          </Appear>
+        ) : null
+      }
+    </div>
+  </div>
+
+  <Appear class="feature-grid">
+    {(features ?? []).map((f) => <FeatureCard title={f.title} description={f.description ?? ''} />)}
+  </Appear>
+</section>

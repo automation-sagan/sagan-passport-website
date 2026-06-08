@@ -1,0 +1,99 @@
+---
+/* /blog/[slug] — blog article, rebuilt to match the live Framer saganpassport
+ * blog post template: a content-width rounded cover image (linked to the
+ * consult call), then a two-column grid — main content (breadcrumb → title →
+ * meta → lead → single-column SECTION blocks) + a sticky right sidebar (More
+ * from the blog + CTA). */
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+import BlogCTA from '../../components/blog/BlogCTA.astro';
+import { BLOG_POSTS, formatDate, type BlogPost } from '../../data/blog';
+import '../../styles/resources.css';
+import '../../styles/blog.css';
+import '../../styles/blog-article.css';
+
+/* The live template wraps the cover image in the same "Schedule a Call" link
+ * used site-wide (Navbar / BlogCTA). */
+const CALENDLY_URL =
+  'https://calendly.com/d/5j7-3xv-p5k/global-talent-hiring-consultation?utm_source=saganpassportdotcom&utm_term=talent';
+
+export function getStaticPaths() {
+  return BLOG_POSTS.map((p) => ({ params: { slug: p.slug }, props: { post: p } }));
+}
+
+const { post } = Astro.props as { post: BlogPost };
+const more = BLOG_POSTS.filter((p) => p.slug !== post.slug).slice(0, 3);
+const metaBits = [post.date ? formatDate(post.date) : null, post.author, post.readTime].filter(Boolean);
+---
+
+<Layout title={`${post.title} — Sagan Passport`}>
+  <Navbar />
+  <div class="home">
+    <article class="bp">
+      <div class="bp__container">
+        {post.image && (
+          <a class="bp__cover" href={CALENDLY_URL} target="_blank" rel="noreferrer">
+            <img src={post.image} alt={post.title} loading="eager" />
+          </a>
+        )}
+
+        <div class="bp__wrap">
+          <!-- main content -->
+          <div class="bp__main">
+            <p class="bp__crumb"><a href="/blog">BLOG POST</a> <span>› {post.title}</span></p>
+            <h1 class="bp__title">{post.title}</h1>
+            <p class="bp__meta">{metaBits.join('  •  ')}</p>
+
+            {post.introHtml && <div class="bp__lead article-content" set:html={post.introHtml}></div>}
+
+            {post.costCards && post.costCards.length > 0 && (
+              <div class="blog-costcards" style="margin-top:32px">
+                {post.costCards.map((c) => (
+                  <div class="blog-costcard">
+                    <span class="blog-costcard__title">{c.title}</span>
+                    <span class="blog-costcard__price">{c.price}</span>
+                    <span class="blog-costcard__unit">{c.unit}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {post.costNote && <p class="blog-costnote" style="margin-top:16px">{post.costNote}</p>}
+
+            <div class="bp__sections">
+              {post.sections.map((s) => (
+                <section class="bp__sec">
+                  {s.label && <p class="bp__seclabel">{s.label}</p>}
+                  {s.title && <h2 class="bp__sectitle">{s.title}</h2>}
+                  <div class="bp__sec-body article-content" set:html={s.html}></div>
+                </section>
+              ))}
+            </div>
+          </div>
+
+          <!-- sticky sidebar -->
+          <aside class="bp__aside">
+            {more.length > 0 && (
+              <div class="bp__more">
+                <h3 class="bp__more-title">More from the blog</h3>
+                <div class="bp__more-line"></div>
+                {more.map((p) => (
+                  <a class="bp__pc" href={`/blog/${p.slug}`}>
+                    <span class="bp__pc-thumb" style={p.image ? `background-image:url(${p.image})` : undefined}></span>
+                    <span class="bp__pc-body">
+                      <span class="bp__pc-cat">{p.category}</span>
+                      <span class="bp__pc-title">{p.title}</span>
+                      {p.readTime && <span class="bp__pc-read">{p.readTime}</span>}
+                    </span>
+                  </a>
+                ))}
+              </div>
+            )}
+            <BlogCTA />
+          </aside>
+        </div>
+      </div>
+    </article>
+  </div>
+  <Footer />
+</Layout>

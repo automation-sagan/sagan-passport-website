@@ -1,0 +1,103 @@
+---
+/* TalentPersonCard — Astro port of the Framer `talent-person-card`. A photo with
+ * a centered glassy "Play" badge and a dandelion rate pill, then role + origin
+ * below. Photo is a shared default (the data is text-only). */
+interface Props {
+  role: string;
+  from: string;
+  rate: string;
+  photo?: string;
+}
+const DEFAULT_PHOTO = 'https://framerusercontent.com/images/Cf7oDzBLWbRK8JBnTkI71VVGPo.png';
+const { role, from, rate, photo = DEFAULT_PHOTO } = Astro.props;
+---
+
+<div class="tpc">
+  <div class="tpc__photo" style={`background-image:url(${photo})`}>
+    <span class="tpc__play" aria-hidden="true">Play</span>
+    <span class="tpc__rate">{rate}</span>
+  </div>
+  <div class="tpc__text">
+    <h4 class="tpc__role">{role}</h4>
+    <p class="tpc__from">{from}</p>
+  </div>
+</div>
+
+<style>
+  .tpc {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  .tpc__photo {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1.345291479820628 / 1;
+    border-radius: 40px;
+    background-size: cover;
+    background-position: center;
+    background-color: var(--space-200);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 12px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  .tpc__play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--grotesk);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .tpc__rate {
+    position: relative;
+    z-index: 1;
+    background: var(--dandelion);
+    color: var(--glacier);
+    border-radius: 100px;
+    padding: 12px 16px;
+    font-family: var(--pp);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .tpc__text {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+  }
+  .tpc__role {
+    margin: 0;
+    font-family: var(--pp-semibold);
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--glacier);
+  }
+  .tpc__from {
+    margin: 0;
+    font-family: var(--pp);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--text-muted);
+  }
+</style>

@@ -1,0 +1,67 @@
+---
+/* BillingToggle — Monthly/Annual pill switch (Astro port of framer
+ * pricing-toggle): a white pill with two segments; the active one is a
+ * Clay-maroon pill (rgb 97,31,44) with white text. A "10% DISCOUNT ON ANNUAL
+ * BILLING" eyebrow sits below. The buttons carry data-billing-value; the
+ * toggling logic lives in PricingTable's script (it also flips the cards). */
+---
+
+<div class="pbt">
+  <div class="pbt__pill" role="tablist" aria-label="Billing period">
+    <button type="button" role="tab" aria-selected="true" class="pbt__seg is-active" data-billing-value="monthly">
+      Billed Monthly
+    </button>
+    <button type="button" role="tab" aria-selected="false" class="pbt__seg" data-billing-value="annual">
+      Billed Annually
+    </button>
+  </div>
+  <p class="pbt__note">10% Discount on Annual Billing</p>
+</div>
+
+<style>
+  .pbt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .pbt__pill {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    padding: 6px;
+    background: var(--white);
+    border-radius: 100px;
+  }
+  .pbt__seg {
+    padding: 14px 28px;
+    font-family: var(--pp);
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--glacier);
+    background: transparent;
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      background-color 0.3s cubic-bezier(0.44, 0, 0.56, 1),
+      color 0.3s cubic-bezier(0.44, 0, 0.56, 1);
+  }
+  .pbt__seg.is-active {
+    background: rgb(97, 31, 44);
+    color: var(--white);
+  }
+  .pbt__note {
+    margin: 0;
+    font-family: var(--grotesk);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    color: var(--glacier);
+  }
+</style>

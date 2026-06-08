@@ -2,5 +2,8 @@
   "name": "saganpassport",
   "private": true,
   "packageManager": "pnpm@10.32.1",
-  "engines": { "node": "22" }
+  "engines": { "node": "22" },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "sharp"]
+  }
 }

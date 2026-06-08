@@ -1,0 +1,51 @@
+---
+/* ServiceCard — Astro port of the Framer `service-card-1` (Space Between
+ * variant): a gradient card with a balanced headline + body. */
+interface Props {
+  title: string;
+  body: string;
+}
+const { title, body } = Astro.props;
+---
+
+<div class="svc">
+  <h3 class="svc__title">{title}</h3>
+  <p class="svc__body">{body}</p>
+</div>
+
+<style>
+  .svc {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 64px 52px;
+    border-radius: 48px;
+    background: linear-gradient(180deg, rgb(245, 243, 240) 0%, rgb(248, 242, 233) 67.75%);
+  }
+  .svc__title {
+    margin: 0;
+    max-width: 415px;
+    font-family: var(--pp);
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: -1px;
+    color: var(--glacier);
+    text-wrap: balance;
+  }
+  .svc__body {
+    margin: 0;
+    font-family: var(--pp);
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--glacier);
+  }
+  @media (max-width: 810px) {
+    .svc { padding: 40px; border-radius: 24px; }
+    .svc__title { font-size: 26px; }
+  }
+</style>

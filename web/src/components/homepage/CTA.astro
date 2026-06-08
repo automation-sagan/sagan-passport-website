@@ -1,0 +1,32 @@
+---
+import AppearText from './AppearText.astro';
+import Appear from './Appear.astro';
+import SplineEmbed from './SplineEmbed.astro';
+import ButtonFill from './ButtonFill.astro';
+import type { HomepageData } from '../../lib/homepage';
+
+/* CTA — heading + body from Sanity; the Spline scene and Calendly link stay in code. */
+interface Props {
+  data?: HomepageData['cta'];
+}
+const { data } = Astro.props;
+const CALENDLY_URL =
+  'https://calendly.com/d/5j7-3xv-p5k/global-talent-hiring-consultation?utm_source=saganpassportdotcom&utm_term=talent';
+---
+
+<section class="section cta">
+  <div class="cta__content">
+    <Appear class="cta__scene" blur={false}>
+      <SplineEmbed scene="https://prod.spline.design/hnKgxipHE7hU2hJC-Pua/scene.hanacode" version="1.2.29" />
+    </Appear>
+    <div class="cta__inner">
+      <AppearText as="h1" class="t-display" style="text-align:center" delay={0.1} text={data?.heading ?? ''} />
+      <Appear as="p" class="t-body" style="text-align:center" delay={0.18}>
+        {data?.body ?? ''}
+      </Appear>
+      <Appear delay={0.28}>
+        <ButtonFill label="Schedule a Call" href={CALENDLY_URL} external />
+      </Appear>
+    </div>
+  </div>
+</section>

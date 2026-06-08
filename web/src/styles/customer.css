@@ -1,0 +1,283 @@
+/* ============================================================================
+ * customer.css — section layout for the customer-vertical landing pages
+ * (/customers/home-services). Self-contained: defines the hero, logo strip,
+ * service grid, talent + roles marquees, case-study, and testimonial sections,
+ * plus a shared centered wrapper. Ported from the React build's `.hs-*` /
+ * `.marquee` classes in example-unframer-app/src/home.css, using the Astro
+ * design tokens (--bg, --white, --glacier, --mint, --space-200).
+ * ========================================================================== */
+
+/* ---- shared centered wrapper ---- */
+.hs-centered {
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+/* ---- marquee (auto-scroll, pauses on hover) ---- */
+.marquee {
+  width: 100%;
+  overflow: hidden;
+}
+.marquee__track {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--gap, 24px);
+  width: max-content;
+  animation: marquee-scroll var(--dur, 55s) linear infinite;
+}
+.marquee__track > * {
+  flex: 0 0 auto;
+}
+.marquee__track--reverse {
+  animation-direction: reverse;
+}
+.marquee__track--tight {
+  gap: 16px;
+}
+.marquee:hover .marquee__track {
+  animation-play-state: paused;
+}
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee__track { animation: none; }
+  .marquee { overflow-x: auto; }
+}
+
+/* ---- hero ---- */
+.hs-hero {
+  background: var(--white);
+  padding: 140px 64px 80px;
+}
+.hs-hero__inner {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 80px;
+}
+.hs-hero__left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 0 24px;
+}
+.hs-hero__eyebrow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+.hs-hero__icon {
+  width: 48px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--mint);
+  flex: 0 0 auto;
+}
+.hs-hero__text {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.hs-hero__img {
+  width: 50%;
+  aspect-ratio: 1;
+  max-height: 70vh;
+  border-radius: 48px;
+  background-color: var(--space-200);
+  background-size: cover;
+  background-position: center;
+  flex: 0 0 auto;
+}
+
+/* ---- logos ---- */
+.hs-logos {
+  background: var(--white);
+  padding: 48px 64px;
+  gap: 48px;
+}
+.hs-logos__inner {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+}
+.hs-logos__grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(50px, 200px));
+  gap: 40px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+.hs-logos__cell {
+  height: 51px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* ---- service cards (2×2) ---- */
+.hs-cards {
+  background: var(--white);
+  padding: 80px 32px;
+}
+.hs-cards__grid {
+  width: 100%;
+  max-width: 1200px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+
+/* ---- talent ---- */
+.hs-talent {
+  background: var(--white);
+  padding: 80px 64px;
+  gap: 48px;
+}
+.hs-talent__people {
+  width: 100%;
+  max-width: 1200px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.hs-talent__tickers {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ---- case study ---- */
+.hs-case {
+  background: var(--bg);
+  padding: 80px 64px;
+  gap: 80px;
+}
+.hs-case__content {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+/* ---- testimonials ---- */
+.hs-tsection {
+  background: var(--bg);
+  padding: 80px 64px 136px;
+}
+
+/* ---- roles ---- */
+.hs-roles {
+  background: var(--white);
+  padding: 80px 64px;
+  gap: 48px;
+}
+
+/* ---- case-study video (mirrors the React .su-video) ---- */
+.hs-video {
+  position: relative;
+  width: 100%;
+  max-width: 1400px;
+  aspect-ratio: 1.657;
+  border-radius: 40px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.hs-video__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0));
+  z-index: 0;
+}
+.hs-video__play {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- video lightbox modal (created dynamically → global, unscoped) ---- */
+.su-vlb-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.85);
+}
+.su-vlb-modal__inner {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  aspect-ratio: 16 / 9;
+}
+.su-vlb-modal__frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 16px;
+}
+.su-vlb-modal__close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+.su-vlb-modal__close:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* ---- responsive ---- */
+@media (max-width: 810px) {
+  .hs-hero { padding: 112px 32px 56px; }
+  .hs-hero__inner { flex-direction: column; gap: 40px; }
+  .hs-hero__left { padding: 0; }
+  .hs-hero__img { width: 100%; aspect-ratio: 16/10; }
+  .hs-logos { padding: 40px 32px; }
+  .hs-logos__grid { grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  .hs-cards { padding: 56px 24px; }
+  .hs-cards__grid { grid-template-columns: 1fr; gap: 24px; }
+  .hs-talent, .hs-roles { padding: 56px 32px; }
+  .hs-talent__people { grid-template-columns: 1fr; gap: 24px; }
+  .hs-case { padding: 56px 32px; gap: 56px; }
+  .hs-tsection { padding: 56px 32px 96px; }
+}
+@media (max-width: 480px) {
+  .hs-hero { padding: 96px 20px 48px; }
+  .hs-logos { padding: 32px 20px; }
+  .hs-logos__grid { grid-template-columns: repeat(2, 1fr); }
+  .hs-cards { padding: 40px 20px; }
+  .hs-talent, .hs-roles { padding: 40px 20px; }
+  .hs-case { padding: 40px 20px; }
+}

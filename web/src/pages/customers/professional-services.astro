@@ -1,0 +1,16 @@
+---
+/* /customers/professional-services — Astro build of the Professional Services customer vertical.
+ * Shares CustomerTemplate, driven by the professionalServices data config. */
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+import CustomerTemplate from '../../components/customer/CustomerTemplate.astro';
+import { professionalServices } from '../../data/customers';
+import '../../styles/customer.css';
+---
+
+<Layout title="Professional Services — Sagan Passport">
+  <Navbar />
+  <CustomerTemplate data={professionalServices} />
+  <Footer />
+</Layout>

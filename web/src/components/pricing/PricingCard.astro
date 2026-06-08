@@ -1,0 +1,188 @@
+---
+/* ----------------------------------------------------------------------------
+ * PricingCard — one plan column (Astro port of framer pricing-card): accent
+ * dots, title, a colored price label, description, a "BEST FOR" block, the
+ * "WHAT'S INCLUDED" feature stack, and the Get Started CTA — all tinted by the
+ * plan's accent. The recommended plan gets a badge and (on desktop) pops
+ * above/below its neighbors.
+ *
+ * Astro is static, so the monthly/annual variants are BOTH rendered (price
+ * spans + feature groups, each tagged data-billing-show); PricingTable's CSS
+ * shows the active one based on the table's data-billing attribute, and its
+ * script flips that attribute on toggle. No client framework needed.
+ * ------------------------------------------------------------------------- */
+import FeatureRow from './FeatureRow.astro';
+import GetStartedButton from './GetStartedButton.astro';
+import type { Plan } from './pricing';
+
+interface Props {
+  plan: Plan;
+}
+const { plan } = Astro.props;
+const { accent, accentDots, recommended, title, price, description, bestFor, features, ctaHref, ctaExternal } = plan;
+---
+
+<article class:list={['pcard', { 'pcard--recommended': recommended }]}>
+  {recommended && <span class="pcard__badge" style={`background:${accent}`}>Recommended</span>}
+
+  <div class="pcard__head">
+    <div class="pcard__dots">
+      {Array.from({ length: accentDots }).map(() => <span class="pcard__dot" style={`background:${accent}`}></span>)}
+    </div>
+    <h3 class="pcard__title">{title}</h3>
+    <span class="pcard__price" data-billing-show="monthly" style={`color:${accent}`}>{price.monthly}</span>
+    <span class="pcard__price" data-billing-show="annual" style={`color:${accent}`}>{price.annual}</span>
+  </div>
+
+  <p class="pcard__desc">{description}</p>
+
+  <div class="pcard__block">
+    <span class="pcard__label">Best For</span>
+    <p class="pcard__text">{bestFor}</p>
+  </div>
+
+  <div class="pcard__block pcard__included">
+    <span class="pcard__label">What&rsquo;s Included</span>
+    <div class="pcard__features" data-billing-show="monthly">
+      {features.monthly.map((f) => <FeatureRow text={f} accent={accent} />)}
+    </div>
+    <div class="pcard__features" data-billing-show="annual">
+      {features.annual.map((f) => <FeatureRow text={f} accent={accent} />)}
+    </div>
+  </div>
+
+  <div class="pcard__cta">
+    <GetStartedButton href={ctaHref} accent={accent} external={ctaExternal} />
+  </div>
+</article>
+
+<style>
+  .pcard {
+    position: relative;
+    flex: 1 1 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 40px;
+    background: var(--white);
+    border: 1px solid rgb(227, 222, 216);
+    border-radius: 32px;
+    box-shadow:
+      0.0602px 0.6022px 0.6052px -1.0833px rgba(0, 0, 0, 0.11),
+      0.2289px 2.2885px 2.2999px -2.1667px rgba(0, 0, 0, 0.1),
+      1px 10px 10.0499px -3.25px rgba(0, 0, 0, 0.06);
+  }
+  /* Recommended card pops above/below its neighbors and lifts off the page. */
+  .pcard--recommended {
+    margin: -24px 0;
+    box-shadow:
+      0px 1.2px 1.2px -1.0833px rgba(0, 0, 0, 0.14),
+      0px 4.6px 4.6px -2.1667px rgba(0, 0, 0, 0.12),
+      0px 20px 20px -3.25px rgba(0, 0, 0, 0.1);
+  }
+
+  .pcard__badge {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    padding: 7px 14px;
+    font-family: var(--grotesk);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    color: var(--white);
+    border-radius: 100px;
+  }
+
+  .pcard__head {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .pcard__dots {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+  }
+  .pcard__dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+  }
+  .pcard__title {
+    margin: 0;
+    font-family: var(--pp);
+    font-size: 26px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: var(--glacier);
+  }
+  .pcard__price {
+    font-family: var(--grotesk);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .pcard__desc {
+    margin: 0;
+    font-family: var(--pp);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--glacier);
+  }
+
+  .pcard__block {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .pcard__label {
+    font-family: var(--grotesk);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    color: rgb(121, 116, 110);
+  }
+  .pcard__text {
+    margin: 0;
+    font-family: var(--pp);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--glacier);
+  }
+  .pcard__included {
+    gap: 0;
+  }
+  .pcard__included .pcard__label {
+    margin-bottom: 4px;
+  }
+  .pcard__features {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pcard__cta {
+    margin-top: auto;
+    padding-top: 8px;
+  }
+
+  @media (max-width: 810px) {
+    .pcard {
+      padding: 32px;
+    }
+    .pcard--recommended {
+      margin: 0;
+    }
+  }
+</style>

@@ -1,0 +1,49 @@
+---
+/* FAQ — heading (left) + accordion (right). Q&A content verbatim from the page. */
+import FaqAccordion from './FaqAccordion.astro';
+import type { QA } from './FaqAccordion.astro';
+
+const FAQS: QA[] = [
+  {
+    question: 'What’s your vetting process for candidates?',
+    answer:
+      'We don’t send resumes. We send finalists.\n\nEvery candidate goes through a structured, multi-step screening process before you ever meet them:\n\nDirect sourcing from proven global markets (LATAM, South Africa, Eastern Europe, Asia-Pacific, and beyond)\n\nRole-specific experience validation\n\nLive English and communication interviews\n\nU.S. business culture alignment screening\n\nSkills assessments or portfolio review when applicable\n\nWe evaluate for competence, communication, and accountability. Only candidates who meet our standards are introduced to you.',
+  },
+  {
+    question: 'What happens if Sagan can’t find the right role for my business requirements?',
+    answer:
+      'We are transparent from the start.\n\nBefore launching a search, we calibrate role scope, compensation, and expectations with you. If something is unrealistic, we’ll tell you upfront.\n\nIf we begin a search and the market requires adjustment, we provide:\n\nReal-time salary benchmarking\n\nMarket availability feedback\n\nRecommended refinements\n\nIf you don’t hire, there’s no obligation under our placement model. We succeed when you do.',
+  },
+  {
+    question: 'Do you provide ongoing support after placement?',
+    answer:
+      'Yes. Our goal is long-term success, not a transaction.\n\nAfter placement, we provide:\n\nOnboarding guidance\n\nRemote management best practices\n\nSupport during the guarantee window\n\nOngoing hiring support for members\n\nWe stay involved to ensure the hire works.',
+  },
+  {
+    question: 'What makes your talent pool different from other placement agencies?',
+    answer:
+      'Three things:\n\nFocus. We specialize in remote global talent for U.S. companies. It’s not an add-on. It’s our core business.\n\nPrecision. We present a curated shortlist, not a flood of unqualified applicants.\n\nDual alignment. We prepare both the employer and the candidate for a successful working relationship. That reduces friction and increases retention.',
+  },
+  {
+    question: 'Can I request specialized or niche skills?',
+    answer:
+      'Yes.\n\nWe place talent across:\n\nIT and engineering\n\nFinance and accounting\n\nSales development and closers\n\nOperations and executive support\n\nMarketing, analytics, and growth roles\n\nIndustry-specific roles (home services, PE-backed platforms, real estate, and more)\n\nFor niche roles, we validate feasibility, confirm compensation ranges, and set realistic timelines before launching the search.',
+  },
+  {
+    question: 'Do you offer a satisfaction or replacement guarantee?',
+    answer:
+      'Yes.\n\nAll placements are backed by a 90-day replacement guarantee. If the hire does not work out within that period due to performance or fit, we will conduct a replacement search at no additional placement fee.\n\nWe are aligned with you from day one. Our objective is a durable, high-performing hire.\n\nAnd for Sagan members we offer unlimited replacements for voluntary departures. At no additional cost, as long as a membership is active, any team member who resigns can be replaced with no time limits and no extra fees.',
+  },
+];
+---
+
+<section class="section hiw-faq">
+  <div class="hiw-faq__inner">
+    <div class="hiw-faq__head">
+      <h3 class="t-h3" style="max-width:291px;margin:0">Frequently Asked Questions</h3>
+    </div>
+    <div class="hiw-faq__list">
+      <FaqAccordion items={FAQS} />
+    </div>
+  </div>
+</section>

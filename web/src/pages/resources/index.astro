@@ -1,0 +1,32 @@
+---
+/* /resources — Resources index: intro + newsletter over a 3-up card grid. */
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+import ResourceCard from '../../components/resources/ResourceCard.astro';
+import NewsletterForm from '../../components/resources/NewsletterForm.astro';
+import { RESOURCES } from '../../data/resources';
+import '../../styles/resources.css';
+---
+
+<Layout title="Resources — Sagan Passport">
+  <Navbar />
+  <div class="home">
+    <section class="section res-list">
+      <div class="res-list__head">
+        <div class="res-list__intro">
+          <h1 class="t-h2" style="margin:0">Resources</h1>
+          <p class="t-body" style="margin:0">
+            A collection of thought leadership and strategic content from our team.
+          </p>
+        </div>
+        <NewsletterForm />
+      </div>
+
+      <div class="res-grid">
+        {RESOURCES.map((r) => <ResourceCard resource={r} />)}
+      </div>
+    </section>
+  </div>
+  <Footer />
+</Layout>

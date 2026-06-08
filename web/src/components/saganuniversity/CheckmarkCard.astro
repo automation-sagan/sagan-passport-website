@@ -1,0 +1,43 @@
+---
+/* CheckmarkCard — Astro port of the Framer `checkmark-card`. A 38px checkmark
+ * icon above a short supporting line, in a 276px column. Used in the
+ * "Our Unique Approach" grid. */
+interface Props {
+  text: string;
+}
+const CHECK_ICON =
+  'https://framerusercontent.com/images/1i53LccbVs7fHThj7a2TfwA.png?width=40&height=40';
+const { text } = Astro.props;
+---
+
+<div class="su-check">
+  <img class="su-check__icon" src={CHECK_ICON} alt="" loading="lazy" />
+  <p class="su-check__text">{text}</p>
+</div>
+
+<style>
+  .su-check {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 24px;
+    width: 276px;
+    max-width: 100%;
+  }
+  .su-check__icon {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    display: block;
+    flex: none;
+  }
+  .su-check__text {
+    margin: 0;
+    font-family: var(--pp);
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--glacier);
+  }
+</style>

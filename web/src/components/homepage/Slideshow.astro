@@ -1,0 +1,218 @@
+---
+/* Slideshow — testimonial carousel (Astro port, vanilla JS). Crossfade between
+ * slides, prev/next arrows, dot indicators, 4s autoplay. Slide data is embedded
+ * as JSON and driven by the client script below. Content comes from Sanity. */
+import { imgUrl } from '../../lib/sanityImage';
+import type { HomepageData } from '../../lib/homepage';
+
+interface Slide {
+  image: string;
+  quote: string;
+  name: string;
+  title: string;
+}
+
+interface Props {
+  slides?: HomepageData['slides'];
+}
+const { slides = [] } = Astro.props;
+const SLIDES: Slide[] = (slides ?? []).map((s) => ({
+  image: imgUrl(s.image),
+  quote: s.quote,
+  name: s.name,
+  title: s.title ?? '',
+}));
+const AUTOPLAY = 4;
+---
+
+<div class="slidex" data-autoplay={AUTOPLAY}>
+  <div class="slidex__slide" data-slide>
+    <img class="slidex__img" src={SLIDES[0].image} alt={SLIDES[0].name} loading="lazy" />
+    <p class="slidex__quote">{SLIDES[0].quote}</p>
+    <div class="slidex__meta">
+      <p class="slidex__name">{SLIDES[0].name}</p>
+      <p class="slidex__title">{SLIDES[0].title}</p>
+    </div>
+  </div>
+
+  <div class="slidex__controls">
+    <button class="slidex__arrow" data-prev aria-label="Previous slide">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true">
+        <path d="M18 12H6M6 12L12 6M6 12L12 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </button>
+    <div class="slidex__dots">
+      {SLIDES.map((_, d) => (
+        <button class={`slidex__dot${d === 0 ? ' is-active' : ''}`} data-dot={d} aria-label={`Go to slide ${d + 1}`}></button>
+      ))}
+    </div>
+    <button class="slidex__arrow" data-next aria-label="Next slide">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true">
+        <path d="M6 12h12M18 12l-6-6M18 12l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </button>
+  </div>
+
+  <script type="application/json" data-slides set:html={JSON.stringify(SLIDES)}></script>
+</div>
+
+<style>
+  .slidex {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 40px 64px;
+    background: var(--bg);
+  }
+  .slidex__slide {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    animation: slidex-fade 0.35s ease;
+  }
+  @keyframes slidex-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .slidex__img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .slidex__quote {
+    max-width: 800px;
+    margin: 0;
+    text-align: center;
+    font-family: var(--pp);
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--glacier);
+  }
+  .slidex__meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .slidex__name {
+    margin: 0;
+    font-family: var(--pp-semibold);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--glacier);
+  }
+  .slidex__title {
+    margin: 0;
+    font-family: var(--pp);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: rgb(74, 107, 107);
+  }
+  .slidex__controls {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .slidex__arrow {
+    width: 48px;
+    height: 48px;
+    flex: none;
+    border-radius: 50%;
+    border: 1px solid var(--glacier);
+    background: transparent;
+    color: var(--glacier);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+  }
+  .slidex__arrow:hover {
+    background: var(--space-300);
+  }
+  .slidex__dots {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .slidex__dot {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: var(--glacier);
+    cursor: pointer;
+    transition: width 0.3s ease;
+  }
+  .slidex__dot.is-active {
+    width: 40px;
+  }
+  @media (max-width: 810px) {
+    .slidex {
+      padding: 20px;
+    }
+    .slidex__quote {
+      font-size: 20px;
+      line-height: 1.3;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.slidex').forEach((root) => {
+    const json = root.querySelector('[data-slides]')?.textContent;
+    if (!json) return;
+    const data: { image: string; quote: string; name: string; title: string }[] = JSON.parse(json);
+    const slide = root.querySelector<HTMLElement>('[data-slide]')!;
+    const img = root.querySelector<HTMLImageElement>('.slidex__img')!;
+    const quote = root.querySelector<HTMLElement>('.slidex__quote')!;
+    const name = root.querySelector<HTMLElement>('.slidex__name')!;
+    const title = root.querySelector<HTMLElement>('.slidex__title')!;
+    const dots = Array.from(root.querySelectorAll<HTMLElement>('[data-dot]'));
+    const n = data.length;
+    const intervalMs = (parseFloat(root.dataset.autoplay || '4') || 4) * 1000;
+    let i = 0;
+    let timer: number;
+
+    const render = () => {
+      const s = data[i];
+      img.src = s.image;
+      img.alt = s.name;
+      quote.textContent = s.quote;
+      name.textContent = s.name;
+      title.textContent = s.title;
+      dots.forEach((d, di) => d.classList.toggle('is-active', di === i));
+      // restart the fade animation
+      slide.style.animation = 'none';
+      void slide.offsetWidth;
+      slide.style.animation = '';
+    };
+    const go = (idx: number) => {
+      i = ((idx % n) + n) % n;
+      render();
+    };
+    const restart = () => {
+      clearInterval(timer);
+      timer = window.setInterval(() => go(i + 1), intervalMs);
+    };
+
+    root.querySelector('[data-prev]')?.addEventListener('click', () => { go(i - 1); restart(); });
+    root.querySelector('[data-next]')?.addEventListener('click', () => { go(i + 1); restart(); });
+    dots.forEach((d, di) => d.addEventListener('click', () => { go(di); restart(); }));
+
+    if (n > 1) timer = window.setInterval(() => go(i + 1), intervalMs);
+  });
+</script>

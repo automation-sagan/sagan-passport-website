@@ -1,0 +1,23 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import HiwHero from '../components/howitworks/HiwHero.astro';
+import ProcessSection from '../components/howitworks/ProcessSection.astro';
+import MembershipSection from '../components/howitworks/MembershipSection.astro';
+import ProofSection from '../components/howitworks/ProofSection.astro';
+import FaqSection from '../components/howitworks/FaqSection.astro';
+import '../styles/howitworks.css';
+---
+
+<Layout title="How It Works — Sagan Passport">
+  <Navbar />
+  <div class="home">
+    <HiwHero />
+    <ProcessSection />
+    <MembershipSection />
+    <ProofSection />
+    <FaqSection />
+  </div>
+  <Footer />
+</Layout>

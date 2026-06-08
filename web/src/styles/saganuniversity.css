@@ -1,0 +1,265 @@
+/* ============================================================================
+ * saganuniversity.css — section layout for /sagan-university.
+ *
+ * Self-contained: defines its own centered wrapper, feature grid, and large-card
+ * overlay (su-scoped) so the page needs no other section stylesheet. Leaf cards
+ * (CourseCard, ProgramCard, …) own their styles in their .astro files. Mirrors
+ * the React build's `.su-*` classes from example-unframer-app/src/home.css,
+ * using the Astro design tokens (--bg, --white, --glacier, --pp, --grotesk).
+ * Modal styles for the video lightbox are global because the overlay is created
+ * dynamically in JS (Astro's scoped attributes would not reach it).
+ * ========================================================================== */
+
+/* ---- shared wrappers ---- */
+.su-centered {
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+.su-feature-grid {
+  width: 100%;
+  max-width: 1200px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 60px;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+/* ---- hero ---- */
+.su-hero {
+  background: var(--bg);
+  padding: 140px 64px 80px;
+}
+.su-hero__buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ---- featured-courses ticker (auto-scrolling marquee) ---- */
+.su-ticker {
+  background: var(--bg);
+  border-radius: 0 0 48px 48px;
+  padding: 4px 0 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  width: 100%;
+}
+.su-ticker__label {
+  font-family: var(--grotesk);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--glacier);
+}
+.su-ticker__viewport {
+  width: 100%;
+  overflow: hidden;
+}
+.su-ticker__track {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  animation: su-ticker-scroll 60s linear infinite;
+}
+.su-ticker__track > * {
+  flex: 0 0 auto;
+}
+.su-ticker__viewport:hover .su-ticker__track {
+  animation-play-state: paused;
+}
+@keyframes su-ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ---- why ---- */
+.su-why {
+  background: var(--white);
+  padding: 80px 64px;
+  gap: 80px;
+}
+
+/* ---- programs ---- */
+.su-programs {
+  background: var(--bg);
+  border-radius: 32px;
+  padding: 80px 64px;
+}
+.su-program-grid {
+  width: 100%;
+  max-width: 1200px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px 8px;
+}
+
+/* ---- approach ---- */
+.su-approach {
+  background: var(--white);
+  padding: 80px 64px;
+  gap: 80px;
+}
+.su-check-grid {
+  width: 100%;
+  max-width: 1200px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 56px 48px;
+  padding: 0 24px;
+  box-sizing: border-box;
+  justify-items: center;
+}
+.su-largecard {
+  position: relative;
+  width: 100%;
+  max-width: 1440px;
+  min-height: 480px;
+  border-radius: 40px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding: 64px;
+  box-sizing: border-box;
+}
+.su-largecard__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0));
+}
+.su-largecard__content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ---- testimonials ---- */
+.su-testimonial-wrap {
+  background: var(--white);
+  padding: 0 8px;
+  width: 100%;
+}
+.su-testimonial {
+  width: 100%;
+  background: var(--bg);
+  border-radius: 48px;
+  padding: 80px 64px 48px;
+}
+
+/* ---- case study / video ---- */
+.su-case {
+  background: var(--white);
+  padding: 80px 64px;
+  gap: 80px;
+}
+.su-case__content {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+}
+.su-video {
+  position: relative;
+  width: 100%;
+  max-width: 1400px;
+  aspect-ratio: 1.657;
+  border-radius: 40px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.su-video__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0));
+  z-index: 0;
+}
+.su-video__play {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- video lightbox modal (created dynamically → global, unscoped) ---- */
+.su-vlb-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.85);
+}
+.su-vlb-modal__inner {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  aspect-ratio: 16 / 9;
+}
+.su-vlb-modal__frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 16px;
+}
+.su-vlb-modal__close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+.su-vlb-modal__close:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* ---- responsive ---- */
+@media (max-width: 810px) {
+  .su-hero { padding: 112px 32px 56px; }
+  .su-why, .su-approach, .su-case { padding: 56px 32px; gap: 56px; }
+  .su-programs { padding: 56px 32px; border-radius: 24px; }
+  .su-testimonial { padding: 56px 32px 40px; border-radius: 32px; }
+  .su-program-grid { grid-template-columns: 1fr; gap: 24px; }
+  .su-check-grid { grid-template-columns: 1fr 1fr; gap: 40px 24px; padding: 0; }
+  .su-largecard { padding: 40px 28px; min-height: 360px; }
+  .su-feature-grid { grid-template-columns: 1fr; gap: 40px; padding: 0; }
+}
+@media (max-width: 480px) {
+  .su-hero, .su-why, .su-approach, .su-case { padding: 40px 20px; }
+  .su-programs { padding: 40px 20px; }
+  .su-check-grid { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,120 @@
+---
+/* CustomerTemplate — the shared customer-vertical landing page (Astro). Driven
+ * entirely by a CustomerData config so every vertical reuses one template.
+ * Leaf cards live in this folder; the play button, testimonial carousel, and
+ * video lightbox are reused from components/saganuniversity/. */
+import ServiceCard from './ServiceCard.astro';
+import TalentPersonCard from './TalentPersonCard.astro';
+import TalentCard from './TalentCard.astro';
+import RoleCard from './RoleCard.astro';
+import PlayButton from '../saganuniversity/PlayButton.astro';
+import TestimonialSlideshow from '../saganuniversity/TestimonialSlideshow.astro';
+import VideoLightbox from '../saganuniversity/VideoLightbox.astro';
+import type { CustomerData } from '../../data/customers';
+
+interface Props {
+  data: CustomerData;
+}
+const { data } = Astro.props;
+const ticker1 = [...data.talent.ticker1, ...data.talent.ticker1];
+const ticker2 = [...data.talent.ticker2, ...data.talent.ticker2];
+const roleEntries = [...data.roles.entries, ...data.roles.entries];
+---
+
+<div class="home">
+  <!-- Hero -->
+  <section class="section hs-hero">
+    <div class="hs-hero__inner">
+      <div class="hs-hero__left">
+        <div class="hs-hero__eyebrow">
+          <span class="hs-hero__icon" aria-hidden="true"></span>
+          <span class="t-eyebrow">{data.eyebrow}</span>
+        </div>
+        <div class="hs-hero__text">
+          <h2 class="t-h2">{data.hero.title}</h2>
+          <p class="t-body">{data.hero.body}</p>
+        </div>
+      </div>
+      <div class="hs-hero__img" style={`background-image:url(${data.hero.image})`}></div>
+    </div>
+  </section>
+
+  <!-- Logos -->
+  <section class="section hs-logos">
+    <div class="hs-logos__inner">
+      <p class="t-body" style="text-align:center">{data.logosHeading}</p>
+      <div class="hs-logos__grid">
+        {data.logos.map((src) => (
+          <div class="hs-logos__cell" style={src ? `background-image:url(${src})` : undefined}></div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Service cards (2×2) -->
+  <section class="section hs-cards">
+    <div class="hs-cards__grid">
+      {data.serviceCards.map((c) => <ServiceCard title={c.title} body={c.body} />)}
+    </div>
+  </section>
+
+  <!-- Talent -->
+  <section class="section hs-talent">
+    <div class="hs-centered" style="max-width:600px">
+      <h2 class="t-h2" style="text-align:center">{data.talent.heading}</h2>
+      <p class="t-body" style="text-align:center">{data.talent.subheading}</p>
+    </div>
+    <div class="hs-talent__people">
+      {data.talent.people.map((p) => <TalentPersonCard role={p.role} from={p.from} rate={p.rate} />)}
+    </div>
+    <div class="hs-talent__tickers">
+      <div class="marquee">
+        <div class="marquee__track">
+          {ticker1.map((t) => <TalentCard label={t} />)}
+        </div>
+      </div>
+      <div class="marquee">
+        <div class="marquee__track marquee__track--reverse">
+          {ticker2.map((t) => <TalentCard label={t} />)}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Case study -->
+  <section class="section hs-case">
+    <div class="hs-case__content">
+      <h2 class="t-h2" style="max-width:580px">{data.caseStudy.title}</h2>
+      <p class="t-body" style="max-width:900px">{data.caseStudy.body}</p>
+    </div>
+    <VideoLightbox
+      class="hs-video"
+      youtubeId={data.caseStudy.youtubeId}
+      style={`background-image:url(${data.caseStudy.image})`}>
+      <div class="hs-video__overlay"></div>
+      <div class="hs-video__play">
+        <PlayButton />
+      </div>
+    </VideoLightbox>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="section hs-tsection">
+    <div style="width:100%;max-width:1056px">
+      <TestimonialSlideshow slides={data.testimonials} />
+    </div>
+  </section>
+
+  <!-- Roles ticker -->
+  <section class="section hs-roles">
+    <div class="hs-centered">
+      <h3 class="t-h3" style="text-align:center">{data.roles.heading}</h3>
+      <p class="t-body" style="text-align:center">{data.roles.body}</p>
+    </div>
+    <div class="marquee">
+      <div class="marquee__track marquee__track--tight">
+        {roleEntries.map((r) => <RoleCard title={r.title} country={r.country} rate={r.rate} />)}
+      </div>
+    </div>
+  </section>
+</div>

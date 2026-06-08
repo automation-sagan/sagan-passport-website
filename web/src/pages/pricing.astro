@@ -1,0 +1,36 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import PricingTable from '../components/pricing/PricingTable.astro';
+import MembershipSection from '../components/howitworks/MembershipSection.astro';
+// MembershipSection uses the .hiw-membership / .hiw-centered / .hiw-toggle layout
+// classes defined in howitworks.css, so we pull that stylesheet in here too.
+import '../styles/howitworks.css';
+---
+
+<Layout title="Pricing — Sagan Passport">
+  <Navbar />
+  <div class="home">
+    <section class="section pricing-hero">
+      <PricingTable />
+    </section>
+    <MembershipSection />
+  </div>
+  <Footer />
+</Layout>
+
+<style>
+  /* Pricing hero — beige section that holds the table (matches the React
+     .pricing-hero in home.css). */
+  .pricing-hero {
+    background: var(--bg);
+    padding: 140px 32px 80px;
+    gap: 48px;
+  }
+  @media (max-width: 810px) {
+    .pricing-hero {
+      padding: 112px 20px 56px;
+    }
+  }
+</style>

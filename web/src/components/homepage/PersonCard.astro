@@ -1,0 +1,94 @@
+---
+/* PersonCard — talent ticker card (Astro port). 480×364 photo card, bottom
+ * gradient, name + role bottom-left, frosted rate pill bottom-right. */
+interface Props {
+  name: string;
+  role: string;
+  rate: string;
+  img: string;
+}
+const { name, role, rate, img } = Astro.props;
+---
+
+<article class="personx">
+  <img class="personx__img" src={img} alt={name} loading="lazy" />
+  <div class="personx__overlay"></div>
+  <div class="personx__content">
+    <div class="personx__info">
+      <span class="personx__name">{name}</span>
+      <span class="personx__role">{role}</span>
+    </div>
+    <span class="personx__rate">{rate}</span>
+  </div>
+</article>
+
+<style>
+  .personx {
+    position: relative;
+    box-sizing: border-box;
+    width: 480px;
+    height: 364px;
+    flex: none;
+    border-radius: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.16);
+    overflow: hidden;
+    background: var(--space-200);
+  }
+  .personx__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .personx__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%);
+  }
+  .personx__content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 24px;
+  }
+  .personx__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .personx__name {
+    font-family: var(--pp);
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.3;
+    color: rgb(255, 255, 255);
+  }
+  .personx__role {
+    font-family: var(--pp);
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: rgb(255, 255, 255);
+  }
+  .personx__rate {
+    flex: none;
+    font-family: var(--grotesk);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: rgb(255, 255, 255);
+    white-space: nowrap;
+    padding: 12px 16px;
+    border-radius: 40px;
+    background: rgba(0, 0, 0, 0.15);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+</style>

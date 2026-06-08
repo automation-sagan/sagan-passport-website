@@ -1,0 +1,97 @@
+---
+/* ProgramCard — Astro port of the Framer `new-program-card` (Desktop). A white
+ * card split into a top block (dandelion icon disc, title, tag) and a bottom
+ * block (body copy), divided by a 5px band. Used in the "Programs" 3-up grid. */
+interface Props {
+  title: string;
+  tag: string;
+  body: string;
+  icon?: string;
+}
+const DEFAULT_ICON =
+  'https://framerusercontent.com/images/l0yEQ46rzKhkZhDNoXzKOZYj0.png?width=32&height=32';
+const { title, tag, body, icon = DEFAULT_ICON } = Astro.props;
+---
+
+<div class="su-program">
+  <div class="su-program__top">
+    <span class="su-program__icon">
+      <img src={icon} alt="" loading="lazy" />
+    </span>
+    <h3 class="su-program__title">{title}</h3>
+    <p class="su-program__tag">{tag}</p>
+  </div>
+  <div class="su-program__bottom">
+    <p class="su-program__body">{body}</p>
+  </div>
+</div>
+
+<style>
+  .su-program {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  .su-program__top {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 24px 24px 38px;
+    background: var(--white);
+    border-bottom: 5px solid var(--space-100);
+    border-radius: 40px 40px 0 0;
+  }
+  .su-program__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 100px;
+    background: var(--dandelion);
+    flex: none;
+  }
+  .su-program__icon img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    display: block;
+  }
+  .su-program__title {
+    margin: 0;
+    max-width: 300px;
+    font-family: var(--pp);
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: -1px;
+    color: var(--glacier);
+  }
+  .su-program__tag {
+    margin: 0;
+    font-family: var(--grotesk);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--glacier);
+  }
+  .su-program__bottom {
+    display: flex;
+    flex-direction: column;
+    padding: 32px 24px 24px;
+    background: var(--white);
+    border-radius: 0 0 40px 40px;
+  }
+  .su-program__body {
+    margin: 0;
+    font-family: var(--pp);
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--glacier);
+  }
+  @media (max-width: 810px) {
+    .su-program__title { font-size: 24px; }
+  }
+</style>

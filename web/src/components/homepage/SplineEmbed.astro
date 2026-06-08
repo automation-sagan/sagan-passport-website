@@ -1,0 +1,21 @@
+---
+/* SplineEmbed — Astro port of the React SplineEmbed. Renders a Spline
+ * "hana-viewer" in an isolated iframe (so the module script executes). The
+ * scene is decorative: pointer-events:none lets scroll fall through to the
+ * page (no scroll stutter), and a transparent background keeps uncovered
+ * areas from rendering black. */
+interface Props {
+  scene: string;
+  version?: string;
+}
+const { scene, version = '1.2.29' } = Astro.props;
+const srcdoc = `<!DOCTYPE html><html><head><meta charset="utf-8"/><style>html,body{margin:0;height:100%;overflow:hidden;background:transparent}hana-viewer{display:block;width:100%;height:100%;background:transparent}</style></head><body><script type="module" src="https://cdn.spline.design/@splinetool/hana-viewer@${version}/hana-viewer.js"></script><hana-viewer url="${scene}" background="transparent" loading-anim-type="none"></hana-viewer></body></html>`;
+---
+
+<iframe
+  srcdoc={srcdoc}
+  title="spline-embed"
+  loading="lazy"
+  scrolling="no"
+  style="border:0;width:100%;height:100%;background:transparent;pointer-events:none;"
+></iframe>

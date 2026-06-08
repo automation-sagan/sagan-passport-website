@@ -1,0 +1,43 @@
+---
+import AppearText from './AppearText.astro';
+import Appear from './Appear.astro';
+import SplineEmbed from './SplineEmbed.astro';
+import type { HomepageData } from '../../lib/homepage';
+
+/* Info section — two alternating text + 3D-scene rows (row 2 reverses on mobile).
+ * Text comes from Sanity; the Spline scene URLs stay in code. */
+interface Props {
+  rows?: HomepageData['infoRows'];
+}
+const { rows = [] } = Astro.props;
+const SCENES = [
+  'https://prod.spline.design/hnKgxipHE7hU2hJC-kJ0/scene.hanacode',
+  'https://prod.spline.design/hnKgxipHE7hU2hJC-que/scene.hanacode',
+];
+const row1 = rows?.[0];
+const row2 = rows?.[1];
+---
+
+<section class="section info">
+  <!-- Row 1 — text left, scene right -->
+  <div class="info__row">
+    <div class="info__text">
+      <AppearText as="h3" class="t-h3" delay={0} text={row1?.heading ?? ''} />
+      <Appear as="p" class="t-body" delay={0.12}>{row1?.body ?? ''}</Appear>
+    </div>
+    <Appear class="info__scene" blur={false} delay={0.1}>
+      <SplineEmbed scene={SCENES[0]} />
+    </Appear>
+  </div>
+
+  <!-- Row 2 — scene left, text right -->
+  <div class="info__row info__row--reverse">
+    <Appear class="info__scene" blur={false} delay={0.1}>
+      <SplineEmbed scene={SCENES[1]} />
+    </Appear>
+    <div class="info__text">
+      <AppearText as="h3" class="t-h3" delay={0} text={row2?.heading ?? ''} />
+      <Appear as="p" class="t-body" delay={0.12}>{row2?.body ?? ''}</Appear>
+    </div>
+  </div>
+</section>

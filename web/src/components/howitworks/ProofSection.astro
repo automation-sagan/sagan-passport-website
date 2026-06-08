@@ -1,0 +1,47 @@
+---
+/* Proof — big testimonial card + G2 / Clutch rating cards (5-col grid). */
+import RatingCard from './RatingCard.astro';
+---
+
+<section class="section hiw-proof">
+  <div class="hiw-centered">
+    <p class="t-eyebrow">Read the proof</p>
+    <h2 class="t-h2" style="text-align:center">An Experience That&rsquo;s &ldquo;100 out of 100&rdquo;</h2>
+  </div>
+  <div class="hiw-proof__grid">
+    {/* Big testimonial */}
+    <div class="hiw-testimonial">
+      <div
+        class="hiw-testimonial__avatar"
+        style="background-image:url(https://framerusercontent.com/images/9x9lgYpbdPLt7Boj8OaTcDihg8.jpeg)"
+      >
+      </div>
+      <div class="hiw-testimonial__body">
+        <h3 class="t-h3">
+          &ldquo;The hiring process is honestly a little bit ridiculous in a good way. I wrote out
+          a massive wish list for an executive admin... and Sagan came back in under a week with a
+          candidate who matched my description almost exactly.&rdquo;
+        </h3>
+        <div class="hiw-nametag">
+          <span class="hiw-name">Nick Fedele</span>
+          <span class="hiw-org">Metal Alliance</span>
+        </div>
+      </div>
+    </div>
+
+    <RatingCard
+      logo="https://framerusercontent.com/images/hH7NOswMFSZR1HNVnU3lAmkjs.png"
+      logoAlt="G2"
+      rating="4.9 star rating"
+      buttonLabel="Read G2 Reviews"
+      buttonHref="https://www.g2.com/products/sagan-passport/reviews#reviews"
+    />
+    <RatingCard
+      logo="https://framerusercontent.com/images/aPaXgdHl45Ipxpu41l5DCZnRjMg.png"
+      logoAlt="Clutch"
+      rating="4.8 star rating"
+      buttonLabel="Read Clutch Reviews"
+      buttonHref="https://clutch.co/profile/sagan-passport"
+    />
+  </div>
+</section>

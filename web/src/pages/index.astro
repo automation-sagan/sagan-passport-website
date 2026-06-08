@@ -1,17 +1,30 @@
 ---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import Hero from '../components/homepage/Hero.astro';
+import TalentTicker from '../components/homepage/TalentTicker.astro';
+import LogoWall from '../components/homepage/LogoWall.astro';
+import InfoSection from '../components/homepage/InfoSection.astro';
+import FeatureCards from '../components/homepage/FeatureCards.astro';
+import Testimonials from '../components/homepage/Testimonials.astro';
+import CTA from '../components/homepage/CTA.astro';
+import { getHomepage } from '../lib/homepage';
+import '../styles/homepage.css';
 
+const home = await getHomepage();
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>sagan passport</h1>
-	</body>
-</html>
+<Layout title={home.seoTitle ?? 'Sagan Passport'}>
+  <Navbar />
+  <div class="home">
+    <Hero data={home.hero} />
+    <TalentTicker items={home.talent} />
+    <LogoWall tagline={home.logosTagline} logos={home.logos} />
+    <InfoSection rows={home.infoRows} />
+    <FeatureCards bigCard={home.bigCard} features={home.features} />
+    <Testimonials slides={home.slides} testimonials={home.testimonials} />
+    <CTA data={home.cta} />
+  </div>
+  <Footer />
+</Layout>

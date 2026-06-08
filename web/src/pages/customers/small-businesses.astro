@@ -1,0 +1,16 @@
+---
+/* /customers/small-businesses — Astro build of the Small Businesses customer vertical.
+ * Shares CustomerTemplate, driven by the smallBusinesses data config. */
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+import CustomerTemplate from '../../components/customer/CustomerTemplate.astro';
+import { smallBusinesses } from '../../data/customers';
+import '../../styles/customer.css';
+---
+
+<Layout title="Small Businesses — Sagan Passport">
+  <Navbar />
+  <CustomerTemplate data={smallBusinesses} />
+  <Footer />
+</Layout>

@@ -1,0 +1,118 @@
+---
+/* GetStartedButton — pricing-card CTA (Astro port). Dark glacier text pill + a
+ * glacier arrow circle. The circle holds TWO arrows for the hover swap (the
+ * Framer "Primary - Hover - White" variant): at rest the accent arrow sits
+ * centered; on hover it slides out to the right while a white arrow slides in
+ * from the left to take its place. Leaving the button reverses it. */
+interface Props {
+  label?: string;
+  href: string;
+  /** accent color for the resting arrow (the plan's accent) */
+  accent: string;
+  external?: boolean;
+}
+const { label = 'Get Started', href, accent, external = false } = Astro.props;
+
+const ARROW = 'M5 12h13M12 5l7 7-7 7';
+---
+
+<a
+  class="pgsb"
+  href={href}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noreferrer' : undefined}
+>
+  <span class="pgsb__label">{label}</span>
+  <span class="pgsb__circle">
+    <svg class="pgsb__arrow pgsb__arrow--a" viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true" style={`color:${accent}`}>
+      <path d={ARROW} stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+    <svg class="pgsb__arrow pgsb__arrow--b" viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
+      <path d={ARROW} stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+  </span>
+</a>
+
+<style>
+  .pgsb {
+    display: inline-flex;
+    align-items: center;
+    gap: 0; /* circle touches the pill — matches saganpassport.com */
+    padding: 0;
+    background: transparent;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: var(--pp);
+  }
+  .pgsb__label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+    padding: 0 28px;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--white);
+    background: var(--glacier);
+    border-radius: 100px;
+    white-space: nowrap;
+    transition: background-color 0.3s cubic-bezier(0.44, 0, 0.56, 1);
+  }
+  .pgsb__circle {
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--glacier);
+    transition: background-color 0.3s cubic-bezier(0.44, 0, 0.56, 1);
+  }
+  /* Two stacked arrows; both centered, offset via translateX. */
+  .pgsb__arrow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transition:
+      transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  /* Resting accent arrow: centered. Hover: slides out to the right. */
+  .pgsb__arrow--a {
+    transform: translate(-50%, -50%) translateX(0);
+    opacity: 1;
+  }
+  /* Incoming white arrow: waits off to the left. Hover: slides into center. */
+  .pgsb__arrow--b {
+    color: var(--white);
+    transform: translate(-50%, -50%) translateX(-200%);
+    opacity: 0;
+  }
+  .pgsb:hover .pgsb__arrow--a {
+    transform: translate(-50%, -50%) translateX(200%);
+    opacity: 0;
+  }
+  .pgsb:hover .pgsb__arrow--b {
+    transform: translate(-50%, -50%) translateX(0);
+    opacity: 1;
+  }
+  /* Pill + circle darken on hover. */
+  .pgsb:hover .pgsb__label,
+  .pgsb:hover .pgsb__circle {
+    background: var(--deep-glacier);
+  }
+  .pgsb:active {
+    transform: translateY(1px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pgsb__arrow {
+      transition: none;
+    }
+  }
+</style>

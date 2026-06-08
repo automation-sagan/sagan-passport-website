@@ -1,0 +1,34 @@
+---
+import Appear from './Appear.astro';
+import PersonCard from './PersonCard.astro';
+import { imgUrl } from '../../lib/sanityImage';
+import type { HomepageData } from '../../lib/homepage';
+
+/* Talent ticker — infinite marquee of PersonCards (rendered twice so the shared
+ * .marquee track loops seamlessly). Content comes from Sanity. */
+interface Props {
+  items?: HomepageData['talent'];
+}
+const { items = [] } = Astro.props;
+const TALENT = (items ?? []).map((t) => ({
+  name: t.name,
+  role: t.role ?? '',
+  rate: t.rate ?? '',
+  img: imgUrl(t.image),
+}));
+const LOOP = [...TALENT, ...TALENT];
+---
+
+<section class="ticker">
+  <Appear class="marquee" blur={false}>
+    <div class="marquee__track">
+      {
+        LOOP.map((t) => (
+          <div class="ticker__item">
+            <PersonCard name={t.name} role={t.role} rate={t.rate} img={t.img} />
+          </div>
+        ))
+      }
+    </div>
+  </Appear>
+</section>

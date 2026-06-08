@@ -1,0 +1,99 @@
+---
+/* ----------------------------------------------------------------------------
+ * PricingTable — Astro port of framer pricing-table: hero heading + subcopy,
+ * the monthly/annual BillingToggle, and the 3 PricingCards.
+ *
+ * Billing state lives in the DOM: the root .ptable carries data-billing
+ * ("monthly" by default); the cards render BOTH variants (each tagged
+ * data-billing-show) and the :global visibility CSS below reveals the active
+ * one. The vanilla script flips data-billing + the toggle's active segment.
+ * ------------------------------------------------------------------------- */
+import BillingToggle from './BillingToggle.astro';
+import PricingCard from './PricingCard.astro';
+import { PLANS } from './pricing';
+---
+
+<div class="ptable" data-billing="monthly">
+  <div class="ptable__head">
+    <h2 class="t-h2" style="text-align:center">An investment in your growth, not just a hiring fee</h2>
+    <p class="t-body" style="text-align:center">
+      We offer transparent, flexible options designed to help you build a world-class team. Choose
+      the path that matches your hiring needs and unlock your potential.
+    </p>
+  </div>
+
+  <BillingToggle />
+
+  <div class="ptable__cards">
+    {PLANS.map((plan) => <PricingCard plan={plan} />)}
+  </div>
+</div>
+
+<style>
+  .ptable {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+  }
+  .ptable__head {
+    width: 100%;
+    max-width: 700px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  .ptable__cards {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: center;
+    gap: 24px;
+    padding: 24px 0;
+  }
+
+  /* Billing visibility: show only the active variant. The targeted nodes live
+     inside PricingCard (a child component), so they need :global to match. */
+  .ptable[data-billing='monthly'] :global([data-billing-show='annual']) {
+    display: none;
+  }
+  .ptable[data-billing='annual'] :global([data-billing-show='monthly']) {
+    display: none;
+  }
+
+  @media (max-width: 810px) {
+    .ptable {
+      gap: 32px;
+    }
+    .ptable__cards {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 24px;
+      padding: 0;
+    }
+  }
+</style>
+
+<script>
+  // Billing toggle: flip the table's data-billing + the active segment. The CSS
+  // above swaps which price/feature variant is visible. (Mirrors the React
+  // PricingTable's lifted state — done with a DOM attribute here.)
+  document.querySelectorAll<HTMLElement>('.ptable').forEach((table) => {
+    const segs = Array.from(table.querySelectorAll<HTMLElement>('[data-billing-value]'));
+    segs.forEach((seg) => {
+      seg.addEventListener('click', () => {
+        const value = seg.dataset.billingValue!;
+        table.dataset.billing = value;
+        segs.forEach((other) => {
+          const on = other === seg;
+          other.classList.toggle('is-active', on);
+          other.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+      });
+    });
+  });
+</script>

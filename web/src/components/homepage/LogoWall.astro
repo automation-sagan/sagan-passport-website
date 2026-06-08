@@ -1,0 +1,28 @@
+---
+import Appear from './Appear.astro';
+import { imgUrl } from '../../lib/sanityImage';
+import type { HomepageData } from '../../lib/homepage';
+
+/* Logo wall — tagline + a grid of customer logos (content from Sanity). */
+interface Props {
+  tagline?: string;
+  logos?: HomepageData['logos'];
+}
+const { tagline = '', logos = [] } = Astro.props;
+const LOGOS = (logos ?? []).map((l) => imgUrl(l));
+---
+
+<section class="section logos">
+  <div class="logos__inner">
+    <Appear as="p" class="t-body" style="text-align:center">
+      {tagline}
+    </Appear>
+    <div class="logos__grid">
+      {
+        LOGOS.map((src, i) => (
+          <Appear class="logos__cell" style={`background-image:url(${src})`} delay={i * 0.04} />
+        ))
+      }
+    </div>
+  </div>
+</section>

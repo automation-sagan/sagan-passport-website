@@ -1,0 +1,40 @@
+---
+/* PlayButton — Astro port of the Framer `play-button` (Variant 1). A 142px
+ * dandelion-yellow circle reading "Play", darkening on hover. Visual only —
+ * the click is owned by the parent VideoLightbox trigger. */
+interface Props {
+  label?: string;
+}
+const { label = 'Play' } = Astro.props;
+---
+
+<div class="su-play" aria-hidden="true">
+  <span class="su-play__label">{label}</span>
+</div>
+
+<style>
+  .su-play {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 142px;
+    height: 142px;
+    border-radius: 100px;
+    background: var(--dandelion);
+    transition: background-color 0.2s ease-in-out;
+  }
+  .su-play__label {
+    font-family: var(--grotesk);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--glacier);
+  }
+  .su-play:hover {
+    background: rgb(230, 177, 18);
+  }
+  @media (max-width: 810px) {
+    .su-play { width: 110px; height: 110px; }
+  }
+</style>

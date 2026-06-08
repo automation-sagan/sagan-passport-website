@@ -1,0 +1,36 @@
+---
+/* /blog — light-blue hero header followed by a 3-up grid of post cards. */
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+import BlogCard from '../../components/blog/BlogCard.astro';
+import { BLOG_POSTS } from '../../data/blog';
+import '../../styles/resources.css';
+import '../../styles/blog.css';
+---
+
+<Layout title="Blog — Sagan Passport">
+  <Navbar />
+  <div class="home">
+    <section class="section blog-hero">
+      <div class="blog-hero__inner">
+        <p class="blog-hero__eyebrow">SAGAN PASSPORT BLOG</p>
+        <h1 class="t-h1" style="margin:0">Global Hiring Resources for Small Business Owners</h1>
+        <p class="blog-hero__intro">
+          The Sagan Passport blog covers everything small business owners need to know about hiring
+          international remote employees, from cost breakdowns and offshore staffing basics to
+          management advice and team-building strategy. No fluff, no jargon. Just practical guidance
+          from a team that does this every day.
+        </p>
+        <div class="blog-hero__line" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <section class="section blog-feed">
+      <div class="res-grid">
+        {BLOG_POSTS.map((p) => <BlogCard post={p} />)}
+      </div>
+    </section>
+  </div>
+  <Footer />
+</Layout>

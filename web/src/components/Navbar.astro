@@ -1,0 +1,737 @@
+---
+/* ----------------------------------------------------------------------------
+ * Navbar — 1:1 Astro port of the Framer-derived Nav (Nav.tsx + Nav.css).
+ * Menu content now comes from the Sanity "navigation" singleton (see
+ * studio/schemaTypes/navigation.ts) and is fetched in this frontmatter. The
+ * hardcoded DEFAULT_NAV below is the fallback used when the document is empty
+ * or unreachable, so the navbar always renders.
+ *
+ * NOTE: this site builds statically, so the menu is baked in at build time —
+ * editing it in Sanity requires a rebuild/redeploy to appear. (To make edits
+ * live, switch the page to SSR / on-demand rendering, or trigger a deploy from
+ * a Sanity webhook.)
+ *
+ * React-isms from the original are replaced with Astro idiom:
+ *   - react-router <Link>/useLocation  → plain <a> + Astro.url.pathname
+ *   - desktop hover dropdowns          → pure CSS :hover (no JS island)
+ *   - mobile drawer + accordions       → one small vanilla <script> below
+ * ------------------------------------------------------------------------- */
+import { sanityClient } from 'sanity:client';
+import { urlFor } from '../lib/sanityImage';
+
+const IMG = (id: string) =>
+  `https://framerusercontent.com/images/${id}.png?width=128&height=64`;
+
+const LOGO_ICON =
+  'https://framerusercontent.com/images/ECyEDC4V3Il9rjq10opn3xtlDPY.png?width=80&height=80';
+const PORTAL_URL = 'https://portal.saganpassport.com';
+const CALENDLY_URL =
+  'https://calendly.com/d/5j7-3xv-p5k/global-talent-hiring-consultation?utm_source=saganpassportdotcom&utm_term=talent';
+const AI_AGENTS_URL = 'https://saganpassport.com/ai-agent';
+
+interface Card {
+  title: string;
+  description: string;
+  iconUrl: string;
+  href: string;
+  external?: boolean;
+}
+interface Item {
+  label: string;
+  href?: string;
+  external?: boolean;
+  wide?: boolean; // two-column dropdown
+  cards?: Card[]; // present → it's a dropdown
+}
+interface Nav {
+  items: Item[];
+  signIn: { label: string; url: string };
+  scheduleCall: { label: string; url: string };
+}
+
+// Fallback menu — mirrors the original Framer nav exactly. Used when Sanity has
+// no navigation document yet.
+const DEFAULT_NAV: Nav = {
+  items: [
+    { label: 'How It Works', href: '/how-it-works' },
+    { label: 'Pricing', href: '/pricing' },
+    {
+      label: 'Customers',
+      wide: true,
+      cards: [
+        { title: 'Home Services', description: 'HVAC, plumbing, electrical, roofing, pest control, landscaping.', iconUrl: IMG('uKBwntodT6pL8Ai2USI8OEankI'), href: '/customers/home-services' },
+        { title: 'Private Equity & Holding', description: 'For firms that acquire and manage a portfolio of operating companies.', iconUrl: IMG('A4dG60ci5LvA56LHtpOvNCuX9w'), href: '/customers/private-equity' },
+        { title: 'Small Businesses', description: 'Startups, local agencies, solo consultants, healthcare.', iconUrl: IMG('1ctNdpChGVPeIxUTpCLgdC47cE'), href: '/customers/small-businesses' },
+        { title: 'Health & Wellness', description: 'Medical practices, dental groups, clinics, pharmacies, and functional medicine.', iconUrl: IMG('vG1caR7Bgv2rjPhqoLkdbJczNCI'), href: '/customers/health-wellness' },
+        { title: 'Franchises', description: 'Multi-location QSR, fitness, retail, and service franchisors and franchisees.', iconUrl: IMG('h7BbveyJKxZ20DQ801S3HEdSew0'), href: '/customers/franchises' },
+        { title: 'Professional Services', description: 'Law firms, accounting firms, and consulting practices.', iconUrl: IMG('9oc7eYSkrWdsdqOsLTdGftSuRw'), href: '/customers/professional-services' },
+        { title: 'Real Estate', description: 'Residential, commercial, property management, and real estate investment firms.', iconUrl: IMG('mzgeP6gU2LhstP9gfiR22xEn3Nc'), href: '/customers/real-estate' },
+      ],
+    },
+    { label: 'Sagan University', href: '/sagan-university' },
+    {
+      label: 'Resources',
+      cards: [
+        { title: 'Resources', description: 'Case studies, guides, and thought leadership from our team.', iconUrl: IMG('uKBwntodT6pL8Ai2USI8OEankI'), href: '/resources' },
+        { title: 'Blog', description: 'Hiring insights, guides, and updates from Sagan Passport.', iconUrl: IMG('uKBwntodT6pL8Ai2USI8OEankI'), href: '/blog' },
+      ],
+    },
+    { label: 'AI Agents', href: AI_AGENTS_URL, external: true },
+  ],
+  signIn: { label: 'Sign In', url: PORTAL_URL },
+  scheduleCall: { label: 'Schedule a Call', url: CALENDLY_URL },
+};
+
+const NAV_QUERY = `*[_type == "navigation"][0]{
+  items[]{ label, type, href, external, wide, cards[]{ title, description, href, external, icon } },
+  signIn, scheduleCall
+}`;
+
+// Fetch from Sanity, normalize into the render model, fall back to defaults.
+let nav: Nav = DEFAULT_NAV;
+try {
+  const data = await sanityClient.fetch(NAV_QUERY);
+  if (data?.items?.length) {
+    nav = {
+      items: data.items.map((it: any): Item => ({
+        label: it.label,
+        href: it.href,
+        external: it.external,
+        wide: it.wide,
+        cards:
+          it.type === 'dropdown'
+            ? (it.cards ?? []).map((c: any): Card => ({
+                title: c.title,
+                description: c.description,
+                href: c.href,
+                external: c.external,
+                iconUrl: c.icon ? urlFor(c.icon).width(128).height(64).url() : '',
+              }))
+            : undefined,
+      })),
+      signIn: data.signIn?.url ? data.signIn : DEFAULT_NAV.signIn,
+      scheduleCall: data.scheduleCall?.url ? data.scheduleCall : DEFAULT_NAV.scheduleCall,
+    };
+  }
+} catch {
+  // Sanity unreachable (e.g. wrong dataset / offline) → keep DEFAULT_NAV.
+}
+
+const pathname = Astro.url.pathname;
+const isActive = (to?: string): boolean =>
+  !!to && (pathname === to || pathname === `${to}/`);
+const half = (n: number) => Math.ceil(n / 2);
+---
+
+<nav class="navx" aria-label="Primary">
+  <div class="navx__bar">
+    {/* Logo */}
+    <a class="navx__logo" href="/" aria-label="Sagan — home">
+      <img class="navx__logo-icon" src={LOGO_ICON} alt="" width="24" height="24" />
+      <span class="navx__logo-text">Sagan</span>
+    </a>
+
+    {/* Desktop links */}
+    <ul class="navx__links">
+      {nav.items.map((item) =>
+        item.cards ? (
+          /* Dropdown — pure CSS hover. The panel's padding-top bridges the gap
+             to the trigger so the cursor can travel in without it closing. */
+          <li class="navx__item">
+            <button class="navx__link navx__link--trigger" type="button" aria-haspopup="true">{item.label}</button>
+            <div class:list={['navx__panel', { 'navx__panel--wide': item.wide }]} role="menu">
+              <div class:list={['navx__panel-inner', { 'navx__grid': item.wide }]}>
+                {item.wide ? (
+                  <>
+                    <div class="navx__col">
+                      {item.cards.slice(0, half(item.cards.length)).map((c, i) => (
+                        <a class="navx-card" style={`--i:${i}`} href={c.href} {...(c.external ? { target: '_blank', rel: 'noreferrer' } : {})}>
+                          <img class="navx-card__icon" src={c.iconUrl} alt="" loading="lazy" />
+                          <span class="navx-card__text">
+                            <span class="navx-card__title">{c.title}</span>
+                            <span class="navx-card__desc">{c.description}</span>
+                          </span>
+                          <svg class="navx-card__arrow" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
+                            <path d="M4 12h15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                            <path d="M13 5.5l6.5 6.5L13 18.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                          </svg>
+                        </a>
+                      ))}
+                    </div>
+                    <div class="navx__col navx__col--divider">
+                      {item.cards.slice(half(item.cards.length)).map((c, i) => (
+                        <a class="navx-card" style={`--i:${half(item.cards!.length) + i}`} href={c.href} {...(c.external ? { target: '_blank', rel: 'noreferrer' } : {})}>
+                          <img class="navx-card__icon" src={c.iconUrl} alt="" loading="lazy" />
+                          <span class="navx-card__text">
+                            <span class="navx-card__title">{c.title}</span>
+                            <span class="navx-card__desc">{c.description}</span>
+                          </span>
+                          <svg class="navx-card__arrow" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
+                            <path d="M4 12h15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                            <path d="M13 5.5l6.5 6.5L13 18.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                          </svg>
+                        </a>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div class="navx__col">
+                    {item.cards.map((c, i) => (
+                      <a class="navx-card" style={`--i:${i}`} href={c.href} {...(c.external ? { target: '_blank', rel: 'noreferrer' } : {})}>
+                        <img class="navx-card__icon" src={c.iconUrl} alt="" loading="lazy" />
+                        <span class="navx-card__text">
+                          <span class="navx-card__title">{c.title}</span>
+                          <span class="navx-card__desc">{c.description}</span>
+                        </span>
+                        <svg class="navx-card__arrow" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
+                          <path d="M4 12h15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                          <path d="M13 5.5l6.5 6.5L13 18.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </li>
+        ) : (
+          <li>
+            <a class:list={['navx__link', { 'is-active': isActive(item.href) }]} href={item.href} {...(item.external ? { target: '_blank', rel: 'noreferrer' } : {})}>{item.label}</a>
+          </li>
+        ),
+      )}
+    </ul>
+
+    {/* CTAs + hamburger */}
+    <div class="navx__cta">
+      <a class="navx__signin" href={nav.signIn.url} target="_blank" rel="noreferrer">{nav.signIn.label}</a>
+      <a class="navx__btn" href={nav.scheduleCall.url} target="_blank" rel="noreferrer">{nav.scheduleCall.label}</a>
+      <button class="navx__burger" type="button" aria-label="Open menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+
+  {/* Mobile drawer — toggle + accordions driven by the vanilla <script> below. */}
+  <div class="navx__drawer">
+    {nav.items.map((item) =>
+      item.cards ? (
+        <div class="navx__acc">
+          <button class="navx__drawer-link navx__acc-trigger" type="button" aria-expanded="false">
+            {item.label}
+            <svg class="navx__acc-chevron" viewBox="0 0 12 12" width="14" height="14" aria-hidden="true">
+              <path d="M2.5 4.5L6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <div class="navx__acc-body">
+            <div class="navx__acc-inner">
+              {item.cards.map((c, i) => (
+                <a class="navx-card" style={`--i:${i}`} href={c.href} {...(c.external ? { target: '_blank', rel: 'noreferrer' } : {})}>
+                  <img class="navx-card__icon" src={c.iconUrl} alt="" loading="lazy" />
+                  <span class="navx-card__text">
+                    <span class="navx-card__title">{c.title}</span>
+                    <span class="navx-card__desc">{c.description}</span>
+                  </span>
+                  <svg class="navx-card__arrow" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
+                    <path d="M4 12h15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    <path d="M13 5.5l6.5 6.5L13 18.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <a class="navx__drawer-link" href={item.href} {...(item.external ? { target: '_blank', rel: 'noreferrer' } : {})}>{item.label}</a>
+      ),
+    )}
+
+    <div class="navx__drawer-cta">
+      <a class="navx__signin navx__signin--block" href={nav.signIn.url} target="_blank" rel="noreferrer">{nav.signIn.label}</a>
+      <a class="navx__btn navx__btn--block" href={nav.scheduleCall.url} target="_blank" rel="noreferrer">{nav.scheduleCall.label}</a>
+    </div>
+  </div>
+</nav>
+
+<style>
+  /* Nav — exact rebuild of the Framer nav. All values verbatim from the Framer
+     source (nav.jsx, menu-item.jsx, dropdown-customers.jsx, nav-link.jsx). */
+  .navx {
+    /* Shared tokens (--glacier, --white, --space-100/200, fonts) come from
+       src/styles/global.css. Only nav-specific one-offs are declared here. */
+    --border-inner: rgb(229, 231, 235); /* panel inner border (one-off, not a design token) */
+    --accent: rgb(252, 205, 64); /* "Schedule a Call" yellow (one-off, ≠ --dandelion) */
+
+    /* Docked: absolute at the top so it scrolls away with the page (mirrors
+       Framer's NavigationScrollAbsolute). The hero's top padding clears it. */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 40;
+    font-family: var(--pp);
+    color: var(--glacier);
+
+    /* Docked = "Desktop White": white bar, top corners 32, no shadow.
+       On scroll = "On Scroll": radius 24 all + triple-layer shadow.
+       Morph mirrors Framer's spring (stiffness 500 / damping 60). */
+    background: var(--white);
+    border-radius: 32px 32px 0 0;
+    box-shadow: none;
+    transition:
+      border-radius 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  /* On scroll: a fixed 98% pill that flies in and stays pinned (mirrors Framer's
+     FlyoutNavigationFixed — width 98%, top 8px). */
+  .navx--floating {
+    position: fixed;
+    top: 8px;
+    left: 50%;
+    width: 98%;
+    transform: translateX(-50%);
+    border-radius: 24px;
+    box-shadow:
+      0.0602px 0.6022px 0.6052px -1.0833px rgba(0, 0, 0, 0.11),
+      0.2289px 2.2885px 2.2999px -2.1667px rgba(0, 0, 0, 0.1),
+      1px 10px 10.0499px -3.25px rgba(0, 0, 0, 0.06);
+    animation: navFlyIn 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes navFlyIn {
+    from {
+      transform: translateX(-50%) translateY(-120%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  }
+
+  /* ---- Bar (.framer-1oleq6f: space-between, padding 16px 24px) ---- */
+  .navx__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    width: 100%;
+  }
+
+  /* ---- Logo (icon 24px + "Sagan" PP Mori SemiBold 22px / -0.04em) ---- */
+  .navx__logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: var(--glacier);
+    flex: none;
+    transition: opacity 0.2s ease;
+  }
+  .navx__logo:hover {
+    opacity: 0.8; /* whileHover animation13: opacity 0.8 */
+  }
+  .navx__logo-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    display: block;
+  }
+  .navx__logo-text {
+    font-family: var(--pp-semibold);
+    font-weight: 600;
+    font-size: 22px;
+    line-height: 1.2;
+    letter-spacing: -0.04em;
+  }
+
+  /* ---- Desktop links (nav-link: PP Mori 16px, padding 10px 12px, radius 40,
+         transparent, NO hover background — matches Framer exactly) ---- */
+  .navx__links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex: 1;
+    justify-content: center;
+  }
+  .navx__item {
+    position: relative;
+  }
+  .navx__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    color: var(--glacier);
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  /* Active link styling (Astro.url.pathname). The Framer original had none;
+     this is a deliberate, subtle addition — semibold to mark the current page. */
+  .navx__link.is-active {
+    font-family: var(--pp-semibold);
+    font-weight: 600;
+  }
+
+  /* ---- Dropdown panel ---- */
+  /* Outer = 1px border (rgb 237,233,229) + radius 24; inner card = white +
+     1px border (rgb 229,231,235) + radius 24 + the exact triple box-shadow.
+     Opens on hover, fades in 0.4s (Framer spring bounce 0.2), offsetY 10. */
+  .navx__panel {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    padding-top: 10px; /* offsetY: 10 gap below the trigger (hover bridge) */
+    transform: translateX(-50%);
+    z-index: 11;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.3s ease,
+      visibility 0.3s,
+      transform 0.4s cubic-bezier(0.22, 1.2, 0.36, 1);
+  }
+  /* Pure CSS hover (no JS island): reveal the panel while hovering the item. */
+  .navx__item:hover .navx__panel {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .navx__panel-inner {
+    border: 1px solid var(--border-inner);
+    border-radius: 24px;
+    background: var(--white);
+    box-shadow:
+      0 0.4817px 0.8671px -1.4167px rgba(0, 0, 0, 0.16),
+      0 1.8308px 3.2955px -2.8333px rgba(0, 0, 0, 0.14),
+      0 8px 14.4px -4.25px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+  }
+  .navx__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(300px, 1fr));
+  }
+  /* Single-column (Resources) panel: fix the column to the Framer card width
+     (~306px) so titles/descriptions don't wrap to a narrow strip. */
+  .navx__panel:not(.navx__panel--wide) .navx__panel-inner {
+    width: 332px;
+  }
+  .navx__col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+  }
+  .navx__col--divider {
+    border-left: 1px solid var(--border-inner);
+  }
+
+  /* ---- Menu-item card (menu-item.jsx: flex row, gap 12, padding 12,
+         radius 12, hover bg rgb(245,243,240)) ---- */
+  .navx-card {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    text-decoration: none;
+    background: transparent;
+    cursor: pointer;
+    /* staggered entrance: each card fades/slides in on open (Framer y:5→0) */
+    opacity: 0;
+    transform: translateY(5px);
+    transition:
+      background-color 0.3s ease,
+      opacity 0.4s ease,
+      transform 0.4s cubic-bezier(0.22, 1.2, 0.36, 1);
+    transition-delay: 0s;
+  }
+  .navx__item:hover .navx-card,
+  .navx__acc.is-open .navx-card {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: calc(0.06s + var(--i, 0) * 0.05s);
+  }
+  .navx-card:hover {
+    background: var(--space-100);
+  }
+  .navx-card__icon {
+    flex: none;
+    width: 32px;
+    height: 16px; /* aspect-ratio 2 / 1 */
+    object-fit: contain;
+    object-position: left center;
+    display: block;
+  }
+  .navx-card__text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1 0 0;
+    min-width: 0;
+  }
+  .navx-card__title {
+    font-family: var(--grotesk);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    color: var(--glacier);
+  }
+  .navx-card__desc {
+    font-family: var(--pp);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: -0.02em;
+    color: var(--glacier);
+  }
+  .navx-card__arrow {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    color: var(--glacier);
+    opacity: 0; /* hidden until hover (Framer arrow opacity 0→1) */
+    transition:
+      opacity 0.25s ease,
+      right 0.25s ease;
+  }
+  .navx-card:hover .navx-card__arrow {
+    opacity: 1;
+    right: 12px; /* shifts 16 → 12 on hover */
+  }
+
+  /* ---- CTAs ---- */
+  .navx__cta {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex: none;
+  }
+  .navx__signin {
+    font-family: var(--pp);
+    font-size: 16px;
+    color: var(--glacier);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+  }
+  .navx__signin:hover {
+    opacity: 0.7;
+  }
+  .navx__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    font-family: var(--pp);
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--glacier);
+    background: var(--accent);
+    border-radius: 100px; /* button-1 corner radius 100 */
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      filter 0.18s ease,
+      transform 0.18s ease;
+  }
+  .navx__btn:hover {
+    filter: brightness(0.96);
+  }
+  .navx__btn:active {
+    transform: translateY(1px);
+  }
+
+  /* ---- Hamburger (.framer-lanbxw: 20×16, 3 bars 2px; Mobile Open rotates) ---- */
+  .navx__burger {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 20px;
+    height: 16px;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  .navx__burger span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--glacier);
+    transition:
+      transform 0.25s ease,
+      opacity 0.2s ease;
+  }
+  .navx__burger.is-open span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .navx__burger.is-open span:nth-child(2) {
+    opacity: 0;
+  }
+  .navx__burger.is-open span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  /* ---- Mobile drawer ---- */
+  .navx__drawer {
+    display: none;
+  }
+
+  /* ===== Collapse to mobile under the tablet breakpoint (810px) ===== */
+  @media (max-width: 810px) {
+    .navx {
+      border-radius: 0;
+    }
+    /* On phones the floating pill becomes a full-width fixed bar. */
+    .navx--floating {
+      top: 0;
+      left: 0;
+      width: 100%;
+      transform: none;
+      border-radius: 0;
+      animation: navFlyInMobile 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes navFlyInMobile {
+      from {
+        transform: translateY(-100%);
+      }
+      to {
+        transform: translateY(0);
+      }
+    }
+    .navx__links,
+    .navx__signin:not(.navx__signin--block),
+    .navx__btn:not(.navx__btn--block) {
+      display: none;
+    }
+    .navx__burger {
+      display: flex;
+    }
+    .navx__bar {
+      padding: 16px;
+    }
+
+    .navx__drawer {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      max-height: 0;
+      overflow: hidden;
+      padding: 0 16px;
+      transition:
+        max-height 0.32s ease,
+        padding 0.32s ease;
+    }
+    .navx__drawer.is-open {
+      max-height: calc(100vh - 64px);
+      overflow-y: auto;
+      padding: 8px 16px 32px;
+      border-top: 1px solid var(--space-200);
+    }
+
+    .navx__drawer-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 12px 8px;
+      font-family: var(--pp);
+      font-size: 18px;
+      color: var(--glacier);
+      text-decoration: none;
+      background: none;
+      border: none;
+      border-bottom: 1px solid var(--space-200);
+      cursor: pointer;
+      text-align: left;
+    }
+    .navx__acc-chevron {
+      transition: transform 0.2s ease;
+    }
+    .navx__acc.is-open .navx__acc-chevron {
+      transform: rotate(180deg);
+    }
+    .navx__acc-body {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.28s ease;
+    }
+    .navx__acc.is-open .navx__acc-body {
+      grid-template-rows: 1fr;
+    }
+    .navx__acc-inner {
+      overflow: hidden;
+      padding-left: 8px;
+    }
+
+    .navx__drawer-cta {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .navx__signin--block {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+      border: 1px solid var(--space-200);
+      border-radius: 100px;
+    }
+    .navx__btn--block {
+      flex: 1;
+    }
+  }
+</style>
+
+<script>
+  // Mobile drawer toggle + accordion expand + on-scroll morph.
+  // Desktop dropdowns are pure CSS (see .navx__item:hover above) — no JS.
+  const nav = document.querySelector<HTMLElement>('.navx');
+  const burger = nav?.querySelector<HTMLButtonElement>('.navx__burger');
+  const drawer = nav?.querySelector<HTMLElement>('.navx__drawer');
+
+  // Hamburger → toggle drawer + lock body scroll while open.
+  burger?.addEventListener('click', () => {
+    const open = burger.classList.toggle('is-open');
+    drawer?.classList.toggle('is-open', open);
+    burger.setAttribute('aria-expanded', String(open));
+    burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    document.body.style.overflow = open ? 'hidden' : '';
+  });
+
+  // Accordion triggers → toggle their section open.
+  nav?.querySelectorAll<HTMLButtonElement>('.navx__acc-trigger').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const acc = btn.closest('.navx__acc');
+      const open = acc?.classList.toggle('is-open') ?? false;
+      btn.setAttribute('aria-expanded', String(open));
+    });
+  });
+
+  // Docked → fixed floating pill once the docked bar has scrolled away
+  // (~nav height). Mirrors the React NAV_FLOAT_THRESHOLD.
+  const onScroll = () => nav?.classList.toggle('navx--floating', window.scrollY > 80);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+</script>
