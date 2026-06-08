@@ -10,22 +10,42 @@
  * ------------------------------------------------------------------------- */
 import BillingToggle from './BillingToggle.astro';
 import PricingCard from './PricingCard.astro';
-import { PLANS } from './pricing';
+import type { Plan } from './pricing';
+import type { PricingData } from '../../lib/pricing';
+
+interface Props {
+  heading?: string;
+  subcopy?: string;
+  plans?: PricingData['plans'];
+}
+const { heading = '', subcopy = '', plans = [] } = Astro.props;
+
+// Map the Sanity plans into the shape PricingCard expects (prices/features
+// keyed by billing period).
+const cards: Plan[] = (plans ?? []).map((p) => ({
+  title: p.title,
+  accent: p.accent ?? 'rgb(33, 151, 255)',
+  accentDots: p.accentDots ?? 1,
+  recommended: p.recommended,
+  price: { monthly: p.priceMonthly ?? '', annual: p.priceAnnual ?? '' },
+  description: p.description ?? '',
+  bestFor: p.bestFor ?? '',
+  features: { monthly: p.featuresMonthly ?? [], annual: p.featuresAnnual ?? [] },
+  ctaHref: p.ctaHref ?? '',
+  ctaExternal: p.ctaExternal,
+}));
 ---
 
 <div class="ptable" data-billing="monthly">
   <div class="ptable__head">
-    <h2 class="t-h2" style="text-align:center">An investment in your growth, not just a hiring fee</h2>
-    <p class="t-body" style="text-align:center">
-      We offer transparent, flexible options designed to help you build a world-class team. Choose
-      the path that matches your hiring needs and unlock your potential.
-    </p>
+    <h2 class="t-h2" style="text-align:center">{heading}</h2>
+    <p class="t-body" style="text-align:center">{subcopy}</p>
   </div>
 
   <BillingToggle />
 
   <div class="ptable__cards">
-    {PLANS.map((plan) => <PricingCard plan={plan} />)}
+    {cards.map((plan) => <PricingCard plan={plan} />)}
   </div>
 </div>
 

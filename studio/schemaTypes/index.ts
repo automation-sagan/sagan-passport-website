@@ -8,6 +8,8 @@ import {feature} from './feature'
 import {infoRow} from './infoRow'
 import {testimonialItem} from './testimonialItem'
 import {slide} from './slide'
+import {pricing} from './pricing'
+import {planItem} from './planItem'
 
 export const schemaTypes = [
   navigation,
@@ -20,4 +22,6 @@ export const schemaTypes = [
   infoRow,
   testimonialItem,
   slide,
+  pricing,
+  planItem,
 ]

@@ -23,11 +23,15 @@ export default defineConfig({
               .id('homepage')
               .child(S.document().schemaType('homepage').documentId('homepage')),
             S.listItem()
+              .title('Pricing')
+              .id('pricing')
+              .child(S.document().schemaType('pricing').documentId('pricing')),
+            S.listItem()
               .title('Navigation')
               .id('navigation')
               .child(S.document().schemaType('navigation').documentId('navigation')),
             ...S.documentTypeListItems().filter(
-              (li) => !['homepage', 'navigation'].includes(li.getId()!),
+              (li) => !['homepage', 'pricing', 'navigation'].includes(li.getId()!),
             ),
           ]),
     }),
@@ -43,10 +47,10 @@ export default defineConfig({
     // create/delete/duplicate actions on the singleton documents themselves.
     newDocumentOptions: (prev, {creationContext}) =>
       creationContext.type === 'global'
-        ? prev.filter((t) => !['homepage', 'navigation'].includes(t.templateId))
+        ? prev.filter((t) => !['homepage', 'pricing', 'navigation'].includes(t.templateId))
         : prev,
     actions: (input, context) =>
-      ['homepage', 'navigation'].includes(context.schemaType)
+      ['homepage', 'pricing', 'navigation'].includes(context.schemaType)
         ? input.filter(({action}) =>
             ['publish', 'discardChanges', 'restore'].includes(action!),
           )

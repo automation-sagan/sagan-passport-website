@@ -7,13 +7,16 @@ import MembershipSection from '../components/howitworks/MembershipSection.astro'
 // MembershipSection uses the .hiw-membership / .hiw-centered / .hiw-toggle layout
 // classes defined in howitworks.css, so we pull that stylesheet in here too.
 import '../styles/howitworks.css';
+import { getPricing } from '../lib/pricing';
+
+const pricing = await getPricing();
 ---
 
-<Layout title="Pricing — Sagan Passport">
+<Layout title={pricing.seoTitle ?? 'Pricing — Sagan Passport'}>
   <Navbar />
   <div class="home">
     <section class="section pricing-hero">
-      <PricingTable />
+      <PricingTable heading={pricing.heading} subcopy={pricing.subcopy} plans={pricing.plans} />
     </section>
     <MembershipSection />
   </div>
