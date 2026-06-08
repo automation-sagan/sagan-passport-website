@@ -59,6 +59,10 @@ export default defineConfig({
               .id('guide')
               .child(S.documentTypeList('guide').title('Guides')),
             S.listItem()
+              .title('Comparisons (vs)')
+              .id('comparison')
+              .child(S.documentTypeList('comparison').title('Comparisons (vs)')),
+            S.listItem()
               .title('Navigation')
               .id('navigation')
               .child(S.document().schemaType('navigation').documentId('navigation')),
@@ -75,6 +79,7 @@ export default defineConfig({
                   'resource',
                   'blog',
                   'guide',
+                  'comparison',
                   'navigation',
                 ].includes(li.getId()!),
             ),

@@ -1,0 +1,620 @@
+---
+/* Faithful port of /vs/athena-vs-sagan. Bespoke layout + persuasive copy are
+ * preserved verbatim; the hero, comparison table, calculator numbers, and
+ * testimonials are driven by the `comparison` Sanity document (key editable
+ * fields). CSS is the page's exact original, extracted to styles/vs/athena.css. */
+import type { ComparisonData } from '../../lib/comparisons';
+import '../../styles/vs/athena.css';
+
+interface Props {
+  data: ComparisonData;
+}
+const { data } = Astro.props;
+
+const slug = data.slug ?? 'athena-vs-sagan';
+const cal = (term: string) =>
+  `${data.calendlyUrl ?? 'https://calendly.com/d/5j7-3xv-p5k/global-talent-hiring-consultation'}?utm_source=${slug}&utm_term=${term}`;
+
+const rows = data.comparisonRows ?? [];
+const testimonials = data.testimonials ?? [];
+
+const competitorCellClass = (s?: string) => (s === 'cross' ? 'cross' : s === 'neutral' ? 'neutral' : '');
+const saganCellClass = (s?: string) => (s === 'check' ? 'check' : s === 'neutral' ? 'neutral' : '');
+const cellHtml = (text?: string, small?: string) =>
+  `${text ?? ''}${small ? `<small>${small}</small>` : ''}`;
+
+const calc = data.calc ?? {};
+const C = data.competitor ?? 'Athena';
+---
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">{C} <span>vs</span> Sagan</a>
+    <a href={cal('nav')} class="nav-cta" target="_blank" rel="noopener">Book a Free Call</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <h1>{data.heroHeadlineLead}<br /><em>{data.heroHeadlineEm}</em></h1>
+    <p>{data.heroBody}</p>
+    <a href={cal('hero')} class="hero-cta" target="_blank" rel="noopener">Book a Free Consultation</a>
+    <div class="hero-sub">{data.heroSub}</div>
+  </div>
+</section>
+
+<!-- RATINGS BAR -->
+<section class="ratings-bar" aria-label="Customer ratings and awards">
+  <div class="ratings-inner">
+    <div class="rating-card">
+      <div class="rating-mark rating-mark--g2" aria-hidden="true">
+        <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#FF492C" d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24Zm.122 5.143c.45 0 .9.044 1.342.132l-1.342 2.806C9.962 8.08 8.203 9.84 8.203 12s1.76 3.92 3.92 3.92c.937 0 1.844-.338 2.553-.951l1.483 2.572A6.856 6.856 0 0 1 5.266 12a6.856 6.856 0 0 1 6.856-6.856Zm3.498.49a1.262 1.262 0 0 1 .026 0c.427 0 .792.113 1.101.34.31.229.466.546.466.946 0 .639-.36 1.03-1.035 1.376l-.377.191c-.403.204-.602.385-.657.706h2.05v.85h-3.101v-.144c0-.526.103-.96.314-1.306.211-.345.576-.65 1.102-.917l.242-.117c.427-.216.538-.401.538-.625 0-.266-.228-.458-.6-.458-.44 0-.773.228-1.004.694l-.592-.595c.13-.279.338-.502.619-.675a1.7 1.7 0 0 1 .908-.266Zm-2.094 5.388h3.394l1.697 2.937-1.697 2.94-1.697-2.94H11.83l1.696-2.937Z"></path></svg>
+        <span>G2</span>
+      </div>
+      <div class="rating-body">
+        <span class="rating-score">4.9<small>/5</small></span>
+        <span class="rating-stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+      </div>
+      <div class="rating-meta">Category leader &middot; Verified reviews</div>
+    </div>
+    <a href="https://clutch.co/profile/sagan-passport" target="_blank" rel="noopener" class="rating-card">
+      <div class="rating-mark rating-mark--clutch" aria-hidden="true">
+        <span>Clutch</span><span class="clutch-dot"></span>
+      </div>
+      <div class="rating-body">
+        <span class="rating-score">4.8<small>/5</small></span>
+        <span class="rating-stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+      </div>
+      <div class="rating-meta">45 verified client reviews</div>
+    </a>
+    <a href="https://clutch.co/profile/sagan-passport" target="_blank" rel="noopener" class="rating-card rating-card--featured">
+      <div class="rating-mark rating-mark--award" aria-hidden="true">Clutch 100 &middot; 2025</div>
+      <div class="rating-body">
+        <span class="rating-score">#20</span>
+      </div>
+      <div class="rating-meta">Fastest-growing companies, globally</div>
+    </a>
+  </div>
+</section>
+
+<!-- PAY GAP CALLOUT -->
+<div class="paygap-section reveal">
+  <div class="paygap-inner">
+    <div class="paygap-label">The Math They Don't Want You to Do</div>
+    <h2 class="paygap-headline">Your assistant gets <em>$800.</em><br>Athena keeps <em>$2,200.</em> Every month.</h2>
+    <div class="paygap-bars">
+      <div class="paygap-bar-row">
+        <div class="paygap-bar-label">With Athena</div>
+        <div class="paygap-bar-track">
+          <div style="display:flex;height:100%;">
+            <div class="paygap-bar-fill talent">$800</div>
+            <div class="paygap-bar-fill athena">$2,200 to Athena</div>
+          </div>
+        </div>
+      </div>
+      <div class="paygap-bar-row">
+        <div class="paygap-bar-label">With Sagan</div>
+        <div class="paygap-bar-track">
+          <div style="display:flex;height:100%;">
+            <div class="paygap-bar-fill sagan-talent">100% goes to YOUR team member</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="paygap-note"><strong>The person you hire gets $800/mo no matter what.</strong> With Athena, you pay $3,000 and they pocket $2,200 &mdash; every month, forever. With Sagan, you pay a small one-time finder's fee and a $499/mo membership. And your hire works for <strong>you</strong> &mdash; not them.</div>
+  </div>
+</div>
+
+<!-- STATS ROW -->
+<div class="stats-row reveal">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <div class="stat-number red-color">$3,000</div>
+      <div class="stat-label">Athena Monthly Bill</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number red-color">$800</div>
+      <div class="stat-label">What Talent Actually Gets</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number sagan-color">Direct</div>
+      <div class="stat-label">Sagan = You Hire Them Directly</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number sagan-color">Included</div>
+      <div class="stat-label">Post-Hire Support (Only Sagan)</div>
+    </div>
+  </div>
+</div>
+
+<!-- THE RECEIPTS -->
+<section class="receipts-section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">The Receipts</div>
+      <h2 class="section-title">Don't Take Our Word For It. <em>Google Theirs.</em></h2>
+      <p class="section-subtitle">We didn't have to dig hard. Their own employees are posting about it on Reddit.</p>
+    </div>
+    <div class="evidence-grid">
+      <div class="evidence-card neutral-source reveal">
+        <div class="source-badge indeed">Indeed Philippines &mdash; Job Posting</div>
+        <div class="evidence-quote">&ldquo;Executive Partner &mdash; PHP 40,000 - PHP 46,000 a month&rdquo;</div>
+        <div class="evidence-detail">Active Athena job listing on Indeed Philippines (~$694&ndash;$799/mo USD). You pay $3,000/mo.</div>
+        <a href="https://ph.indeed.com/cmp/Athena-6bd74d10/jobs" class="evidence-link" target="_blank" rel="noopener">See Job Posting on Indeed &rarr;</a>
+      </div>
+      <div class="evidence-card neutral-source reveal reveal-delay-1">
+        <div class="source-badge reddit">Reddit r/buhaydigital</div>
+        <div class="evidence-quote">&ldquo;Clients pay them $3,000 a month (this is public on their website). Fixed 45,000php per month yung salary.&rdquo;</div>
+        <div class="evidence-detail">Posted by verified Athena employees (Philippines operations)</div>
+        <a href="https://www.reddit.com/r/buhaydigital/comments/12tqykf/athena_executive_assistant_salary_range_to_those/" class="evidence-link" target="_blank" rel="noopener">See on Reddit &rarr;</a>
+      </div>
+      <div class="evidence-card neutral-source reveal">
+        <div class="source-badge reddit">Reddit r/buhaydigital</div>
+        <div class="evidence-quote">&ldquo;Imagine the client paid 3000 USD a month but only 750 goes to the [assistant]&rdquo;</div>
+        <div class="evidence-detail">Athena applicant doing the math for the first time</div>
+        <a href="https://www.reddit.com/r/buhaydigital/comments/1j5faei/athena_ea_failed_final_interview/" class="evidence-link" target="_blank" rel="noopener">See on Reddit &rarr;</a>
+      </div>
+      <div class="evidence-card athena-source reveal reveal-delay-1">
+        <div class="source-badge athena-com">Athena.com</div>
+        <div class="evidence-quote">&ldquo;$3,000 per month, annual commitment ($36,000/yr)&rdquo;</div>
+        <div class="evidence-detail">Listed publicly on their own pricing page</div>
+        <a href="https://www.athena.com/pricing" class="evidence-link" target="_blank" rel="noopener">See on Athena.com &rarr;</a>
+      </div>
+    </div>
+    <div class="receipts-callout reveal">
+      Athena's own job postings list pay at &#8369;40,000&ndash;46,000/mo (~$694&ndash;$799). You pay $3,000/mo. <strong>That means Athena keeps $2,200+/mo &mdash; roughly 73% of what you pay. Every single month. And they call this a &ldquo;premium service.&rdquo;</strong>
+    </div>
+  </div>
+</section>
+
+<!-- BETTER TALENT -->
+<section class="talent-section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">Talent Quality</div>
+      <h2 class="section-title">Direct Hire = <em>Better</em> Talent</h2>
+      <p class="section-subtitle">Would you take a job knowing you get $800 while your boss charges the client $3,000? Neither would anyone good.</p>
+    </div>
+    <div class="talent-grid">
+      <div class="talent-card agency-card reveal">
+        <h3>Working for a Staffing Agency</h3>
+        <div class="talent-item"><div class="icon">&#10007;</div><div>Knows you pay $3,000 but they only see $800</div></div>
+        <div class="talent-item"><div class="icon">&#10007;</div><div>No path to promotion &mdash; they work for Athena, not you</div></div>
+        <div class="talent-item"><div class="icon">&#10007;</div><div>Can't ask you for a raise &mdash; they work for Athena, not you</div></div>
+        <div class="talent-item"><div class="icon">&#10007;</div><div>The best people leave for real jobs as soon as they can</div></div>
+        <div class="talent-item"><div class="icon">&#10007;</div><div>Feels like a commodity, not a team member</div></div>
+      </div>
+      <div class="talent-card direct-card reveal reveal-delay-1">
+        <h3>Working as a Direct Hire</h3>
+        <div class="talent-item"><div class="icon">&#10003;</div><div>Gets paid fairly &mdash; the salary you set goes directly to them</div></div>
+        <div class="talent-item"><div class="icon">&#10003;</div><div>Real career path with promotions and growth</div></div>
+        <div class="talent-item"><div class="icon">&#10003;</div><div>Direct relationship with the team they serve</div></div>
+        <div class="talent-item"><div class="icon">&#10003;</div><div>Great people want real jobs &mdash; not staffing agency gigs</div></div>
+        <div class="talent-item"><div class="icon">&#10003;</div><div>Feels valued, invested, and loyal to your company</div></div>
+      </div>
+    </div>
+    <div class="talent-callout reveal">
+      <strong>Great people don't stay at staffing agencies.</strong> They leave the moment they find a real job. With Athena, you're not getting the best &mdash; you're getting whoever hasn't found a way out yet.
+    </div>
+  </div>
+</section>
+
+<!-- MODEL COMPARISON -->
+<section class="model-section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">Business Model</div>
+      <h2 class="section-title">Outsourcing vs. <em>Direct Hire</em></h2>
+      <p class="section-subtitle">Athena charges $3,000/mo and keeps most of it. Sagan helps you hire someone directly &mdash; they work for you, not a middleman.</p>
+    </div>
+    <div class="model-grid">
+      <div class="model-card athena-card reveal">
+        <h3>Athena</h3>
+        <div class="model-tag">Outsourcing / Staffing</div>
+        <div class="model-price">$3,000/mo</div>
+        <div class="model-price-note">Only $800 reaches your assistant. Athena takes $2,200 every month. It never stops.</div>
+        <div class="model-item"><div class="icon">&#10007;</div><div>Athena <strong>employs</strong> your assistant &mdash; they work for Athena, not you</div></div>
+        <div class="model-item"><div class="icon">&#10007;</div><div>Your assistant gets $800. Athena pockets $2,200. Every single month.</div></div>
+        <div class="model-item"><div class="icon">&#10007;</div><div>Can't promote, give raises, or build loyalty directly</div></div>
+        <div class="model-item"><div class="icon">&#10007;</div><div>Cancel Athena, lose your assistant &mdash; or pay a <strong>$24,000 buyout fee</strong> to keep them</div></div>
+        <div class="model-item"><div class="icon">&#10007;</div><div>Annual commitment required ($36K locked in)</div></div>
+        <div class="model-item"><div class="icon">&#10007;</div><div>73 cents of every dollar you pay goes to Athena &mdash; not your assistant</div></div>
+      </div>
+      <div class="model-card sagan-card reveal reveal-delay-1">
+        <h3>Sagan</h3>
+        <div class="model-tag">Hiring Membership</div>
+        <div class="model-price">$499/mo + finder's fee</div>
+        <div class="model-price-note">$499/mo membership + a one-time finder's fee per hire. Your hire gets the same $800/mo &mdash; you just stop paying $2,200/mo to a middleman.</div>
+        <div class="model-item"><div class="icon">&#10003;</div><div><strong>Direct hire</strong> &mdash; the person is YOUR team member from day one</div></div>
+        <div class="model-item"><div class="icon">&#10003;</div><div>Your hire gets the same $800/mo &mdash; with no $2,200 skimmed off the top</div></div>
+        <div class="model-item"><div class="icon">&#10003;</div><div>Promote, give raises, and build real loyalty</div></div>
+        <div class="model-item"><div class="icon">&#10003;</div><div><strong>Leave Sagan? Your team member stays.</strong> They work for you, not us. Cancel anytime &mdash; your team is your team.</div></div>
+        <div class="model-item"><div class="icon">&#10003;</div><div>Training support, playbooks, and a community of business owners</div></div>
+        <div class="model-item"><div class="icon">&#10003;</div><div>Every dollar of salary goes to your hire &mdash; zero middleman cut</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON TABLE (from Sanity) -->
+<section class="comparison-section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">Side-by-Side</div>
+      <h2 class="section-title">How They <em>Actually</em> Compare</h2>
+      <p class="section-subtitle">One charges you $3,000/mo to rent a person. The other helps you hire one. Guess which one wants you to never read this page.</p>
+    </div>
+    <div class="comparison-table-wrapper reveal">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>{C}</th>
+            <th>Sagan <span class="winner-badge">Better Value</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rows.map((r) => (
+              <tr>
+                <td>{r.label}{r.labelSmall && <small>{r.labelSmall}</small>}</td>
+                <td class={competitorCellClass(r.competitorState)} set:html={cellHtml(r.competitorText, r.competitorSmall)} />
+                <td class={saganCellClass(r.saganState)} set:html={cellHtml(r.saganText, r.saganSmall)} />
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- CALCULATOR (numbers from Sanity) -->
+<section class="calculator-section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">Cost Calculator</div>
+      <h2 class="section-title">See How Much You <em>Actually</em> Save</h2>
+      <p class="section-subtitle">{C} is counting on you not running these numbers. Go ahead — they can't stop you.</p>
+    </div>
+    <div class="calc-card reveal">
+      <div class="calc-inputs">
+        <div class="calc-field">
+          <label for="hires">Number of Assistants</label>
+          <select id="hires">
+            <option value="1" selected>1 assistant</option>
+            <option value="2">2 assistants</option>
+            <option value="3">3 assistants</option>
+            <option value="5">5 assistants</option>
+            <option value="10">10 assistants</option>
+          </select>
+        </div>
+        <div class="calc-field">
+          <label for="years">Timeframe</label>
+          <select id="years">
+            <option value="1">1 year</option>
+            <option value="2" selected>2 years</option>
+            <option value="3">3 years</option>
+            <option value="5">5 years</option>
+          </select>
+        </div>
+      </div>
+      <div class="calc-divider"></div>
+      <div class="calc-results">
+        <div class="calc-result-card athena-calc">
+          <div class="calc-result-label">Money Going to {C}</div>
+          <div class="calc-result-amount" id="athena-cost">$52,800</div>
+          <div class="calc-result-detail" id="athena-detail"></div>
+        </div>
+        <div class="calc-result-card sagan-calc">
+          <div class="calc-result-label">Money Going to Sagan</div>
+          <div class="calc-result-amount" id="sagan-cost">$13,704</div>
+          <div class="calc-result-detail" id="sagan-detail"></div>
+          <div class="calc-result-detail" id="sagan-membership-note" style="margin-top:4px;opacity:0.7;font-size:.85em"></div>
+        </div>
+      </div>
+      <div class="calc-savings">
+        <div class="calc-savings-label">You Save</div>
+        <div class="calc-savings-amount" id="savings-amount">$39,096</div>
+        <div class="calc-savings-note" id="savings-note"></div>
+      </div>
+      <div class="calc-talent-note"></div>
+    </div>
+  </div>
+</section>
+
+<!-- MIDDLEMAN BREAKDOWN -->
+<section class="middleman-section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">Follow the Money</div>
+      <h2 class="section-title">Where Does Your <em>Money</em> Go?</h2>
+      <p class="section-subtitle">Your hire costs $800/mo either way. The only difference? Athena charges you $2,200 on top &mdash; every month, forever. Sagan charges $499/mo plus a one-time finder's fee. That's it.</p>
+    </div>
+    <div class="middleman-visual reveal">
+      <div class="middleman-row athena-row">
+        <div class="middleman-company">Athena<small>$3,000/mo billed to you</small></div>
+        <div class="middleman-bar-container">
+          <div class="middleman-bar">
+            <div class="talent-share">$800</div>
+            <div class="company-share">$2,200 to Athena</div>
+          </div>
+          <div class="middleman-bar-labels">
+            <span>Your assistant: 27%</span>
+            <span>Athena's cut: 73%</span>
+          </div>
+        </div>
+      </div>
+      <div class="middleman-row sagan-row">
+        <div class="middleman-company">Sagan<small>You set the salary directly</small></div>
+        <div class="middleman-bar-container">
+          <div class="middleman-bar">
+            <div class="talent-share">100% goes to YOUR team member</div>
+          </div>
+          <div class="middleman-bar-labels">
+            <span>Your hire: 100%</span>
+            <span>Middleman cut: $0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POST-HIRE -->
+<section class="posthire-section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">After the Hire</div>
+      <h2 class="section-title">What Happens <em>After</em> They've Got You?</h2>
+      <p class="section-subtitle">With Athena, you're locked in. Cancel and you lose the person. It's a beautifully designed trap — unless you just... don't walk into it.</p>
+    </div>
+    <div class="posthire-grid">
+      <div class="posthire-card athena-card reveal">
+        <h3>Athena</h3>
+        <div class="posthire-item"><div class="icon">&#10007;</div><div>Your assistant works for Athena &mdash; not for you</div></div>
+        <div class="posthire-item"><div class="icon">&#10007;</div><div>Cancel = lose your assistant immediately</div></div>
+        <div class="posthire-item"><div class="icon">&#10007;</div><div>Can't give direct raises or promotions</div></div>
+        <div class="posthire-item"><div class="icon">&#10007;</div><div>$3,000/mo never goes down &mdash; not after year 1, 2, or 5</div></div>
+        <div class="posthire-item"><div class="icon">&#10007;</div><div>No peer community or executive network</div></div>
+      </div>
+      <div class="posthire-card sagan-card reveal reveal-delay-1">
+        <h3>Sagan</h3>
+        <div class="posthire-item"><div class="icon">&#10003;</div><div><strong>Your hire is YOUR team member</strong> &mdash; direct, loyal, and permanent</div></div>
+        <div class="posthire-item"><div class="icon">&#10003;</div><div><strong>Cancel Sagan anytime</strong> &mdash; your team member stays. They work for you, not us. You never lose your team.</div></div>
+        <div class="posthire-item"><div class="icon">&#10003;</div><div><strong>Give raises, promotions, and equity</strong> &mdash; build real loyalty</div></div>
+        <div class="posthire-item"><div class="icon">&#10003;</div><div><strong>The finder's fee is one-time.</strong> Year 2? Just the membership. With Athena, it's $36K/yr forever.</div></div>
+        <div class="posthire-item"><div class="icon">&#10003;</div><div><strong>Community</strong> of business owners who hire globally &mdash; you're not doing this alone</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS (from Sanity) -->
+<section class="testimonials-section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">What Members Say</div>
+      <h2 class="section-title">Trusted by Executives Scaling<br>With <em>Global Talent</em></h2>
+      <p style="color: var(--slate-light); font-size: 0.85rem; margin-top: 8px;">Verified reviews on <a href="https://clutch.co/profile/sagan-passport" target="_blank" rel="noopener" style="color: var(--sagan); text-decoration: underline;">Clutch</a> &mdash; 4.8&#9733; from 45 reviews</p>
+    </div>
+    <div class="testimonial-grid">
+      {
+        testimonials.map((t, i) => (
+          <div class={`testimonial-card reveal${i === 1 ? ' reveal-delay-1' : i === 2 ? ' reveal-delay-2' : ''}`}>
+            <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <div class="testimonial-text">&ldquo;{t.text}&rdquo;</div>
+            <div class="testimonial-divider"></div>
+            <div class="testimonial-author">{t.author}</div>
+            <div class="testimonial-role">{t.role}</div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<!-- WALL OF LOVE -->
+<section class="wall-section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">Wall of Love</div>
+      <h2 class="section-title">Don't Take <em>Our</em> Word For It</h2>
+      <p class="section-subtitle">Real posts. Real reviews. From real business owners who chose Sagan.</p>
+    </div>
+    <div class="wall-grid">
+      <div class="wall-card tweet-card reveal">
+        <blockquote class="twitter-tweet" data-conversation="none" data-dnt="true"><a href="https://twitter.com/StrongpointRich/status/1822046644256260219"></a></blockquote>
+      </div>
+      <div class="wall-card quote-card reveal">
+        <div class="quote-source"><span class="clutch-icon">&#9733;</span> Verified on Clutch</div>
+        <div class="quote-text large">&ldquo;The peace of mind that we're able to deliver to our clients starts with the partnership with your company.&rdquo;</div>
+        <div class="quote-divider"></div>
+        <div class="quote-author">Vish Mazumder</div>
+        <div class="quote-role">Franchisee, Mighty Dog Roofing</div>
+      </div>
+      <div class="wall-card tweet-card reveal">
+        <blockquote class="twitter-tweet" data-dnt="true"><a href="https://twitter.com/joshuamschultz/status/1787224837980635274"></a></blockquote>
+      </div>
+      <div class="wall-card quote-card reveal">
+        <div class="quote-source"><span class="clutch-icon">&#9733;</span> Verified on Clutch</div>
+        <div class="quote-text">&ldquo;I had VERY high expectations when choosing a global talent provider and Sagan Passport has surpassed even those. I have recommended Sagan to 10+ friends and will continue to do so.&rdquo;</div>
+        <div class="quote-divider"></div>
+        <div class="quote-author">DeAnn Gruber</div>
+        <div class="quote-role">Franchisee, Massage Envy</div>
+      </div>
+      <div class="wall-card tweet-card reveal">
+        <blockquote class="twitter-tweet" data-dnt="true"><a href="https://twitter.com/Chad_Nelson_/status/1801277850193973269"></a></blockquote>
+      </div>
+      <div class="wall-card quote-card reveal">
+        <div class="quote-source"><span class="clutch-icon">&#9733;</span> Verified on Clutch</div>
+        <div class="quote-text large">&ldquo;I have hired well over 100 people in my career. Sagan led the way for us the entire time. The team is collaborative and communicative at each step.&rdquo;</div>
+        <div class="quote-divider"></div>
+        <div class="quote-author">Warren Lzo</div>
+        <div class="quote-role">Franchisee, PropertyCraft Management</div>
+      </div>
+      <div class="wall-card tweet-card reveal">
+        <blockquote class="twitter-tweet" data-dnt="true"><a href="https://twitter.com/DIBookkeeping/status/1793025290760798350"></a></blockquote>
+      </div>
+      <div class="wall-card quote-card reveal">
+        <div class="quote-source"><span class="clutch-icon">&#9733;</span> Verified on Clutch</div>
+        <div class="quote-text">&ldquo;The time to hire was faster than we have ever been able to accomplish internally. The quality of hire appears to be as good or better than we have had the ability to hire locally.&rdquo;</div>
+        <div class="quote-divider"></div>
+        <div class="quote-author">Mark Miller</div>
+        <div class="quote-role">Franchisee, Soccer Shots Buffalo</div>
+      </div>
+      <div class="wall-card tweet-card reveal">
+        <blockquote class="twitter-tweet" data-dnt="true"><a href="https://twitter.com/jakelywakely/status/1782529918565310975"></a></blockquote>
+      </div>
+      <div class="wall-card quote-card reveal">
+        <div class="quote-source"><span class="clutch-icon">&#9733;</span> Verified on Clutch</div>
+        <div class="quote-text large">&ldquo;As a new business owner, it has been worth every penny. Sagan Passport strives to just blow us away with valuable work that seems to improve every month.&rdquo;</div>
+        <div class="quote-divider"></div>
+        <div class="quote-author">John Kelly</div>
+        <div class="quote-role">Franchisee, Rolling Suds</div>
+      </div>
+      <div class="wall-card tweet-card reveal">
+        <blockquote class="twitter-tweet" data-dnt="true"><a href="https://twitter.com/brandonadixon/status/1798342882702790712"></a></blockquote>
+      </div>
+      <div class="wall-card tweet-card reveal">
+        <blockquote class="twitter-tweet" data-dnt="true"><a href="https://twitter.com/BroknClok/status/1776285301062729752"></a></blockquote>
+      </div>
+    </div>
+    <div class="wall-cta-row reveal">
+      <a href="https://clutch.co/profile/sagan-passport" target="_blank" rel="noopener">Read all 45 verified reviews on Clutch &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- EVERYONE WINS -->
+<section class="wins-section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">Who Wins?</div>
+      <h2 class="section-title">Everyone Wins. <em>Except the Middleman.</em></h2>
+      <p class="section-subtitle">You save money. Your hire gets paid fairly. The only loser? The middleman.</p>
+    </div>
+    <div class="wins-grid">
+      <div class="wins-card winner reveal">
+        <div class="wins-number">01</div>
+        <div class="wins-label">Winner</div>
+        <h4>You Save Money</h4>
+        <p>Same person, same pay. You just stop giving Athena $2,200 every month. The finder's fee? You pay it once.</p>
+      </div>
+      <div class="wins-card winner reveal reveal-delay-1">
+        <div class="wins-number">02</div>
+        <div class="wins-label">Winner</div>
+        <h4>Your Hire Earns More</h4>
+        <p>All of their pay goes to them &mdash; not 27%. They're happier and more loyal.</p>
+      </div>
+      <div class="wins-card winner reveal reveal-delay-2">
+        <div class="wins-number">03</div>
+        <div class="wins-label">Winner</div>
+        <h4>You Get Better People</h4>
+        <p>Great people want real jobs, not agency gigs. They'll build a career with you.</p>
+      </div>
+      <div class="wins-card loser reveal">
+        <div class="wins-number">&times;</div>
+        <div class="wins-label">Loser</div>
+        <h4>The Middleman</h4>
+        <p>They lose their $2,200/mo cut. We're sure they'll be fine.</p>
+      </div>
+    </div>
+    <div class="wins-bottom-text reveal">
+      <strong>You save money. Your hire earns more. You get better people.</strong> The only ones upset? The middleman. Thoughts and prayers.
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="container reveal">
+    <h2>Stop Paying a <em>73% Markup.</em></h2>
+    <p>Same talent, same salary. $499/mo membership + a one-time finder's fee &mdash; instead of $2,200 to a middleman every month. And if you cancel? Your team member stays. There's no catch.</p>
+    <a href={cal('bottom-cta')} class="hero-cta" target="_blank" rel="noopener">Book a Free Consultation</a>
+    <div class="hero-sub">No commitment &bull; No pressure &bull; Just a conversation Athena would rather you didn't have</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <p>&copy; 2026 Sagan. All information based on publicly available data. <a href="https://saganpassport.com" target="_blank" rel="noopener">saganpassport.com</a></p>
+  </div>
+</footer>
+
+<!-- Twitter embed widget -->
+<script is:inline async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<!-- Scroll reveal + calculator (numbers injected from Sanity) -->
+<script
+  is:inline
+  define:vars={{
+    talentMonthly: calc.talentMonthly ?? 800,
+    middlemanMonthly: calc.middlemanMonthly ?? 2200,
+    membershipMonthly: calc.membershipMonthly ?? 499,
+    finderFeePct: calc.finderFeePct ?? 18,
+    competitor: C,
+  }}
+>
+  // ── Scroll reveal ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+  document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+  // ── Calculator ──
+  const hiresSelect = document.getElementById('hires');
+  const yearsSelect = document.getElementById('years');
+  const TALENT = talentMonthly;
+  const MIDDLEMAN = middlemanMonthly;
+  const MEMBERSHIP = membershipMonthly;
+  const FINDER = finderFeePct / 100;
+
+  function fmt(n) { return '$' + n.toLocaleString('en-US'); }
+
+  function calculate() {
+    const hires = parseInt(hiresSelect.value) || 1;
+    const years = parseInt(yearsSelect.value) || 2;
+    const months = years * 12;
+    const annualSalary = TALENT * 12;
+
+    const middlemanTotal = MIDDLEMAN * hires * months;
+    const saganPlacement = Math.round(annualSalary * FINDER * hires);
+    const saganMembership = MEMBERSHIP * months;
+    const saganTotal = saganPlacement + saganMembership;
+
+    document.getElementById('athena-cost').textContent = fmt(middlemanTotal);
+    document.getElementById('athena-detail').textContent =
+      fmt(MIDDLEMAN) + '/mo × ' + hires + (hires > 1 ? ' people' : ' person') + ' × ' + months + ' months';
+    document.getElementById('sagan-cost').textContent = fmt(saganTotal);
+    document.getElementById('sagan-detail').textContent =
+      fmt(saganPlacement) + ' finder’s fee + ' + fmt(saganMembership) + ' membership';
+    document.getElementById('sagan-membership-note').textContent =
+      hires > 1
+        ? 'Same ' + fmt(MEMBERSHIP) + '/mo membership whether you hire ' + hires + ' people or 1.'
+        : 'Same ' + fmt(MEMBERSHIP) + '/mo membership whether you hire 1 person or 10.';
+
+    const savings = middlemanTotal - saganTotal;
+    document.getElementById('savings-amount').textContent = fmt(savings);
+    document.getElementById('savings-note').textContent =
+      'Your hire gets paid the same either way. The only difference is how much goes to the middleman.';
+
+    const talentNote = document.querySelector('.calc-talent-note');
+    talentNote.innerHTML =
+      '<strong>Sagan finds you great people. ' + competitor + ' rents them to you.</strong> ' +
+      competitor + ' takes ' + fmt(middlemanTotal) + ' over ' + years + (years === 1 ? ' year' : ' years') +
+      '. Sagan takes ' + fmt(saganTotal) + '. You save ' + fmt(savings) + '. Cancel anytime — keep your whole team.';
+  }
+
+  hiresSelect.addEventListener('change', calculate);
+  yearsSelect.addEventListener('change', calculate);
+  calculate();
+</script>
+
+<!-- Universal HubSpot capture (no guide slug — just lead capture) -->
+<script is:inline src="/hubspot-capture.js" data-portal-id="50517161" data-form-guid="daac2804-e5c3-48e7-8ab7-a5b41c9e7c38"></script>

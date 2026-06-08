@@ -33,6 +33,9 @@ import {blogSection} from './blogSection'
 import {blogCostCard} from './blogCostCard'
 import {guide} from './guide'
 import {guideStat} from './guideStat'
+import {comparison} from './comparison'
+import {comparisonRow} from './comparisonRow'
+import {comparisonTestimonial} from './comparisonTestimonial'
 
 export const schemaTypes = [
   navigation,
@@ -70,4 +73,7 @@ export const schemaTypes = [
   blogCostCard,
   guide,
   guideStat,
+  comparison,
+  comparisonRow,
+  comparisonTestimonial,
 ]
