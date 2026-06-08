@@ -1,0 +1,29 @@
+---
+/* /customers/[slug] — one dynamic route for every customer vertical. Slugs and
+ * content come from the `customer` documents in Sanity; all verticals share
+ * CustomerTemplate. */
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+import CustomerTemplate from '../../components/customer/CustomerTemplate.astro';
+import { getAllCustomerSlugs, getCustomerBySlug } from '../../lib/customers';
+import '../../styles/customer.css';
+
+export async function getStaticPaths() {
+  const slugs = await getAllCustomerSlugs();
+  return Promise.all(
+    slugs.map(async (slug) => ({
+      params: { slug },
+      props: { data: (await getCustomerBySlug(slug))! },
+    })),
+  );
+}
+
+const { data } = Astro.props;
+---
+
+<Layout title={data.seoTitle ?? 'Customers — Sagan Passport'}>
+  <Navbar />
+  <CustomerTemplate data={data} />
+  <Footer />
+</Layout>

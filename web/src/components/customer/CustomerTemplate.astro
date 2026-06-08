@@ -10,15 +10,34 @@ import RoleCard from './RoleCard.astro';
 import PlayButton from '../saganuniversity/PlayButton.astro';
 import TestimonialSlideshow from '../saganuniversity/TestimonialSlideshow.astro';
 import VideoLightbox from '../saganuniversity/VideoLightbox.astro';
-import type { CustomerData } from '../../data/customers';
+import { imgUrl } from '../../lib/sanityImage';
+import type { CustomerData } from '../../lib/customers';
 
 interface Props {
   data: CustomerData;
 }
 const { data } = Astro.props;
-const ticker1 = [...data.talent.ticker1, ...data.talent.ticker1];
-const ticker2 = [...data.talent.ticker2, ...data.talent.ticker2];
-const roleEntries = [...data.roles.entries, ...data.roles.entries];
+
+const hero = data.hero ?? {};
+const talent = data.talent ?? {};
+const caseStudy = data.caseStudy ?? {};
+const roles = data.roles ?? {};
+const serviceCards = data.serviceCards ?? [];
+const logos = data.logos ?? [];
+const people = talent.people ?? [];
+
+// Marquee tracks double the source list for a seamless loop (UI-only).
+const ticker1 = [...(talent.ticker1 ?? []), ...(talent.ticker1 ?? [])];
+const ticker2 = [...(talent.ticker2 ?? []), ...(talent.ticker2 ?? [])];
+const roleEntries = [...(roles.entries ?? []), ...(roles.entries ?? [])];
+
+// Resolve testimonial avatars to CDN URLs for TestimonialSlideshow.
+const testimonials = (data.testimonials ?? []).map((t) => ({
+  image: imgUrl(t.image),
+  quote: t.quote ?? '',
+  name: t.name ?? '',
+  title: t.title ?? '',
+}));
 ---
 
 <div class="home">
@@ -31,11 +50,11 @@ const roleEntries = [...data.roles.entries, ...data.roles.entries];
           <span class="t-eyebrow">{data.eyebrow}</span>
         </div>
         <div class="hs-hero__text">
-          <h2 class="t-h2">{data.hero.title}</h2>
-          <p class="t-body">{data.hero.body}</p>
+          <h2 class="t-h2">{hero.title}</h2>
+          <p class="t-body">{hero.body}</p>
         </div>
       </div>
-      <div class="hs-hero__img" style={`background-image:url(${data.hero.image})`}></div>
+      <div class="hs-hero__img" style={`background-image:url(${imgUrl(hero.image)})`}></div>
     </div>
   </section>
 
@@ -44,9 +63,10 @@ const roleEntries = [...data.roles.entries, ...data.roles.entries];
     <div class="hs-logos__inner">
       <p class="t-body" style="text-align:center">{data.logosHeading}</p>
       <div class="hs-logos__grid">
-        {data.logos.map((src) => (
-          <div class="hs-logos__cell" style={src ? `background-image:url(${src})` : undefined}></div>
-        ))}
+        {logos.map((src) => {
+          const url = imgUrl(src);
+          return <div class="hs-logos__cell" style={url ? `background-image:url(${url})` : undefined}></div>;
+        })}
       </div>
     </div>
   </section>
@@ -54,18 +74,18 @@ const roleEntries = [...data.roles.entries, ...data.roles.entries];
   <!-- Service cards (2×2) -->
   <section class="section hs-cards">
     <div class="hs-cards__grid">
-      {data.serviceCards.map((c) => <ServiceCard title={c.title} body={c.body} />)}
+      {serviceCards.map((c) => <ServiceCard title={c.title ?? ''} body={c.body ?? ''} />)}
     </div>
   </section>
 
   <!-- Talent -->
   <section class="section hs-talent">
     <div class="hs-centered" style="max-width:600px">
-      <h2 class="t-h2" style="text-align:center">{data.talent.heading}</h2>
-      <p class="t-body" style="text-align:center">{data.talent.subheading}</p>
+      <h2 class="t-h2" style="text-align:center">{talent.heading}</h2>
+      <p class="t-body" style="text-align:center">{talent.subheading}</p>
     </div>
     <div class="hs-talent__people">
-      {data.talent.people.map((p) => <TalentPersonCard role={p.role} from={p.from} rate={p.rate} />)}
+      {people.map((p) => <TalentPersonCard role={p.role ?? ''} from={p.from ?? ''} rate={p.rate ?? ''} />)}
     </div>
     <div class="hs-talent__tickers">
       <div class="marquee">
@@ -84,13 +104,13 @@ const roleEntries = [...data.roles.entries, ...data.roles.entries];
   <!-- Case study -->
   <section class="section hs-case">
     <div class="hs-case__content">
-      <h2 class="t-h2" style="max-width:580px">{data.caseStudy.title}</h2>
-      <p class="t-body" style="max-width:900px">{data.caseStudy.body}</p>
+      <h2 class="t-h2" style="max-width:580px">{caseStudy.title}</h2>
+      <p class="t-body" style="max-width:900px">{caseStudy.body}</p>
     </div>
     <VideoLightbox
       class="hs-video"
-      youtubeId={data.caseStudy.youtubeId}
-      style={`background-image:url(${data.caseStudy.image})`}>
+      youtubeId={caseStudy.youtubeId ?? ''}
+      style={`background-image:url(${imgUrl(caseStudy.image)})`}>
       <div class="hs-video__overlay"></div>
       <div class="hs-video__play">
         <PlayButton />
@@ -101,19 +121,19 @@ const roleEntries = [...data.roles.entries, ...data.roles.entries];
   <!-- Testimonials -->
   <section class="section hs-tsection">
     <div style="width:100%;max-width:1056px">
-      <TestimonialSlideshow slides={data.testimonials} />
+      <TestimonialSlideshow slides={testimonials.length ? testimonials : undefined} />
     </div>
   </section>
 
   <!-- Roles ticker -->
   <section class="section hs-roles">
     <div class="hs-centered">
-      <h3 class="t-h3" style="text-align:center">{data.roles.heading}</h3>
-      <p class="t-body" style="text-align:center">{data.roles.body}</p>
+      <h3 class="t-h3" style="text-align:center">{roles.heading}</h3>
+      <p class="t-body" style="text-align:center">{roles.body}</p>
     </div>
     <div class="marquee">
       <div class="marquee__track marquee__track--tight">
-        {roleEntries.map((r) => <RoleCard title={r.title} country={r.country} rate={r.rate} />)}
+        {roleEntries.map((r) => <RoleCard title={r.title ?? ''} country={r.country ?? ''} rate={r.rate ?? ''} />)}
       </div>
     </div>
   </section>

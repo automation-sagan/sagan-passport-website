@@ -21,6 +21,10 @@ import {saganUniversity} from './saganUniversity'
 import {course} from './course'
 import {program} from './program'
 import {notFound} from './notFound'
+import {customer} from './customer'
+import {serviceCard} from './serviceCard'
+import {talentPerson} from './talentPerson'
+import {roleEntry} from './roleEntry'
 
 export const schemaTypes = [
   navigation,
@@ -46,4 +50,8 @@ export const schemaTypes = [
   course,
   program,
   notFound,
+  customer,
+  serviceCard,
+  talentPerson,
+  roleEntry,
 ]

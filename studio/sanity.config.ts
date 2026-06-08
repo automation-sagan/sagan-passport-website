@@ -43,6 +43,10 @@ export default defineConfig({
               .id('notFound')
               .child(S.document().schemaType('notFound').documentId('notFound')),
             S.listItem()
+              .title('Customers')
+              .id('customer')
+              .child(S.documentTypeList('customer').title('Customers')),
+            S.listItem()
               .title('Navigation')
               .id('navigation')
               .child(S.document().schemaType('navigation').documentId('navigation')),
@@ -55,6 +59,7 @@ export default defineConfig({
                   'membership',
                   'saganUniversity',
                   'notFound',
+                  'customer',
                   'navigation',
                 ].includes(li.getId()!),
             ),
