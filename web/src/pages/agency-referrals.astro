@@ -1,0 +1,21 @@
+---
+/* /agency-referrals. Standalone landing page ported 1:1 from the bespoke
+ * agency-referrals/index.html (an iframe wrapper around an external Lovable app
+ * plus HubSpot scripts). Own route so it ships only its own markup/CSS, isolated
+ * from the main marketing site. Content/SEO comes from the matching
+ * `landingPage` Sanity doc. */
+import LandingLayout from '../layouts/LandingLayout.astro';
+import AgencyReferralsPage from '../components/landing/AgencyReferralsPage.astro';
+import { getLandingPageBySlug } from '../lib/landingPages';
+
+export const prerender = true;
+const data = (await getLandingPageBySlug('agency-referrals'))!;
+---
+
+<LandingLayout
+  title={data.seoTitle ?? 'Sagan Agency Referral Partners'}
+  description={data.seoDescription}
+  canonical={data.canonical}
+>
+  <AgencyReferralsPage data={data} />
+</LandingLayout>

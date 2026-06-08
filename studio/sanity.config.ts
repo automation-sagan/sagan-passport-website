@@ -67,6 +67,10 @@ export default defineConfig({
               .id('agentDemo')
               .child(S.documentTypeList('agentDemo').title('AI Agent demos')),
             S.listItem()
+              .title('Landing pages')
+              .id('landingPage')
+              .child(S.documentTypeList('landingPage').title('Landing pages')),
+            S.listItem()
               .title('Navigation')
               .id('navigation')
               .child(S.document().schemaType('navigation').documentId('navigation')),
@@ -85,6 +89,7 @@ export default defineConfig({
                   'guide',
                   'comparison',
                   'agentDemo',
+                  'landingPage',
                   'navigation',
                 ].includes(li.getId()!),
             ),

@@ -1,0 +1,28 @@
+---
+/* Faithful 1:1 port of /agency-referrals/index.html. This is a minimal iframe
+ * wrapper: the actual page UI lives in an external Lovable app embedded full-
+ * bleed via <iframe>, plus the HubSpot embed + capture scripts. There is NO
+ * hero/headline/lead/CTA content on this page, so data.heroEyebrow /
+ * heroHeadlineHtml / heroLeadHtml / ctaUrl are intentionally UNUSED — the page
+ * is too minimal to drive from them. data is still accepted for the standard
+ * landing-page interface and SEO is wired via the route file. */
+import type { LandingPageData } from '../../lib/landingPages';
+
+interface Props {
+  data: LandingPageData;
+}
+const { data } = Astro.props;
+---
+
+<!-- Start of HubSpot Embed Code -->
+<script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/50517161.js" is:inline></script>
+<!-- End of HubSpot Embed Code -->
+
+<iframe src="https://agency-referrals.lovable.app/" title="Sagan Agency Referrals"></iframe>
+<script src="/hubspot-capture.js" data-portal-id="50517161" data-form-guid="daac2804-e5c3-48e7-8ab7-a5b41c9e7c38" is:inline></script>
+
+<style is:global>
+  * { margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  iframe { width: 100%; height: 100%; border: none; }
+</style>

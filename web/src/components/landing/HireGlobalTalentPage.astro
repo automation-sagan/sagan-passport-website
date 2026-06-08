@@ -1,0 +1,844 @@
+---
+/* Faithful 1:1 port of /hire-global-talent/index.html. Bespoke layout, copy,
+ * testimonial wall, lead-form/HubSpot/Make capture, and smooth-anchor JS are
+ * preserved verbatim. Only the hero (eyebrow, headline, lead) and the primary
+ * Calendly CTA are driven by the `landingPage` Sanity document. CSS is the
+ * page's exact original, extracted to styles/landing/hire-global-talent.css
+ * (with the source <head> Google Fonts <link> prepended as an @import). */
+import type { LandingPageData } from '../../lib/landingPages';
+import '../../styles/landing/hire-global-talent.css';
+
+interface Props {
+  data: LandingPageData;
+}
+const { data } = Astro.props;
+
+const cta =
+  data.ctaUrl ?? 'https://calendly.com/d/cmcb-jfm-gs8/global-talent-hiring-consultation-rene';
+---
+
+<header class="topbar">
+  <div class="wrap topbar__row">
+    <a class="brand" href="#top" aria-label="Sagan home">
+      <img src="/hire-global-talent/assets/sagan-logo.png" alt="" />
+      <span>Sagan</span>
+    </a>
+    <nav class="nav" aria-label="Page navigation">
+      <a href="#model">Model</a>
+      <a href="#roles">Roles</a>
+      <a href="#process">Process</a>
+      <a href="#call">Consultation</a>
+    </nav>
+    <a class="btn btn--blue" href="#call">
+      Find my next hire
+    </a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap hero__grid">
+      <div class="hero__copy reveal">
+        <span class="eyebrow">{data.heroEyebrow ?? 'global talent hiring consultation'}</span>
+        <h1 id="hero-title" set:html={data.heroHeadlineHtml ?? 'Hire the person. Skip the staffing markup.'} />
+        <p
+          class="hero__lead"
+          set:html={data.heroLeadHtml ??
+            'Sagan helps HVAC, plumbing, roofing, cleaning, and home service operators hire career-caliber professionals across Latin America, South Africa, the Philippines, and beyond. Dispatch, phones, books, estimates, follow-up, and ops support without the staffing markup.'}
+        />
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="#call">
+            Find my next hire
+          </a>
+          <a class="btn btn--ghost" href="#model">See the model</a>
+        </div>
+        <p class="hero__note">30 minutes. Role, salary band, market fit, and the next move.</p>
+        <div class="signal-strip" aria-label="Common global talent roles">
+          <span>dispatcher</span>
+          <span>CSR</span>
+          <span>bookkeeper</span>
+          <span>estimate coordinator</span>
+          <span>ServiceTitan admin</span>
+          <span>lead follow-up</span>
+        </div>
+      </div>
+
+      <aside class="talent-panel reveal" aria-label="Sagan talent pipeline preview">
+        <div class="panel-head">
+          <span><span class="status-dot" aria-hidden="true"></span> live talent map</span>
+          <span>SAGAN / DIRECT HIRE</span>
+        </div>
+        <div class="pipeline">
+          <div class="candidate">
+            <div class="avatar">AM</div>
+            <div>
+              <strong>Dispatch Coordinator</strong>
+              <span>Colombia / ServiceTitan / $1.5k-$2.5k/mo</span>
+            </div>
+            <div class="match">shortlist</div>
+          </div>
+          <div class="candidate">
+            <div class="avatar">TS</div>
+            <div>
+              <strong>Bookkeeper</strong>
+              <span>South Africa / AP, AR, month-end / $900-$2k/mo</span>
+            </div>
+            <div class="match">screened</div>
+          </div>
+          <div class="candidate">
+            <div class="avatar">LR</div>
+            <div>
+              <strong>Customer Service Rep</strong>
+              <span>Philippines / phones, intake, scheduling / $900-$1.5k/mo</span>
+            </div>
+            <div class="match">ready</div>
+          </div>
+          <div class="candidate">
+            <div class="avatar">JV</div>
+            <div>
+              <strong>Lead Follow-Up Coordinator</strong>
+              <span>Mexico / estimates, CRM, rehash / $1.2k-$2.5k/mo</span>
+            </div>
+            <div class="match">match</div>
+          </div>
+        </div>
+        <div class="panel-foot">
+          <div class="metric">
+            <b>20+</b>
+            <span>countries sourced</span>
+          </div>
+          <div class="metric">
+            <b>direct</b>
+            <span>client relationship</span>
+          </div>
+          <div class="metric">
+            <b>human</b>
+            <span>not seats</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <div class="proof">
+    <div class="wrap proof__bar reveal" aria-label="Sagan operating principles">
+      <div class="proof__item">
+        <b>Direct hire</b>
+        <span>The talent works with your team, not behind an agency wall.</span>
+      </div>
+      <div class="proof__item">
+        <b>Global reach</b>
+        <span>Latin America, South Africa, Philippines, Eastern Europe, and more.</span>
+      </div>
+      <div class="proof__item">
+        <b>Operator-led</b>
+        <span>Role design starts from workflow, not a generic job-description template.</span>
+      </div>
+      <div class="proof__item">
+        <b>Clean math</b>
+        <span>No mystery markup sitting between you and the person doing the work.</span>
+      </div>
+    </div>
+
+    <div class="wrap review-strip reveal" aria-label="Sagan review platform credibility">
+      <div class="review-pill">
+        <span class="review-stars" aria-label="five stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+        <span class="review-score">4.9</span>
+        <img src="/hire-global-talent/assets/g2-favicon.png" alt="G2" />
+        <span class="review-name">G2</span>
+        <span class="review-meta">(39 reviews)</span>
+      </div>
+      <div class="review-pill">
+        <span class="review-stars" aria-label="five stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+        <span class="review-score">4.8</span>
+        <img src="/hire-global-talent/assets/clutch-favicon.png" alt="Clutch" />
+        <span class="review-name">Clutch</span>
+        <span class="review-meta">(45 reviews)</span>
+      </div>
+      <div class="review-pill">
+        <span class="review-trophy" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 4C5 8 5 13 7 18" />
+            <path d="M17 4C19 8 19 13 17 18" />
+            <path d="M9 19c1 1 2 1 3 1s2 0 3-1" />
+            <path d="M8 9c1 0 2-.5 2-1.5" />
+            <path d="M8 13c1 0 2-.5 2-1.5" />
+            <path d="M16 9c-1 0-2-.5-2-1.5" />
+            <path d="M16 13c-1 0-2-.5-2-1.5" />
+          </svg>
+        </span>
+        <span class="review-score">#20</span>
+        <span class="review-name">Clutch 100</span>
+        <span class="review-meta">&middot; Fastest Growing</span>
+      </div>
+    </div>
+  </div>
+
+  <section class="love-section" aria-labelledby="love-title">
+    <div class="wrap">
+      <div class="love-head reveal">
+        <div>
+          <span class="eyebrow">wall of love</span>
+          <h2 id="love-title">The customers are not subtle about this.</h2>
+        </div>
+        <p>
+          Founders and operators talking about the hires they made through Sagan.
+        </p>
+      </div>
+
+      <div class="tweet-wall">
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>I wanna gush about my new admin who started last month She revamped my whole company. She worked late to finish a whole new automated process for customer engagement and sales....</p>&mdash; Mike Okhravi @mikethelummox <a href="https://x.com/Mikethelummox/status/1770224023961559144">source</a></blockquote>
+        </article>
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>In the past two weeks I've received several cold DMs and emails pitching me on hiring remote talent. If we ever made the decision to hire remote talent, Sagan Passport is the...</p>&mdash; Chad @Chad_Nelson_ <a href="https://x.com/chad_nelson_/status/1801277850193973269">source</a></blockquote>
+        </article>
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>I just had two interviews with global talent, and it blew my mind. High quality talent and hungry people. They had the American spirit that I remembered growing up. I am...</p>&mdash; Jared Peno @jaredpeno <a href="https://x.com/jaredpeno/status/1770908142278172852">source</a></blockquote>
+        </article>
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>1st week in the books with our new hire from @SaganPassport @MatznerJon - @BinsiDevadasan and team did a great job finding JN. They found him faster than we were ready to take...</p>&mdash; Ken Otto @BroknClok <a href="https://x.com/BroknClok/status/1776285301062729752">source</a></blockquote>
+        </article>
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>Want your own Monica? Highly recommend talking to @MatznerJon and the team at Sagan Passport. Not sponsored, no affiliate, just good people.</p>&mdash; Peter Lohmann @pslohmann <a href="https://x.com/pslohmann/status/1777797430789972292">source</a></blockquote>
+        </article>
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>@MatznerJon and @SaganPassport have helped us hire 3 new team members since starting. Accounting Specialist - Philippines Customer Service Rep - Argentina And most recently:...</p>&mdash; Jake Wakely @jakelywakely <a href="https://x.com/jakelywakely/status/1782529918565310975">source</a></blockquote>
+        </article>
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>The economics on hiring through Passport are crazy. I've used them for 4 hires - each one amazing and crushing it! https://t.co/V2DtEaRQIo</p>&mdash; Josh Schultz @joshuamschultz <a href="https://x.com/joshuamschultz/status/1787224837980635274">source</a></blockquote>
+        </article>
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>@MatznerJon is your guy - better service, better price, and better for your prospective hire.</p>&mdash; Brock Briggs @BrockHBriggs <a href="https://x.com/BrockHBriggs/status/1793414029085655137">source</a></blockquote>
+        </article>
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>Beyond impressed with what @MatznerJon is building with Sagan We just kicked off a role in LATAM with them and their team is crushing it thus far Beyond excited to see the...</p>&mdash; Sean O'Dowd @SeanODowd15 <a href="https://x.com/SeanODowd15/status/1790771891877167603">source</a></blockquote>
+        </article>
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>While we haven't started yet (we will), I gotta give Sagan a shout out. We've talked to several companies about overseas talent and Sagan had the best offer with the best perks...</p>&mdash; Nick Garren @nicholasgarren <a href="https://x.com/nicholasgarren/status/1831737069485404666">source</a></blockquote>
+        </article>
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>We've had 35% growth in the first 5 months of this year and a big reason we've been able to do it without churn and on time is the @SaganPassport membership we picked up pretty...</p>&mdash; Dialed In Bookkeeping @DIBookkeeping <a href="https://x.com/dibookkeeping/status/1793025290760798350">source</a></blockquote>
+        </article>
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>Rarely do you find yourself increasingly pleased as time goes on when you buy a membership. Especially one paid annually. But I am just that! Thank you.</p>&mdash; Tyler Groce @tylergroce1 <a href="https://x.com/tylergroce1/status/1795906980164350241">source</a></blockquote>
+        </article>
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>I'm strongly considering hiring (3) offshore talent hires this week alone.@SaganPassport is how I found all of them. In total, I'll pay them what I pay one straight out of...</p>&mdash; Alex Kirby @serial_smb_guy <a href="https://x.com/serial_smb_guy/status/1796264516981797350">source</a></blockquote>
+        </article>
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>Thanks! I'd argue that the hiring is a really small component of the value of @SaganPassport. The trainings, the Skool community, and the network have been terrific. I'm really...</p>&mdash; John Kelly @JKBusiness35 <a href="https://x.com/JKBusiness35/status/1817997285080314253">source</a></blockquote>
+        </article>
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>We made our first overseas hire through @SaganPassport this week. Here's a few takeaways so far. My goal was to offload all scheduling/dispatch/invoicing (jobber). Also to be...</p>&mdash; Brandon Dixon @brandonadixon <a href="https://x.com/brandonadixon/status/1798342882702790712">source</a></blockquote>
+        </article>
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>Summary of my experience as a new business owner leveraging global talent via @SaganPassport Hires made: 6 (by end of this week) Cost of hires (to date) : $4,000 Headaches...</p>&mdash; Greg Van Horn @gvh41 <a href="https://x.com/gvh41/status/1831840504042160638">source</a></blockquote>
+        </article>
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>Cosponsored We're hiring 5 roles this month. Sagan is our #1 pipeline for high quality talent without the leg work.</p>&mdash; Ben Billups @BenBillups <a href="https://x.com/BenBillups/status/1811769567166800223">source</a></blockquote>
+        </article>
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>His name is Alex. We are already predicting he will be promoted further with time, and has the skills &amp; potential to lead groups of people. His responses to all our questions...</p>&mdash; Jacob Becker @SuccessWithJake <a href="https://x.com/SuccessWithJake/status/1812830627328131220">source</a></blockquote>
+        </article>
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>Sagan's easily the highest value service we use - and I wouldn't say that if it wasn't far-and-away true.</p>&mdash; Rich Jordan @StrongpointRich <a href="https://x.com/strongpointrich/status/1822046644256260219">source</a></blockquote>
+        </article>
+        <article class="tweet-embed-card">
+          <blockquote class="tweet-fallback" data-dnt="true" data-theme="light"><p>Jon is an animal. But Sagan is a terrific product. Hugely fair and productive for us, and enriching for our global staff. Some of our best ppl.</p>&mdash; AD @adamdej <a href="https://x.com/adamdej/status/1904401112595100079">source</a></blockquote>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="model" class="dark-band" aria-labelledby="model-title">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <span class="eyebrow">the model</span>
+          <h2 id="model-title">This is not outsourcing with better branding.</h2>
+        </div>
+        <p>
+          The old model hides the worker, marks up the labor, and calls it managed service.
+          Sagan is built around the opposite idea: find excellent people, make the economics visible,
+          and get the middle layer out of the relationship.
+        </p>
+      </div>
+
+      <div class="comparison reveal">
+        <article class="compare-card">
+          <header>BPO / staffing</header>
+          <div class="compare-row">
+            <b>relationship</b>
+            <span>The agency owns the employment relationship.</span>
+          </div>
+          <div class="compare-row">
+            <b>economics</b>
+            <span>Recurring margin is baked into the monthly bill.</span>
+          </div>
+          <div class="compare-row">
+            <b>incentive</b>
+            <span>Keep the person abstract enough that the markup feels normal.</span>
+          </div>
+        </article>
+
+        <article class="compare-card">
+          <header>Sagan direct hire</header>
+          <div class="compare-row">
+            <b>relationship</b>
+            <span>You hire the professional into your operating rhythm.</span>
+          </div>
+          <div class="compare-row">
+            <b>economics</b>
+            <span>You see the salary, the role, and the hiring path clearly.</span>
+          </div>
+          <div class="compare-row">
+            <b>incentive</b>
+            <span>Build a real team member who can earn trust and compound context.</span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="why-title">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <span class="eyebrow">why sagan</span>
+          <h2 id="why-title">The best global talent has options.</h2>
+        </div>
+        <p>
+          They do not want to be treated like a seat in a call center. They want serious work,
+          real responsibility, and a company that sees them as a professional. That is the unlock.
+        </p>
+      </div>
+
+      <div class="cards reveal">
+        <article class="card">
+          <div class="card__icon">01</div>
+          <h3>Role design before sourcing</h3>
+          <p>We map the work, the tools, the time zone needs, and the judgment required before we touch the talent pool.</p>
+        </article>
+        <article class="card">
+          <div class="card__icon">02</div>
+          <h3>Talent with actual trajectory</h3>
+          <p>Operators, analysts, coordinators, assistants, marketers, and support leaders who want ownership, not gig work.</p>
+        </article>
+        <article class="card">
+          <div class="card__icon">03</div>
+          <h3>A hiring path you can explain</h3>
+          <p>No black box. The consultation turns your messy headcount idea into a role, market, salary band, and next step.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="roles" aria-labelledby="roles-title">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <span class="eyebrow">roles sagan places</span>
+          <h2 id="roles-title">Build the office behind the truck.</h2>
+        </div>
+        <p>
+          The consultation is useful whether you know the exact seat or only know where the day keeps breaking.
+          Bring the bottleneck. Sagan will turn it into a hireable home service role with a realistic monthly salary range.
+        </p>
+      </div>
+
+      <div class="roles-grid reveal">
+        <article class="role-card">
+          <div>
+            <h3>Dispatch and scheduling</h3>
+            <p>Answer the board, route techs, manage reschedules, and keep the day from melting down.</p>
+          </div>
+          <span>typical salary: $1.2k-$2.5k/mo</span>
+        </article>
+        <article class="role-card">
+          <div>
+            <h3>Bookkeeping and AP/AR</h3>
+            <p>Clean books, vendor bills, customer invoices, collections follow-up, and month-end support.</p>
+          </div>
+          <span>typical salary: $900-$2.5k/mo</span>
+        </article>
+        <article class="role-card">
+          <div>
+            <h3>CSR and call intake</h3>
+            <p>Phones, web leads, booking questions, membership calls, and customer updates.</p>
+          </div>
+          <span>typical salary: $900-$2k/mo</span>
+        </article>
+        <article class="role-card">
+          <div>
+            <h3>Estimate follow-up</h3>
+            <p>Unclosed estimates, financing nudges, abandoned quotes, and polite rehash until the answer is clear.</p>
+          </div>
+          <span>typical salary: $900-$2.5k/mo</span>
+        </article>
+        <article class="role-card">
+          <div>
+            <h3>ServiceTitan admin</h3>
+            <p>Job cleanup, tags, memberships, forms, pricebook support, reports, and CRM hygiene.</p>
+          </div>
+          <span>typical salary: $1.5k-$2.5k/mo</span>
+        </article>
+        <article class="role-card">
+          <div>
+            <h3>Marketing coordinator</h3>
+            <p>Review requests, email campaigns, neighborhood lists, vendor coordination, and local promo execution.</p>
+          </div>
+          <span>typical salary: $800-$2.5k/mo</span>
+        </article>
+        <article class="role-card">
+          <div>
+            <h3>Reporting and data</h3>
+            <p>Daily scorecards, close-rate reports, tech performance, lead source cleanup, and dashboard upkeep.</p>
+          </div>
+          <span>typical salary: $1k-$2k/mo</span>
+        </article>
+        <article class="role-card">
+          <div>
+            <h3>Ops coordinator</h3>
+            <p>Permits, parts, warranties, vendor follow-up, technician notes, and the admin work nobody owns.</p>
+          </div>
+          <span>typical salary: $1.2k-$2.5k/mo</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="process" aria-labelledby="process-title">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <span class="eyebrow">the hiring path</span>
+          <h2 id="process-title">The call should make the hire obvious.</h2>
+        </div>
+        <p>
+          You do not need a perfect job description. You need a clear operating problem,
+          a realistic talent market, and a decision on whether this is worth moving.
+        </p>
+      </div>
+
+      <div class="process reveal">
+        <article class="step">
+          <b>01</b>
+          <h3>Map the bottleneck</h3>
+          <p>What is stuck, who owns it today, what does it cost you, and what would good look like?</p>
+        </article>
+        <article class="step">
+          <b>02</b>
+          <h3>Shape the role</h3>
+          <p>Responsibilities, tools, schedule, communication load, seniority, and likely country fit.</p>
+        </article>
+        <article class="step">
+          <b>03</b>
+          <h3>Pressure-test the economics</h3>
+          <p>Salary expectations, tradeoffs, and whether a direct global hire beats the alternatives.</p>
+        </article>
+        <article class="step">
+          <b>04</b>
+          <h3>Decide the next move</h3>
+          <p>If there is a fit, you leave with a clear path to the shortlist. If not, you still get the map.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="call" aria-labelledby="call-title">
+    <div class="wrap offer reveal">
+      <div class="offer-main">
+        <span class="eyebrow">book the consultation</span>
+        <h2 id="call-title">Leave with the global hire your company should make next.</h2>
+        <p>
+          Bring the work you want off your plate, the role you are considering, or the team constraint
+          you keep working around. The point is not to sell you a generic VA pitch. The point
+          is to find the highest-leverage hire and decide whether Sagan should source it.
+        </p>
+        <form class="lead-form" id="leadForm" novalidate>
+          <label class="lead-form__label" for="leadEmail">Work email</label>
+          <div class="lead-form__row">
+            <input
+              class="lead-form__input"
+              id="leadEmail"
+              name="email"
+              type="email"
+              inputmode="email"
+              autocomplete="email"
+              placeholder="you@company.com"
+              required
+            />
+            <button class="btn btn--primary lead-form__btn" type="submit">
+              Find my next hire
+            </button>
+          </div>
+          <p class="lead-form__msg" id="leadFormMsg" role="status" aria-live="polite"></p>
+        </form>
+        <div class="lead-form__success" id="leadFormSuccess" hidden>
+          <p class="lead-form__success-title">Thanks — now book your consultation.</p>
+          <a class="btn btn--primary" data-calendly href={cta} target="_blank" rel="noopener">
+            Book my consultation →
+          </a>
+        </div>
+      </div>
+      <aside class="offer-list">
+        <span class="eyebrow">what you will cover</span>
+        <div class="check-list">
+          <div class="check">
+            <i>01</i>
+            <span>The role your home service workflow is quietly asking for</span>
+          </div>
+          <div class="check">
+            <i>02</i>
+            <span>Which talent markets are likely to produce the best candidates</span>
+          </div>
+          <div class="check">
+            <i>03</i>
+            <span>What experience level you need, and what would be overkill</span>
+          </div>
+          <div class="check">
+            <i>04</i>
+            <span>How to onboard the hire so they help techs and customers, not just a task inbox</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="final-cta" aria-labelledby="final-title">
+    <div class="wrap final-cta__grid reveal">
+      <h2 id="final-title">If the work matters, hire someone who can own it.</h2>
+      <div>
+        <p>
+          Use the consultation to turn vague hiring pressure into a practical global talent plan.
+        </p>
+        <a class="btn btn--primary" href="#call">
+          Find my next hire
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap footer-row">
+    <a class="brand" href="#top" aria-label="Back to top">
+      <img src="/hire-global-talent/assets/sagan-logo.png" alt="" />
+      <span>Sagan</span>
+    </a>
+    <div class="footer-links">
+      <a href="#model">Model</a>
+      <a href="#roles">Roles</a>
+      <a href="#process">Process</a>
+      <a href="#call">Find my next hire</a>
+    </div>
+  </div>
+</footer>
+
+<div class="mobile-cta" aria-hidden="false">
+  <a class="btn btn--blue" href="#call">
+    Find my next hire
+  </a>
+</div>
+
+<!-- Twitter / X widgets embed (loads the testimonial wall). Kept verbatim. -->
+<script is:inline async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<script is:inline define:vars={{ CALENDLY_URL: cta }}>
+  const reveals = document.querySelectorAll(".reveal");
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.12 }
+  );
+
+  reveals.forEach((node) => observer.observe(node));
+
+  const hydrateTweetCard = (card) => {
+    const quote = card.querySelector(".tweet-fallback");
+
+    if (!quote || quote.dataset.tweetHydrated === "true") return;
+
+    quote.dataset.tweetHydrated = "true";
+    quote.classList.add("twitter-tweet");
+
+    if (window.twttr && window.twttr.widgets) {
+      window.twttr.widgets.load(card);
+    }
+  };
+
+  const startTweetHydration = () => {
+    if (!window.twttr || !window.twttr.widgets) {
+      window.setTimeout(startTweetHydration, 250);
+      return;
+    }
+
+    const tweetCards = Array.from(document.querySelectorAll(".tweet-embed-card"));
+    tweetCards.slice(0, 3).forEach(hydrateTweetCard);
+
+    const tweetObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+
+          hydrateTweetCard(entry.target);
+          tweetObserver.unobserve(entry.target);
+        });
+      },
+      { rootMargin: "900px 0px", threshold: 0.01 }
+    );
+
+    tweetCards.slice(3).forEach((card) => tweetObserver.observe(card));
+  };
+
+  window.addEventListener("load", startTweetHydration);
+
+  /* ---- HubSpot email capture ----
+     Same portal + form used site-wide (see hubspot-capture.js).
+     Both IDs are public and safe to keep in this file. */
+  const HUBSPOT = {
+    portalId: "50517161",
+    formGuid: "daac2804-e5c3-48e7-8ab7-a5b41c9e7c38",
+  };
+
+  /* Make.com webhook — fires a parallel POST on every submission, mirroring
+     hubspot-capture.js. Body shape: { submission: { submittedAt, pageUrl,
+     pageTitle, ...fields } } — all keys flat. */
+  const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/2ccpsjqsst3arigocljg0trvlx7reu1n";
+
+  /* Fire-and-forget POST to the Make scenario. `raw` is the flat set of
+     submitted fields (email + any UTMs); page context is merged on top. */
+  const sendToMake = (raw) => {
+    if (!MAKE_WEBHOOK_URL) return;
+    const submission = Object.assign(
+      {
+        submittedAt: new Date().toISOString(),
+        pageUrl: window.location.href,
+        pageTitle: document.title,
+      },
+      raw
+    );
+    const payload = { submission: submission };
+    try {
+      fetch(MAKE_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      }).catch((err) => console.warn("[Make Webhook] Network error:", err));
+    } catch (e) {
+      console.warn("[Make Webhook] Failed to send:", e);
+    }
+  };
+
+  /* Capture UTM params (utm_source/medium/campaign/content/term) and
+     persist them in sessionStorage so they survive a multi-page journey —
+     mirrors the behaviour of the shared hubspot-capture.js. Returns a flat
+     { utm_source: "...", ... } object for whatever is present. */
+  const captureUTMs = () => {
+    const params = new URLSearchParams(window.location.search);
+    const keys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
+    const found = {};
+    keys.forEach((k) => {
+      const v = params.get(k);
+      if (v) found[k] = v;
+    });
+    if (Object.keys(found).length > 0) {
+      try { sessionStorage.setItem("_sg_utms", JSON.stringify(found)); } catch (e) {}
+    }
+    let stored = {};
+    try { stored = JSON.parse(sessionStorage.getItem("_sg_utms") || "{}"); } catch (e) {}
+    const result = Object.assign({}, stored, found); // URL params win over stored
+    // Fallback for this landing page: if the visitor arrived with no
+    // utm_source (URL or a prior page), tag the lead source as "HSA".
+    // A real utm_source from an ad/campaign is always kept. Applied only
+    // to the returned value — never written to sessionStorage — so it
+    // can't override the source on other Sagan pages.
+    if (!result.utm_source) result.utm_source = "HSA";
+    return result;
+  };
+
+  (function initLeadForm() {
+    const form = document.getElementById("leadForm");
+    if (!form) return;
+
+    const emailInput = document.getElementById("leadEmail");
+    const msg = document.getElementById("leadFormMsg");
+    const successMsg = document.getElementById("leadFormSuccess");
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    const showSuccess = () => {
+      form.hidden = true;
+      successMsg.hidden = false;
+      // Best-effort: open Calendly. If the browser blocks it, the button below still works.
+      try {
+        window.open(CALENDLY_URL, "_blank", "noopener");
+      } catch (e) {}
+    };
+
+    const isConfigured =
+      HUBSPOT.portalId &&
+      HUBSPOT.formGuid &&
+      HUBSPOT.portalId !== "YOUR_PORTAL_ID" &&
+      HUBSPOT.formGuid !== "YOUR_FORM_GUID";
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const email = emailInput.value.trim();
+      msg.textContent = "";
+      msg.classList.remove("is-error");
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        msg.textContent = "Please enter a valid email address.";
+        msg.classList.add("is-error");
+        emailInput.focus();
+        return;
+      }
+
+      const originalLabel = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Sending…";
+
+      if (!isConfigured) {
+        console.warn("[HubSpot] Set HUBSPOT.portalId and HUBSPOT.formGuid to enable capture.");
+        showSuccess();
+        return;
+      }
+
+      try {
+        // Build the field list: email + any UTM params we captured.
+        const fields = [{ name: "email", value: email }];
+        const utms = captureUTMs();
+        const raw = { email: email };
+        ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"].forEach((k) => {
+          if (utms[k]) {
+            fields.push({ name: k, value: utms[k] });
+            raw[k] = utms[k];
+          }
+        });
+
+        // Fire the Make.com webhook in parallel — same email + UTMs + page context.
+        sendToMake(raw);
+
+        const res = await fetch(
+          "https://api.hsforms.com/submissions/v3/integration/submit/" +
+            HUBSPOT.portalId +
+            "/" +
+            HUBSPOT.formGuid,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              fields: fields,
+              context: {
+                pageUri: window.location.href,
+                pageName: document.title,
+              },
+            }),
+          }
+        );
+        if (!res.ok) throw new Error("HubSpot responded " + res.status);
+        showSuccess();
+      } catch (err) {
+        console.error(err);
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalLabel;
+        msg.textContent = "Something went wrong — please try again.";
+        msg.classList.add("is-error");
+      }
+    });
+
+    // CTAs across the page point at #call (smooth-scroll). Focus the email
+    // field once they land, so capturing the email is clearly the first step.
+    document.querySelectorAll('a[href="#call"]').forEach((link) => {
+      link.addEventListener("click", () => {
+        if (form.hidden) return; // already submitted — leave the success state alone
+        window.setTimeout(function () {
+          emailInput.focus({ preventScroll: true });
+        }, 500);
+      });
+    });
+  })();
+
+  /* ---- Layout-shift-proof in-page navigation ----
+     The testimonial wall lazy-loads ~30 Twitter embeds as you scroll, which
+     grows the page by thousands of px mid-scroll. A native #anchor jump (or
+     CSS smooth scroll) locks onto a stale target position and strands you in
+     the tweet wall instead of the section you clicked. This re-reads the
+     target's live position every frame so the scroll tracks the growing
+     content, then settles exactly on the section under the sticky header.
+     HEADER_OFFSET is derived from the 76px .topbar (+ small gap) — adjust
+     if the topbar height changes. */
+  (function initSmoothAnchors() {
+    const HEADER_OFFSET = 80;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function targetTop(el) {
+      return Math.max(0, el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET);
+    }
+
+    function scrollToEl(el) {
+      if (reduceMotion) {
+        window.scrollTo(0, targetTop(el));
+        return;
+      }
+      const startY = window.scrollY;
+      const startTime = performance.now();
+      const duration = 650;
+      const settleDeadline = startTime + duration + 1500; // cap the settle phase
+      const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+      // Suppress CSS smooth-scroll so our per-frame jumps aren't double-animated.
+      const root = document.documentElement;
+      const prevBehavior = root.style.scrollBehavior;
+      root.style.scrollBehavior = "auto";
+
+      let stableFrames = 0;
+      let lastTarget = targetTop(el);
+
+      function frame(now) {
+        const elapsed = now - startTime;
+        if (elapsed < duration) {
+          const y = startY + (targetTop(el) - startY) * ease(elapsed / duration);
+          window.scrollTo(0, y);
+          requestAnimationFrame(frame);
+          return;
+        }
+        // Settle: glide onto the (possibly still-moving) target, then lock.
+        const ty = targetTop(el);
+        const next = window.scrollY + (ty - window.scrollY) * 0.3;
+        window.scrollTo(0, next);
+        stableFrames = Math.abs(ty - lastTarget) < 1 && Math.abs(ty - next) < 1
+          ? stableFrames + 1
+          : 0;
+        lastTarget = ty;
+        if (stableFrames < 5 && now < settleDeadline) {
+          requestAnimationFrame(frame);
+        } else {
+          window.scrollTo(0, ty);
+          root.style.scrollBehavior = prevBehavior;
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach((link) => {
+      const hash = link.getAttribute("href");
+      if (!hash || hash === "#") return; // leave "#"/"#top" to native behaviour
+      link.addEventListener("click", (event) => {
+        const el = document.querySelector(hash);
+        if (!el) return; // no matching target — don't hijack the click
+        event.preventDefault();
+        scrollToEl(el);
+        history.replaceState(null, "", hash);
+      });
+    });
+  })();
+</script>

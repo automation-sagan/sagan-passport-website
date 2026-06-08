@@ -1,0 +1,1325 @@
+---
+// Faithful 1:1 port of Backstop/index.html — an interactive landing page +
+// claim form. Content stays IN CODE (no Sanity). Wrapped in LandingLayout for
+// the SEO <head>; the page ships its own fonts (@import), <style is:global>,
+// inline scripts, and the /hubspot-capture.js loader. The claim form POSTs to
+// /backstop/api/send-email (ported APIRoute that proxies Resend).
+import LandingLayout from '../../layouts/LandingLayout.astro';
+
+export const prerender = true;
+---
+
+<LandingLayout
+  title="Sagan Backstop — If oil hits $175, your Sagan membership is on us"
+  description="If WTI crude settles at or above $175 a barrel on any trading day on or before June 30, 2026, we refund your Sagan Membership — and you keep all the benefits."
+  canonical="https://saganpassport.com/backstop"
+>
+  <Fragment slot="head">
+    <meta property="og:title" content="If oil hits $175, your Sagan membership is on us" />
+    <meta property="og:description" content="Sagan Backstop. Our bet. Your refund. If WTI crude settles at or above $175 on any trading day on or before June 30, 2026, we refund your Sagan Membership." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="If oil hits $175, your Sagan membership is on us" />
+    <meta name="twitter:description" content="Sagan Backstop. Our bet. Your refund. If WTI crude settles at or above $175 on any trading day on or before June 30, 2026, we refund your Sagan Membership." />
+    <link rel="icon" type="image/svg+xml" href="/backstop/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" sizes="any" href="/backstop/favicon.svg" />
+  </Fragment>
+
+  <style is:global>
+@import url('https://fonts.googleapis.com/css2?family=Fragment+Mono&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+/* ────────────────────────────────────────────────────────────────
+   SAGAN TOKENS — verified against saganpassport.com brand system
+──────────────────────────────────────────────────────────────── */
+:root {
+  --glacier:        #093A3E;
+  --dark-glacier:   #06282B;
+  --glacier-muted:  #4A6B6B;
+  --cream:          #F5F2ED;
+  --cream-deep:     #EDE9E5;
+  --white:          #FFFFFF;
+  --dandelion:      #F5B800;
+  --hairline:       rgba(9, 58, 62, 0.10);
+  --hairline-soft:  rgba(9, 58, 62, 0.06);
+  --hairline-strong: rgba(9, 58, 62, 0.18);
+
+  --display: 'Plus Jakarta Sans', 'PP Mori', 'Inter', system-ui, sans-serif;
+  --body:    'Space Grotesk', system-ui, sans-serif;
+  --mono:    'Fragment Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --r-chip:  10px;
+  --r-card:  24px;
+  --r-panel: 40px;
+  --r-hero:  48px;
+  --r-pill:  999px;
+
+  --ease: cubic-bezier(0.5, 0, 0, 1);
+  --gutter: 24px;
+  --max: 1200px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; scroll-behavior: smooth; }
+
+body {
+  font-family: var(--body);
+  color: var(--glacier);
+  background: var(--cream);
+  font-size: 17px;
+  line-height: 1.55;
+  overflow-x: hidden;
+}
+
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+
+.wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
+
+/* ────────────────────────────────────────────────────────────────
+   TYPOGRAPHY
+──────────────────────────────────────────────────────────────── */
+h1, h2, h3 {
+  font-family: var(--display);
+  color: var(--glacier);
+  font-weight: 600;
+}
+
+.mono { font-family: var(--mono); font-feature-settings: "tnum"; letter-spacing: 0; }
+
+.eyebrow {
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--glacier-muted);
+}
+
+.dash { color: var(--dandelion); }
+
+/* ────────────────────────────────────────────────────────────────
+   NAV
+──────────────────────────────────────────────────────────────── */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 18px 0;
+  backdrop-filter: saturate(1.4) blur(10px);
+  -webkit-backdrop-filter: saturate(1.4) blur(10px);
+  background: rgba(245, 242, 237, 0.78);
+  border-bottom: 1px solid transparent;
+  transition: border-color .3s var(--ease);
+}
+.nav.is-scrolled { border-bottom-color: var(--hairline-soft); }
+.nav__row {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+.nav__logo {
+  font-family: var(--display);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--glacier);
+  font-size: 20px;
+}
+.nav__spacer { flex: 1; }
+.nav__cta {
+  display: inline-block;
+  padding: 11px 22px;
+  border-radius: var(--r-pill);
+  background: var(--glacier);
+  color: var(--cream);
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.005em;
+  transition: transform .3s var(--ease), background .3s var(--ease);
+  cursor: pointer;
+}
+.nav__cta:hover { transform: translateY(-1px); background: var(--dark-glacier); }
+
+/* ────────────────────────────────────────────────────────────────
+   BUTTONS
+──────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-block;
+  padding: 18px 30px;
+  border-radius: var(--r-pill);
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: -0.005em;
+  transition: transform .3s var(--ease), background .3s var(--ease), color .3s var(--ease), border-color .3s var(--ease);
+  cursor: pointer;
+  border: 1px solid transparent;
+  text-align: center;
+}
+.btn--primary { background: var(--glacier); color: var(--cream); }
+.btn--primary:hover { background: var(--dark-glacier); transform: translateY(-2px); }
+.btn--ghost { background: transparent; color: var(--glacier); border-color: var(--hairline); }
+.btn--ghost:hover { background: var(--glacier); color: var(--cream); border-color: var(--glacier); }
+.btn--large { padding: 22px 40px; font-size: 17px; }
+.btn .arrow { display: inline-block; transition: transform .3s var(--ease); margin-left: 6px; }
+.btn:hover .arrow { transform: translateX(3px); }
+
+/* ────────────────────────────────────────────────────────────────
+   HERO
+──────────────────────────────────────────────────────────────── */
+.hero { padding: 96px 0 48px; }
+.hero__eyebrow { margin-bottom: 32px; }
+.hero h1 {
+  font-size: clamp(42px, 6.8vw, 80px);
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+  margin-bottom: 28px;
+  max-width: 20ch;
+}
+.hero__lead {
+  max-width: 56ch;
+  font-size: clamp(17px, 1.4vw, 20px);
+  color: var(--glacier-muted);
+  line-height: 1.55;
+  margin-bottom: 40px;
+}
+.hero__ctas {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 56px;
+}
+
+/* PROOF BAR — G2 / Clutch / Clutch 100 (Sagan standard) */
+.proof {
+  display: inline-flex;
+  align-items: center;
+  gap: 28px;
+  padding: 14px 24px;
+  background: var(--white);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-pill);
+  animation: proof-rise .9s var(--ease) .15s both;
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+@keyframes proof-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.proof__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+.proof__stars {
+  color: var(--dandelion);
+  font-size: 14px;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+.proof__num {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--glacier);
+  letter-spacing: -0.02em;
+  font-feature-settings: "tnum";
+}
+.proof__mark {
+  display: inline-flex;
+  align-items: center;
+  color: var(--glacier);
+  line-height: 1;
+}
+.proof__mark--g2 svg { width: 22px; height: 22px; display: block; fill: currentColor; }
+.proof__mark--clutch {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -0.04em;
+  padding-top: 1px;
+}
+.proof__badge {
+  color: var(--dandelion);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.proof__ranking {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  font-family: var(--body);
+  font-size: 13px;
+  color: var(--glacier-muted);
+  letter-spacing: -0.005em;
+}
+.proof__ranking .proof__mark--clutch { font-size: 15px; align-self: center; padding-top: 0; }
+.proof__ranking-num {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--glacier);
+  letter-spacing: -0.02em;
+}
+.proof__divider {
+  width: 1px;
+  height: 28px;
+  background: var(--hairline-strong);
+}
+
+/* CAMPAIGN STRIP — countdown / trigger / refund (minimal, below proof bar) */
+.campaign-strip {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 20px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--glacier-muted);
+  letter-spacing: 0;
+  flex-wrap: wrap;
+}
+.campaign-strip .dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--hairline-strong);
+  display: inline-block;
+}
+.campaign-strip .label {
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 10px;
+  font-weight: 500;
+  font-family: var(--body);
+  color: var(--glacier-muted);
+  margin-right: 6px;
+}
+.campaign-strip .val { color: var(--glacier); }
+.campaign-strip__link {
+  text-decoration: none;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid var(--hairline-strong);
+  padding-bottom: 2px;
+  transition: border-color 280ms cubic-bezier(0.5, 0, 0, 1), color 280ms cubic-bezier(0.5, 0, 0, 1);
+  cursor: pointer;
+}
+.campaign-strip__link:hover { border-color: var(--dandelion); }
+.campaign-strip__link:hover .val { color: var(--dandelion); }
+.campaign-strip__arrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--glacier-muted);
+  margin-left: 2px;
+  transition: transform 280ms cubic-bezier(0.5, 0, 0, 1), color 280ms cubic-bezier(0.5, 0, 0, 1);
+  display: inline-block;
+}
+.campaign-strip__link:hover .campaign-strip__arrow {
+  color: var(--dandelion);
+  transform: translate(2px, -2px);
+}
+
+/* ────────────────────────────────────────────────────────────────
+   NARRATIVE BLOCKS
+──────────────────────────────────────────────────────────────── */
+.narrative { padding: 96px 0; }
+.narrative:has(.big-quote) { padding-bottom: 32px; }
+.narrative:has(.big-quote) + .narrative { padding-top: 32px; }
+.narrative__inner { max-width: 720px; }
+.narrative .eyebrow { margin-bottom: 28px; }
+.narrative h2 {
+  font-size: clamp(30px, 4.5vw, 48px);
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  margin-bottom: 36px;
+}
+.narrative p {
+  font-size: clamp(17px, 1.3vw, 19px);
+  line-height: 1.6;
+  margin-bottom: 20px;
+  color: var(--glacier);
+}
+.narrative p strong { color: var(--glacier); font-weight: 600; }
+.narrative p.muted { color: var(--glacier-muted); }
+
+.big-quote {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(28px, 3.5vw, 40px);
+  letter-spacing: -0.028em;
+  line-height: 1.1;
+  color: var(--glacier);
+  margin-top: 40px;
+  padding-top: 40px;
+  border-top: 1px solid var(--hairline-soft);
+  max-width: 20ch;
+}
+
+/* ────────────────────────────────────────────────────────────────
+   PROMISE SECTION
+──────────────────────────────────────────────────────────────── */
+.promise { padding: 96px 0; background: var(--cream-deep); }
+.promise__inner { max-width: 900px; }
+.promise .eyebrow { margin-bottom: 28px; }
+.promise h2 {
+  font-size: clamp(30px, 4.5vw, 48px);
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  margin-bottom: 40px;
+  max-width: 28ch;
+}
+.parenthetical {
+  color: var(--glacier-muted);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* ────────────────────────────────────────────────────────────────
+   MACK PHOTO
+──────────────────────────────────────────────────────────────── */
+.mack-photo {
+  margin-top: 48px;
+  border-radius: var(--r-card);
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(9, 58, 62, 0.14);
+  background: var(--glacier);
+  position: relative;
+}
+.mack-photo img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.mack-photo__caption {
+  margin-top: 16px;
+  font-family: var(--body);
+  font-size: 13px;
+  color: var(--glacier-muted);
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+  max-width: 60ch;
+}
+.mack-photo__caption strong {
+  color: var(--glacier);
+  font-weight: 500;
+  font-family: var(--mono);
+  margin-right: 6px;
+}
+
+.terms-card {
+  background: var(--white);
+  border: 1px solid var(--hairline-soft);
+  border-radius: var(--r-card);
+  padding: 40px 44px;
+  margin-bottom: 48px;
+}
+.terms { }
+.terms li {
+  padding: 22px 0;
+  border-bottom: 1px solid var(--hairline-soft);
+  display: flex;
+  gap: 20px;
+  align-items: baseline;
+  font-size: clamp(16px, 1.2vw, 18px);
+  line-height: 1.5;
+  color: var(--glacier);
+}
+.terms li:first-child { padding-top: 0; }
+.terms li:last-child { padding-bottom: 0; border-bottom: none; }
+.terms__dot {
+  color: var(--dandelion);
+  font-weight: 700;
+  flex-shrink: 0;
+  font-family: var(--mono);
+}
+.terms li strong { color: var(--glacier); font-weight: 600; }
+.terms li span:last-child { color: var(--glacier); }
+
+.claim-cta {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto;
+}
+.claim-cta h3 {
+  font-size: clamp(22px, 2.2vw, 28px);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.claim-cta p {
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--glacier-muted);
+  margin-bottom: 28px;
+}
+.claim-cta p strong { color: var(--glacier); font-weight: 600; }
+
+/* ────────────────────────────────────────────────────────────────
+   MODAL + CLAIM FORM
+──────────────────────────────────────────────────────────────── */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal[aria-hidden="false"] { display: flex; }
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(9, 58, 62, 0.55);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  animation: modalFade 280ms var(--ease);
+}
+.modal__card {
+  position: relative;
+  background: var(--white);
+  border-radius: var(--r-card);
+  max-width: 560px;
+  width: 100%;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 44px 36px;
+  box-shadow: 0 40px 80px rgba(9, 58, 62, 0.22);
+  animation: modalSlide 360ms var(--ease);
+}
+.modal__close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  width: 36px;
+  height: 36px;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--glacier-muted);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: color 220ms var(--ease), background 220ms var(--ease);
+}
+.modal__close:hover { color: var(--glacier); background: var(--cream); }
+.modal__header { margin-bottom: 28px; }
+.modal__header .eyebrow { margin-bottom: 12px; }
+.modal__header h3 {
+  font-family: var(--display);
+  font-size: clamp(22px, 2.4vw, 28px);
+  font-weight: 600;
+  color: var(--glacier);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 10px;
+}
+.modal__header p {
+  font-size: 15px;
+  color: var(--glacier-muted);
+  line-height: 1.55;
+}
+
+.claim-form .field { margin-bottom: 18px; }
+.claim-form label,
+.claim-form .field__legend {
+  display: block;
+  font-family: var(--body);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--glacier);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.claim-form .hint {
+  font-weight: 400;
+  color: var(--glacier-muted);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 11px;
+  margin-left: 6px;
+}
+.claim-form input[type="text"],
+.claim-form input[type="email"],
+.claim-form textarea {
+  width: 100%;
+  font-family: var(--body);
+  font-size: 15px;
+  padding: 13px 16px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 12px;
+  background: var(--cream);
+  color: var(--glacier);
+  transition: border-color 220ms var(--ease), background 220ms var(--ease);
+}
+.claim-form input:focus,
+.claim-form textarea:focus {
+  outline: none;
+  border-color: var(--glacier);
+  background: var(--white);
+}
+.claim-form textarea { resize: vertical; min-height: 72px; font-family: var(--body); }
+.claim-form input[type="file"] {
+  font-family: var(--body);
+  font-size: 14px;
+  width: 100%;
+  padding: 12px;
+  border: 1px dashed var(--hairline-strong);
+  border-radius: 12px;
+  background: var(--cream);
+  color: var(--glacier-muted);
+  cursor: pointer;
+}
+.claim-form input[type="file"]::file-selector-button {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: none;
+  background: var(--glacier);
+  color: var(--cream);
+  margin-right: 12px;
+  cursor: pointer;
+}
+.claim-form .radio-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.claim-form .radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 999px;
+  font-family: var(--body);
+  font-size: 14px;
+  color: var(--glacier);
+  cursor: pointer;
+  transition: border-color 220ms var(--ease), background 220ms var(--ease);
+}
+.claim-form .radio input { accent-color: var(--glacier); }
+.claim-form .radio:has(input:checked) {
+  border-color: var(--glacier);
+  background: var(--cream);
+}
+.form__status {
+  font-family: var(--body);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 14px;
+  min-height: 0;
+  color: var(--glacier-muted);
+}
+.form__status.error { color: #B33A2A; }
+.form__status.success { color: #0A6B47; }
+#submit-btn { width: 100%; }
+#submit-btn[disabled] { opacity: 0.6; cursor: wait; }
+.modal__success {
+  text-align: center;
+  padding: 20px 0;
+}
+.modal__success h4 {
+  font-family: var(--display);
+  font-size: 24px;
+  color: var(--glacier);
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+.modal__success p {
+  font-size: 15px;
+  color: var(--glacier-muted);
+  line-height: 1.55;
+}
+
+@keyframes modalFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalSlide {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 520px) {
+  .modal__card { padding: 32px 22px; border-radius: 18px; }
+}
+
+.rules {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--hairline);
+  margin: 0 0 20px;
+  padding: 0;
+}
+.rules__section {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--glacier);
+  margin: 28px 0 10px;
+  font-weight: 600;
+}
+.rules__section:first-of-type { margin-top: 4px; }
+.rules__row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 20px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--hairline);
+  margin: 0;
+}
+.rules__label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--glacier-muted);
+  padding-top: 2px;
+  margin: 0;
+}
+.rules__body {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--glacier);
+  margin: 0;
+}
+.rules__body strong { font-weight: 600; }
+.rules__body em { font-style: italic; color: var(--glacier-muted); }
+.rules__cta { width: 100%; justify-content: center; }
+#rules-modal .modal__header h3 { outline: none; }
+
+@media (max-width: 520px) {
+  .rules__row { grid-template-columns: 1fr; gap: 6px; }
+  .rules__label { font-size: 10px; }
+}
+
+/* ────────────────────────────────────────────────────────────────
+   FINAL CTA BAND
+──────────────────────────────────────────────────────────────── */
+.final {
+  padding: 140px 0;
+  text-align: center;
+}
+.final .eyebrow { display: block; margin-bottom: 32px; color: var(--glacier-muted); }
+.final h2 {
+  font-size: clamp(36px, 5.5vw, 60px);
+  letter-spacing: -0.035em;
+  line-height: 1.06;
+  margin: 0 auto 32px;
+  max-width: 22ch;
+}
+.final p {
+  font-size: clamp(17px, 1.3vw, 20px);
+  color: var(--glacier-muted);
+  max-width: 48ch;
+  margin: 0 auto 48px;
+  line-height: 1.55;
+}
+.final .terms-link {
+  font-family: var(--body);
+  font-size: 14px;
+  color: var(--glacier-muted);
+  margin: 32px auto 0;
+  letter-spacing: 0.02em;
+  max-width: none;
+}
+.terms-link a {
+  color: var(--glacier);
+  text-decoration: none;
+  border-bottom: 1px solid var(--hairline-strong);
+  padding-bottom: 2px;
+  transition: border-color 280ms cubic-bezier(0.5, 0, 0, 1), color 280ms cubic-bezier(0.5, 0, 0, 1);
+}
+.terms-link a:hover {
+  color: var(--dandelion);
+  border-color: var(--dandelion);
+}
+.terms-link .arrow {
+  margin-left: 4px;
+  display: inline-block;
+  transition: transform 280ms cubic-bezier(0.5, 0, 0, 1);
+}
+.terms-link a:hover .arrow { transform: translateX(3px); }
+
+/* ────────────────────────────────────────────────────────────────
+   FOOTER
+──────────────────────────────────────────────────────────────── */
+footer {
+  padding: 96px 0 64px;
+  background: var(--cream);
+  border-top: 1px solid var(--hairline-soft);
+}
+.footer-tagline {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(32px, 5vw, 56px);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--glacier);
+  margin-bottom: 48px;
+  max-width: 16ch;
+}
+.footer-tagline .dash { color: var(--dandelion); }
+.footer-meta {
+  font-family: var(--body);
+  font-size: 13px;
+  color: var(--glacier-muted);
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 32px;
+  border-top: 1px solid var(--hairline-soft);
+}
+
+/* ────────────────────────────────────────────────────────────────
+   REVEAL
+──────────────────────────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .9s var(--ease), transform .9s var(--ease);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ────────────────────────────────────────────────────────────────
+   MOBILE
+──────────────────────────────────────────────────────────────── */
+@media (max-width: 820px) {
+  .hero { padding: 72px 0 40px; }
+  .narrative, .promise { padding: 72px 0; }
+  .final { padding: 96px 0; }
+  .hero__ctas .btn { width: 100%; }
+  .hero__ctas { flex-direction: column; align-items: stretch; }
+  .proof {
+    flex-direction: column;
+    align-items: flex-start;
+    border-radius: 22px;
+    padding: 18px 22px;
+    gap: 14px;
+  }
+  .proof__divider { display: none; }
+  .claim-cta { text-align: left; }
+  .terms-card { padding: 28px 24px; }
+  .terms li { flex-direction: row; gap: 14px; padding: 18px 0; }
+  .footer-meta { flex-direction: column; gap: 6px; }
+  .nav { padding: 14px 0; }
+  .nav__logo { font-size: 17px; }
+  .nav__cta { padding: 9px 16px; font-size: 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .proof { opacity: 1; transform: none; transition: none; animation: none; }
+  html { scroll-behavior: auto; }
+}
+  </style>
+
+<!-- Google Tag Manager (noscript) -->
+<!--
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KV7HKVSJ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+-->
+<!-- End Google Tag Manager (noscript) -->
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <div class="nav__row">
+    <div class="nav__logo">Sagan</div>
+    <div class="nav__spacer"></div>
+    <a href="#claim" class="nav__cta" data-open-modal>Schedule a Call</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero__eyebrow eyebrow">Backstop · Resolves June 30, 2026</div>
+    <h1>Oil hits $175<span class="dash">—</span>your Sagan membership is on us.</h1>
+    <p class="hero__lead">Small business owners feel every oil spike. We're putting real money on the line.</p>
+    <div class="hero__ctas">
+      <a href="#claim" class="btn btn--primary" data-open-modal>Claim the Guarantee</a>
+      <a href="#promise" class="btn btn--ghost">Read the promise <span class="arrow">→</span></a>
+    </div>
+    <div class="proof" aria-label="Third-party ratings and recognition">
+      <div class="proof__item">
+        <span class="proof__stars" aria-hidden="true">★★★★★</span>
+        <span class="proof__num">4.9</span>
+        <span class="proof__mark proof__mark--g2" role="img" aria-label="G2">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24Zm.122 5.143c.45 0 .9.044 1.342.132l-1.342 2.806C9.962 8.08 8.203 9.84 8.203 12s1.76 3.92 3.92 3.92c.937 0 1.844-.338 2.553-.951l1.483 2.572A6.856 6.856 0 0 1 5.266 12a6.856 6.856 0 0 1 6.856-6.856Zm3.498.49a1.262 1.262 0 0 1 .026 0c.427 0 .792.113 1.101.34.31.229.466.546.466.946 0 .639-.36 1.03-1.035 1.376l-.377.191c-.403.204-.602.385-.657.706h2.05v.85h-3.101v-.144c0-.526.103-.96.314-1.306.211-.345.576-.65 1.102-.917l.242-.117c.427-.216.538-.401.538-.625 0-.266-.228-.458-.6-.458-.44 0-.773.228-1.004.694l-.592-.595c.13-.279.338-.502.619-.675a1.7 1.7 0 0 1 .908-.266Zm-2.094 5.388h3.394l1.697 2.937-1.697 2.94-1.697-2.94H11.83l1.696-2.937Z"/></svg>
+        </span>
+      </div>
+      <span class="proof__divider" aria-hidden="true"></span>
+      <div class="proof__item">
+        <span class="proof__stars" aria-hidden="true">★★★★★</span>
+        <span class="proof__num">4.8</span>
+        <span class="proof__mark proof__mark--clutch" role="img" aria-label="Clutch">Clutch</span>
+      </div>
+      <span class="proof__divider" aria-hidden="true"></span>
+      <div class="proof__item">
+        <span class="proof__badge" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 4C5 8 5 13 7 18"/>
+            <path d="M17 4C19 8 19 13 17 18"/>
+            <path d="M9 19c1 1 2 1 3 1s2 0 3-1"/>
+            <path d="M8 9c1 0 2-.5 2-1.5"/>
+            <path d="M8 13c1 0 2-.5 2-1.5"/>
+            <path d="M16 9c-1 0-2-.5-2-1.5"/>
+            <path d="M16 13c-1 0-2-.5-2-1.5"/>
+          </svg>
+        </span>
+        <span class="proof__num">#20</span>
+        <span class="proof__ranking">
+          <span class="proof__mark proof__mark--clutch" role="img" aria-label="Clutch">Clutch</span>
+          <span class="proof__ranking-num">100</span>
+          <span>· Fastest Growing</span>
+        </span>
+      </div>
+    </div>
+    <div class="campaign-strip" aria-label="Campaign terms">
+      <span><span class="label">Resolves</span><span class="val" id="countdown-value">—</span></span>
+      <span class="dot" aria-hidden="true"></span>
+      <a class="campaign-strip__link" href="https://polymarket.com/event/cl-hit-jun-2026" target="_blank" rel="noopener" aria-label="View bet conditions on Polymarket"><span class="label">Trigger</span><span class="val">WTI $175 / bbl <span class="campaign-strip__arrow">↗</span></span></a>
+      <span class="dot" aria-hidden="true"></span>
+      <span><span class="label">Refund</span><span class="val">100% of dues</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- PART 01 — MATTRESS MACK -->
+<section class="narrative">
+  <div class="wrap">
+    <div class="narrative__inner">
+      <div class="eyebrow reveal">Part 01 · The Mattress Mack move</div>
+      <h2 class="reveal">He bet on the Astros<span class="dash">—</span>paid out $10 million. No asterisks.</h2>
+      <p class="reveal">Jim "Mattress Mack" McIngvale told Houston: "If the Astros win the World Series, your $3,000 mattress is free." He meant it. The Astros won. Seven thousand customers walked into Gallery Furniture and out with $10 million in refunds. No fine print.</p>
+      <p class="reveal">He pulled it off because he knew his customers and had the stones to put his own money on the line.</p>
+      <figure class="mack-photo reveal">
+        <img src="/backstop/assets/mack.jpg" alt="Jim 'Mattress Mack' McIngvale at Caesars Sportsbook, holding betting tickets in front of stacks of cash." loading="lazy" width="1600" height="890" />
+      </figure>
+      <p class="mack-photo__caption reveal"><strong>Mack, Caesars Sportsbook.</strong> Holding the tickets that would cost him tens of millions if the Astros won. They did.</p>
+      <div class="big-quote reveal">We're doing the same thing.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PART 02 — EMPATHY -->
+<section class="narrative">
+  <div class="wrap">
+    <div class="narrative__inner">
+      <div class="eyebrow reveal">Part 02 · Who we built Sagan for</div>
+      <h2 class="reveal">If your business runs on wheels<span class="dash">—</span>you already know.</h2>
+      <p class="reveal">Fleet. Home services. Delivery. Route-based ops. Anything with trucks that need to roll.</p>
+      <p class="reveal">You can't forecast the pump. You can't budget around it. You watch a sustained spike eat your margin alive while your pricing stays frozen.</p>
+      <p class="reveal">Your dispatch manager keeps asking about fuel surcharges. Your customers are price-shopping every renewal. Your margin is gone before the job books.</p>
+      <p class="reveal"><strong>That's who we built Sagan for.</strong> Owner-operators, small teams, families running their own shops.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PART 03 — THE PROMISE -->
+<section class="promise" id="promise">
+  <div class="wrap">
+    <div class="promise__inner">
+      <div class="eyebrow reveal">Part 03 · The promise</div>
+      <h2 class="reveal">If WTI crude settles at or above $175 on any trading day on or before June 30, 2026, we refund your Sagan Membership <span class="parenthetical">(and you keep all the benefits).</span></h2>
+      <div class="terms-card reveal">
+        <ul class="terms">
+          <li><span class="terms__dot">→</span><span><strong>Your annual membership dues. Refunded to you.</strong> You stay a member for the rest of the year.</span></li>
+          <li><span class="terms__dot">→</span><span><strong>Your direct-hire team members.</strong> They stay on your team. Nothing changes.</span></li>
+        </ul>
+      </div>
+      <div class="claim-cta reveal" id="claim">
+        <h3>How to claim it.</h3>
+        <p>Join Sagan, or renew and pay in advance, by May 18, 2026. Fill out the form with your receipt attached.</p>
+        <button type="button" class="btn btn--primary btn--large" data-open-modal>Submit your claim <span class="arrow">→</span></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PART 04 — WHY -->
+<section class="narrative">
+  <div class="wrap">
+    <div class="narrative__inner">
+      <div class="eyebrow reveal">Part 04 · Why we'd do this</div>
+      <h2 class="reveal">Global talent is the best hedge when the world gets weird.</h2>
+      <p class="reveal">Every input cost a small business touches (fuel, insurance, tariffs, domestic payroll) is trending one direction. The harder those numbers get, the better the math on direct-hire global talent works.</p>
+      <p class="reveal"><strong>Here's the trade.</strong></p>
+      <p class="reveal">If oil stays sane, you got the talent you needed and paid us for it. Square deal.</p>
+      <p class="reveal">If oil breaks $175, you got the same access. It cost you nothing. We eat the hit. That's why Sagan exists.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final">
+  <div class="wrap">
+    <div class="eyebrow reveal">Mack hedged his promos with real bets. So do we.</div>
+    <h2 class="reveal">Our bet. Your refund.</h2>
+    <p class="reveal">Join Sagan, or renew and pay in advance, by May 18, 2026. Submit your receipt and you're locked in.</p>
+    <a href="#claim" class="btn btn--primary btn--large reveal" data-open-modal="claim-modal">Submit your claim <span class="arrow">→</span></a>
+    <p class="reveal terms-link"><a href="#rules" data-open-modal="rules-modal">Read the terms <span class="arrow">→</span></a></p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="footer-tagline">Source and scale<span class="dash">—</span>with Sagan.</div>
+    <div class="footer-meta">
+      <span>© Sagan Passport</span>
+      <span>·</span>
+      <span>Promo window: April 18 – May 18, 2026</span>
+      <span>·</span>
+      <span>Void where prohibited</span>
+    </div>
+  </div>
+</footer>
+
+<!-- CLAIM MODAL -->
+<div class="modal" id="claim-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="claim-modal-title">
+  <div class="modal__backdrop" data-close-modal></div>
+  <div class="modal__card" role="document">
+    <button type="button" class="modal__close" aria-label="Close" data-close-modal>×</button>
+    <div class="modal__header">
+      <div class="eyebrow">Backstop · The claim</div>
+      <h3 id="claim-modal-title">Lock in the guarantee.</h3>
+      <p>Join Sagan, or renew and pay in advance, by May 18, 2026. Attach your receipt. We confirm inside one business day.</p>
+    </div>
+    <form class="claim-form" id="claim-form" novalidate>
+      <div class="field">
+        <label for="cf-name">Full name</label>
+        <input type="text" id="cf-name" name="name" autocomplete="name" required />
+      </div>
+      <div class="field">
+        <label for="cf-email">Business email</label>
+        <input type="email" id="cf-email" name="email" autocomplete="email" required />
+      </div>
+      <div class="field">
+        <label for="cf-company">Company</label>
+        <input type="text" id="cf-company" name="company" autocomplete="organization" required />
+      </div>
+      <div class="field">
+        <span class="field__legend">Status</span>
+        <div class="radio-group">
+          <label class="radio"><input type="radio" name="status" value="new" checked /> New member</label>
+          <label class="radio"><input type="radio" name="status" value="renewal" /> Renewal (paid in advance)</label>
+        </div>
+      </div>
+      <div class="field">
+        <label for="cf-receipt">Payment receipt <span class="hint">PDF, PNG, or JPG · max 5 MB</span></label>
+        <input type="file" id="cf-receipt" name="receipt" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" required />
+      </div>
+      <div class="field">
+        <label for="cf-notes">Notes <span class="hint">optional</span></label>
+        <textarea id="cf-notes" name="notes" rows="3"></textarea>
+      </div>
+      <div class="form__status" id="form-status" role="status" aria-live="polite"></div>
+      <button type="submit" class="btn btn--primary btn--large" id="submit-btn">Submit claim</button>
+
+      <!-- UTM tracking — auto-filled by /hubspot-capture.js on page load -->
+      <input type="hidden" name="utm_source"   id="utm_source" />
+      <input type="hidden" name="utm_medium"   id="utm_medium" />
+      <input type="hidden" name="utm_campaign" id="utm_campaign" />
+      <input type="hidden" name="utm_content"  id="utm_content" />
+      <input type="hidden" name="utm_term"     id="utm_term" />
+    </form>
+    <div class="modal__success" id="claim-success" hidden>
+      <h4>We've got it.</h4>
+      <p>Your claim is logged. We'll confirm inside one business day. If anything looks off, email <a href="mailto:jon@getsagan.com" style="color:var(--glacier);border-bottom:1px solid var(--hairline-strong);">jon@getsagan.com</a>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- RULES MODAL -->
+<div class="modal" id="rules-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="rules-modal-title">
+  <div class="modal__backdrop" data-close-modal></div>
+  <div class="modal__card" role="document">
+    <button type="button" class="modal__close" aria-label="Close" data-close-modal>×</button>
+    <div class="modal__header">
+      <div class="eyebrow">The terms · How it resolves</div>
+      <h3 id="rules-modal-title" tabindex="-1">Backstop terms.</h3>
+      <p>Plain language. The financial trigger is decided by a public market — no Sagan-specific interpretation. The Sagan refund terms follow.</p>
+    </div>
+
+    <h4 class="rules__section">The financial trigger</h4>
+    <dl class="rules">
+      <div class="rules__row">
+        <dt class="rules__label">The market</dt>
+        <dd class="rules__body">We mirror <a href="https://polymarket.com/event/cl-hit-jun-2026" target="_blank" rel="noopener" style="color:var(--glacier);border-bottom:1px solid var(--hairline-strong);"><strong>Polymarket's "Will WTI hit $175 by Jun 30, 2026?" market</strong></a>. If that market resolves <strong>Yes</strong>, the backstop fires. Their rules are our rules — no separate Sagan interpretation of the price.</dd>
+      </div>
+    </dl>
+
+    <h4 class="rules__section">The refund</h4>
+    <dl class="rules">
+      <div class="rules__row">
+        <dt class="rules__label">Eligibility window</dt>
+        <dd class="rules__body">Open to members who join Sagan Passport, or renew and pay their next annual dues in advance, and whose payment settles <strong>on or before 11:59pm PT on May 18, 2026</strong>. Claim forms with valid receipts must be submitted <strong>on or before 11:59pm PT on July 31, 2026</strong>.</dd>
+      </div>
+      <div class="rules__row">
+        <dt class="rules__label">What gets refunded</dt>
+        <dd class="rules__body">The <strong>annual Sagan Passport membership dues</strong> paid under this promo, refunded <strong>100%</strong> to the original payment method in USD. Taxes, currency-conversion fees, and payment processing fees are not refunded. One refund per company.</dd>
+      </div>
+      <div class="rules__row">
+        <dt class="rules__label">What you keep</dt>
+        <dd class="rules__body">Your membership runs its full paid term. Team members you hire through Sagan remain members of your team — they are your employees, not ours, before and after any refund. Access to Sagan University, Sagan Black, Global Pay Direct, and all other benefits continues through the paid term.</dd>
+      </div>
+      <div class="rules__row">
+        <dt class="rules__label">Refund timing</dt>
+        <dd class="rules__body">If the backstop fires, we initiate refunds within <strong>30 days</strong> of the CME settlement that resolves it, using the final corrected settlement value available at the time of processing.</dd>
+      </div>
+      <div class="rules__row">
+        <dt class="rules__label">If the backstop does not fire</dt>
+        <dd class="rules__body">Your membership is not refunded. You still have your team, your platform, and everything else you paid for.</dd>
+      </div>
+      <div class="rules__row">
+        <dt class="rules__label">Legal</dt>
+        <dd class="rules__body">Sagan Passport can verify claims and decline clearly fraudulent submissions. Void where prohibited by law. No purchase obligation beyond the membership you chose to buy. No cash alternative outside the stated refund. This promo is governed by the laws applicable to your Sagan Passport membership agreement.</dd>
+      </div>
+    </dl>
+
+    <a class="btn btn--primary btn--large rules__cta" href="https://polymarket.com/event/cl-hit-jun-2026" target="_blank" rel="noopener">See the market on Polymarket <span class="arrow">↗</span></a>
+  </div>
+</div>
+
+<script is:inline>
+(function() {
+  var target = new Date('2026-06-30T23:59:59-04:00').getTime();
+  var el = document.getElementById('countdown-value');
+  if (!el) return;
+  function update() {
+    var diff = target - Date.now();
+    if (diff <= 0) { el.textContent = 'Resolved'; return; }
+    var days = Math.floor(diff / 86400000);
+    var hours = Math.floor((diff % 86400000) / 3600000);
+    var minutes = Math.floor((diff % 3600000) / 60000);
+    el.textContent = days + 'd ' + hours + 'h ' + minutes + 'm';
+  }
+  update();
+  setInterval(update, 60000);
+})();
+
+(function() {
+  var nav = document.getElementById('nav');
+  function onScroll() {
+    if (window.scrollY > 8) nav.classList.add('is-scrolled');
+    else nav.classList.remove('is-scrolled');
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+
+(function() {
+  var els = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window)) {
+    els.forEach(function(el) { el.classList.add('visible'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+  els.forEach(function(el) { io.observe(el); });
+})();
+
+// Modal system (handles claim + rules + any future modals)
+(function() {
+  var lastFocus = null;
+  var FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+  function getFocusable(modal) {
+    return Array.prototype.slice.call(modal.querySelectorAll(FOCUSABLE))
+      .filter(function(el) { return el.offsetWidth > 0 || el.offsetHeight > 0 || el === document.activeElement; });
+  }
+
+  function openModal(modal) {
+    if (!modal) return;
+    // Close any already-open modal first so focus handling stays consistent
+    var alreadyOpen = document.querySelector('.modal[aria-hidden="false"]');
+    if (alreadyOpen && alreadyOpen !== modal) {
+      alreadyOpen.setAttribute('aria-hidden', 'true');
+    } else if (!alreadyOpen) {
+      lastFocus = document.activeElement;
+    }
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function() {
+      // Rules modal (informational) focuses its title; claim modal focuses first visible form field
+      var titled = modal.querySelector('.modal__header h3[tabindex="-1"]');
+      if (titled) { titled.focus(); return; }
+      var focusable = getFocusable(modal);
+      var firstInput = focusable.filter(function(el) {
+        return (el.tagName === 'INPUT' && el.type !== 'file') || el.tagName === 'TEXTAREA';
+      })[0];
+      if (firstInput) { firstInput.focus(); return; }
+      var close = modal.querySelector('.modal__close');
+      if (close) close.focus();
+    }, 80);
+  }
+  function closeAnyOpenModal() {
+    var open = document.querySelector('.modal[aria-hidden="false"]');
+    if (!open) return;
+    open.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
+  }
+
+  document.querySelectorAll('[data-open-modal]').forEach(function(b) {
+    b.addEventListener('click', function(e) {
+      e.preventDefault();
+      var id = b.getAttribute('data-open-modal') || 'claim-modal';
+      openModal(document.getElementById(id));
+    });
+  });
+  document.querySelectorAll('[data-close-modal]').forEach(function(b) {
+    b.addEventListener('click', function(e) { e.preventDefault(); closeAnyOpenModal(); });
+  });
+  document.addEventListener('keydown', function(e) {
+    var open = document.querySelector('.modal[aria-hidden="false"]');
+    if (!open) return;
+    if (e.key === 'Escape') { closeAnyOpenModal(); return; }
+    if (e.key !== 'Tab') return;
+    var focusable = getFocusable(open);
+    if (!focusable.length) { e.preventDefault(); return; }
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    var active = document.activeElement;
+    // If focus has escaped the modal (e.g. after opening), pull it back in
+    if (!open.contains(active)) {
+      e.preventDefault();
+      (e.shiftKey ? last : first).focus();
+      return;
+    }
+    // Focused element is inside the modal but not in the focus ring (e.g. title h3 with tabindex=-1)
+    if (focusable.indexOf(active) === -1) {
+      e.preventDefault();
+      (e.shiftKey ? last : first).focus();
+      return;
+    }
+    if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
+  });
+
+  // Claim form submission logic (below)
+  var modal = document.getElementById('claim-modal');
+  if (!modal) return;
+  var form = document.getElementById('claim-form');
+  var status = document.getElementById('form-status');
+  var submitBtn = document.getElementById('submit-btn');
+  var success = document.getElementById('claim-success');
+
+  function escapeHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/[&<>"']/g, function(c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function toBase64(file) {
+    return new Promise(function(resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function() {
+        var result = reader.result;
+        var comma = result.indexOf(',');
+        resolve(comma >= 0 ? result.substring(comma + 1) : result);
+      };
+      reader.onerror = function() { reject(new Error('File read failed')); };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    status.className = 'form__status';
+    status.textContent = '';
+
+    var data = new FormData(form);
+    var name = (data.get('name') || '').toString().trim();
+    var email = (data.get('email') || '').toString().trim();
+    var company = (data.get('company') || '').toString().trim();
+    var memberStatus = (data.get('status') || 'new').toString();
+    var notes = (data.get('notes') || '').toString().trim();
+    var file = data.get('receipt');
+
+    if (!name || !email || !company) {
+      status.className = 'form__status error';
+      status.textContent = 'Please complete the required fields.';
+      return;
+    }
+    if (!file || !file.size) {
+      status.className = 'form__status error';
+      status.textContent = 'Please attach your payment receipt.';
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      status.className = 'form__status error';
+      status.textContent = 'Receipt must be under 5 MB.';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting…';
+
+    toBase64(file).then(function(b64) {
+      var subject = 'Backstop claim — ' + company + ' (' + memberStatus + ')';
+      var html =
+        '<div style="font-family:system-ui,sans-serif;color:#093A3E;">' +
+        '<h2 style="margin:0 0 16px;">New Backstop claim</h2>' +
+        '<p style="margin:0 0 6px;"><strong>Name:</strong> ' + escapeHtml(name) + '</p>' +
+        '<p style="margin:0 0 6px;"><strong>Email:</strong> ' + escapeHtml(email) + '</p>' +
+        '<p style="margin:0 0 6px;"><strong>Company:</strong> ' + escapeHtml(company) + '</p>' +
+        '<p style="margin:0 0 6px;"><strong>Status:</strong> ' + escapeHtml(memberStatus) + '</p>' +
+        (notes ? '<p style="margin:16px 0 6px;"><strong>Notes:</strong><br>' + escapeHtml(notes).replace(/\n/g, '<br>') + '</p>' : '') +
+        '<p style="margin:16px 0 0;color:#4A6B6B;font-size:13px;">Receipt attached: ' + escapeHtml(file.name) + '</p>' +
+        '</div>';
+
+      return fetch('/backstop/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: 'Backstop <jon@globalandremote.com>',
+          to: ['jon@getsagan.com'],
+          reply_to: email,
+          subject: subject,
+          html: html,
+          attachments: [{
+            filename: file.name,
+            content: b64
+          }]
+        })
+      });
+    }).then(function(res) {
+      if (!res.ok) {
+        return res.text().then(function(t) { throw new Error('Submit failed (' + res.status + ')'); });
+      }
+      form.hidden = true;
+      success.hidden = false;
+      form.reset();
+    }).catch(function(err) {
+      console.error(err);
+      status.className = 'form__status error';
+      status.textContent = 'Something broke on our end. Email jon@getsagan.com directly and we\'ll sort it.';
+    }).finally(function() {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit claim';
+    });
+  });
+})();
+</script>
+
+<script is:inline src="/hubspot-capture.js" data-portal-id="50517161" data-form-guid="daac2804-e5c3-48e7-8ab7-a5b41c9e7c38"></script>
+</LandingLayout>

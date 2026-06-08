@@ -1,0 +1,2809 @@
+---
+// /ai-savings — faithful 1:1 port of the standalone "AI Savings Scan" app
+// (Sagan passport Domain/AI savings scan/index.html). Content lives in code,
+// not Sanity — this is a tool, not a CMS page. Own route so only this page's
+// CSS/scripts bundle. Backends live at /ai-savings/api/{generate-team,email}.
+//
+// Astro notes:
+//   - Every <script> with content/attrs is is:inline (the app is all hand-rolled
+//     JS — letting Astro bundle/transform it would break it).
+//   - Source <head> font <link> tags are converted to a top @import inside the
+//     <style is:global> block; preconnect + favicon go in slot="head".
+//   - The app fetches /ai-savings/api/generate-team and /ai-savings/api/email
+//     (rewritten from the source's /api/* paths now that it lives under
+//     /ai-savings/). All other logic is identical to the source.
+import LandingLayout from '../../layouts/LandingLayout.astro';
+
+export const prerender = true;
+---
+
+<LandingLayout
+  title="AI Savings Scan · AI is earning us $267K/month. What could it save you?"
+  description="Describe your team in one sentence. We show you where AI agents can save you money, role by role, with the monthly number. Built on Sagan's 2,500-hire dataset."
+  canonical="https://saganpassport.com/ai-savings"
+>
+  <Fragment slot="head">
+    <meta property="og:title" content="AI Savings Scan · How much could AI save your team each month?" />
+    <meta property="og:description" content="AI is earning us an extra $267K/month inside Sagan. Describe your team in a sentence and see how much it could be saving yours." />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href="/ai-savings/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/50517161.js" is:inline></script>
+    <!-- End of HubSpot Embed Code -->
+  </Fragment>
+
+  <style is:global>
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0b1220;
+      --navy-2: #111a2e;
+      --sagan: #1e3a5f;
+      --sagan-deep: #152d4a;
+      --sagan-light: #dbeafe;
+      --ink: #0f172a;
+      --ink-2: #1e293b;
+      --ink-3: #334155;
+      --ink-4: #475569;
+      --ink-5: #64748b;
+      --paper: #fafaf7;
+      --paper-warm: #f5f3ee;
+      --white: #ffffff;
+      --line: #e5e2d9;
+      --line-2: #d9d5c9;
+      --red: #b91c1c;
+      --red-ink: #7f1d1d;
+      --red-bg: #fef2f2;
+      --red-bg-2: #fee2e2;
+      --amber: #b45309;
+      --amber-ink: #78350f;
+      --amber-bg: #fffbeb;
+      --amber-bg-2: #fef3c7;
+      --green: #047857;
+      --green-ink: #064e3b;
+      --green-bg: #ecfdf5;
+      --green-bg-2: #d1fae5;
+      --radius: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --shadow-sm: 0 1px 2px rgba(11,18,32,0.04);
+      --shadow: 0 1px 3px rgba(11,18,32,0.06), 0 1px 2px rgba(11,18,32,0.04);
+      --shadow-md: 0 6px 16px rgba(11,18,32,0.06), 0 2px 6px rgba(11,18,32,0.04);
+      --shadow-lg: 0 20px 40px rgba(11,18,32,0.08), 0 8px 16px rgba(11,18,32,0.04);
+      --shadow-xl: 0 30px 60px rgba(11,18,32,0.12), 0 12px 24px rgba(11,18,32,0.06);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    .serif { font-family: 'Newsreader', Georgia, serif; }
+    .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+    button { cursor: pointer; font-family: inherit; }
+    button:disabled { cursor: not-allowed; }
+    a { color: inherit; }
+
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+    .container-narrow { max-width: 820px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── ANIMATIONS ── */
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-d1 { transition-delay: 0.1s; }
+    .reveal-d2 { transition-delay: 0.2s; }
+    .reveal-d3 { transition-delay: 0.3s; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.55; transform: scale(1.15); }
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Respect users who prefer reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .reveal { opacity: 1 !important; transform: none !important; }
+    }
+
+    /* Keyboard-visible focus rings on interactive elements */
+    :focus { outline: none; }
+    :focus-visible {
+      outline: 2px solid var(--sagan);
+      outline-offset: 2px;
+      border-radius: 6px;
+    }
+    button:focus-visible,
+    a:focus-visible,
+    [role="button"]:focus-visible {
+      box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.22);
+      outline-offset: 3px;
+    }
+    input:focus-visible, textarea:focus-visible {
+      outline: none;
+    }
+
+    /* ── NAV ── */
+    nav.top {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(250,250,247,0.88);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-inner {
+      max-width: 1120px; margin: 0 auto; padding: 0 24px;
+      display: flex; justify-content: space-between; align-items: center; height: 64px;
+    }
+    .nav-logo {
+      color: var(--ink); font-weight: 800; font-size: 0.98rem;
+      text-decoration: none; letter-spacing: -0.02em;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-logo-mark {
+      width: 22px; height: 22px; border-radius: 6px;
+      background: linear-gradient(135deg, var(--sagan) 0%, var(--sagan-deep) 100%);
+      display: grid; place-items: center;
+      color: white; font-size: 0.68rem; font-weight: 900; letter-spacing: 0;
+    }
+    .nav-logo span { color: var(--sagan); }
+    .nav-right { display: flex; align-items: center; gap: 18px; }
+    .nav-pill {
+      font-size: 0.78rem; color: var(--ink-4); font-weight: 600;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .nav-pill-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+      animation: pulse-dot 2.4s ease-in-out infinite;
+    }
+    @media (max-width: 640px) { .nav-pill { display: none; } }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 88px 24px 72px;
+      text-align: center;
+      position: relative;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(30,58,95,0.06) 0%, transparent 70%),
+        linear-gradient(180deg, var(--paper) 0%, var(--paper-warm) 100%);
+      border-bottom: 1px solid var(--line);
+      overflow: hidden;
+    }
+    .hero::before {
+      content: ""; position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(11,18,32,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(11,18,32,0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse 60% 80% at 50% 30%, black 20%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse 60% 80% at 50% 30%, black 20%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-inner { max-width: 820px; margin: 0 auto; position: relative; }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 6px 14px;
+      background: var(--white); border: 1px solid var(--line-2);
+      border-radius: 999px;
+      font-size: 0.72rem; font-weight: 700; color: var(--ink-3);
+      letter-spacing: 0.08em; text-transform: uppercase;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow-sm);
+    }
+    .hero-eyebrow-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--red);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5.2vw, 3.6rem);
+      font-weight: 900; line-height: 1.06;
+      letter-spacing: -0.038em; color: var(--ink);
+      margin-bottom: 22px;
+    }
+    .hero h1 em {
+      font-family: 'Newsreader', Georgia, serif;
+      font-style: italic; font-weight: 500;
+      color: var(--sagan);
+    }
+    .hero h1 .highlight {
+      background: linear-gradient(180deg, transparent 62%, rgba(220,38,38,0.2) 62%);
+      padding: 0 4px;
+    }
+    .hero p.lede {
+      color: var(--ink-4);
+      font-size: clamp(1.02rem, 1.5vw, 1.16rem);
+      max-width: 640px; margin: 0 auto 36px;
+      line-height: 1.65;
+    }
+    .hero-cta-row {
+      display: flex; justify-content: center; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--ink); color: var(--white);
+      padding: 15px 30px; border-radius: 10px;
+      text-decoration: none; font-weight: 700; font-size: 0.98rem;
+      border: none; cursor: pointer;
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                  background 0.2s ease,
+                  box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 2px 6px rgba(11,18,32,0.2);
+      will-change: transform;
+    }
+    .btn-primary:hover {
+      background: var(--navy);
+      transform: translateY(-2px);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 10px 24px rgba(11,18,32,0.28);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { background: var(--ink-5); cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.65; }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--ink-3); text-decoration: none; font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .btn-ghost:hover { color: var(--sagan); }
+
+    .hero-proof {
+      display: inline-flex; align-items: center; gap: 18px; flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 42px;
+      padding: 14px 22px;
+      background: rgba(255,255,255,0.6);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 0.83rem; color: var(--ink-4);
+      box-shadow: var(--shadow-sm);
+    }
+    .hero-proof strong { color: var(--ink); font-weight: 700; }
+    .hero-proof-divider { width: 1px; height: 14px; background: var(--line-2); }
+    @media (max-width: 640px) {
+      .hero-proof-divider { display: none; }
+      .hero-proof { flex-direction: column; gap: 6px; border-radius: 12px; }
+    }
+
+    /* ── TRUST STRIP ── */
+    .trust-strip {
+      padding: 40px 24px 28px;
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+    }
+    .trust-inner {
+      max-width: 1040px; margin: 0 auto;
+      display: flex; flex-direction: column; align-items: center; gap: 18px;
+    }
+    .trust-label {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--ink-5);
+    }
+    .trust-metrics {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 28px; width: 100%;
+    }
+    @media (max-width: 720px) { .trust-metrics { grid-template-columns: repeat(2, 1fr); gap: 20px; } }
+    .trust-metric {
+      text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .trust-metric-stars {
+      display: inline-flex; gap: 2px; color: #f59e0b;
+    }
+    .trust-metric-stars svg { width: 14px; height: 14px; }
+    .trust-metric-badge {
+      width: 26px; height: 26px; border-radius: 7px;
+      display: grid; place-items: center;
+      background: linear-gradient(135deg, var(--sagan) 0%, var(--sagan-deep) 100%);
+      color: white;
+      box-shadow: 0 4px 10px rgba(30,58,95,0.22);
+    }
+    .trust-metric-badge svg { width: 14px; height: 14px; }
+    .trust-metric-value {
+      font-size: clamp(1.2rem, 2vw, 1.45rem); font-weight: 900;
+      color: var(--ink); letter-spacing: -0.02em;
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
+    .trust-metric-value em {
+      font-family: 'Newsreader', serif; font-style: italic; font-weight: 500;
+      color: var(--sagan);
+    }
+    .trust-metric-label {
+      font-size: 0.78rem; color: var(--ink-4); font-weight: 500;
+      line-height: 1.35;
+    }
+
+    /* ── SCANNER ── */
+    .scanner { padding: 64px 24px 96px; background: var(--paper); }
+    .scanner-card {
+      max-width: 780px; margin: 0 auto;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.6) inset,
+        0 24px 48px -16px rgba(11,18,32,0.08),
+        0 8px 16px -8px rgba(11,18,32,0.05);
+      overflow: hidden;
+    }
+    .scanner-card.hidden { display: none; }
+    .describe-textarea { resize: vertical; min-height: 56px; line-height: 1.5; }
+    .describe-fine {
+      margin-top: 8px; font-size: 0.78rem; color: var(--ink-5);
+      text-align: center;
+    }
+    .describe-fine a { color: var(--sagan); text-decoration: none; font-weight: 600; }
+    .advanced-toggle {
+      margin-top: 16px; text-align: center; font-size: 0.84rem;
+      color: var(--ink-4); cursor: pointer; font-weight: 500;
+      padding-top: 16px; border-top: 1px solid var(--line);
+    }
+    .advanced-toggle:hover { color: var(--sagan); }
+    .advanced-panel {
+      margin-top: 16px;
+      padding: 16px;
+      background: var(--paper);
+      border-radius: 10px;
+      border: 1px solid var(--line);
+    }
+    .advanced-panel.hidden { display: none; }
+
+    /* ── ROSTER EDITOR ── */
+    .roster-list { display: flex; flex-direction: column; gap: 8px; }
+    .roster-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px; align-items: center;
+      padding: 12px 14px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      transition: all 0.15s;
+      animation: slideUp 0.25s ease backwards;
+    }
+    .roster-row:hover { border-color: var(--line-2); background: var(--white); }
+    .roster-role {
+      font-weight: 600; color: var(--ink); font-size: 0.95rem;
+      border: none; background: transparent; padding: 4px 0;
+      font-family: inherit; width: 100%;
+    }
+    .roster-role:focus { outline: none; border-bottom: 1px dashed var(--sagan); }
+    .roster-counter {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--white); border: 1px solid var(--line);
+      border-radius: 8px; padding: 2px;
+    }
+    .counter-btn {
+      width: 28px; height: 28px; border-radius: 6px;
+      border: none; background: transparent;
+      display: grid; place-items: center;
+      color: var(--ink-4); cursor: pointer;
+      font-weight: 700; font-size: 1rem;
+      transition: all 0.1s;
+    }
+    .counter-btn:hover { background: var(--paper-warm); color: var(--ink); }
+    .counter-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .counter-val {
+      min-width: 28px; text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700; font-size: 0.92rem; color: var(--ink);
+    }
+    .remove-btn {
+      width: 32px; height: 32px; border-radius: 8px;
+      border: none; background: transparent;
+      display: grid; place-items: center;
+      color: var(--ink-5); cursor: pointer;
+      transition: all 0.1s;
+    }
+    .remove-btn:hover { background: var(--red-bg); color: var(--red); }
+    .remove-btn svg { width: 16px; height: 16px; }
+
+    .roster-add {
+      display: flex; gap: 8px; margin-top: 12px;
+      padding: 12px 14px;
+      background: var(--paper-warm);
+      border: 1px dashed var(--line-2);
+      border-radius: 10px;
+    }
+    .roster-add input {
+      flex: 1;
+      border: none; background: transparent;
+      font-family: inherit; font-size: 0.92rem;
+      color: var(--ink); padding: 6px 0;
+    }
+    .roster-add input:focus { outline: none; }
+    .roster-add input::placeholder { color: var(--ink-5); }
+    .btn-secondary {
+      padding: 8px 16px;
+      background: var(--ink);
+      color: var(--white);
+      border: none; border-radius: 8px;
+      font-size: 0.84rem; font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-secondary:hover { background: var(--navy); }
+    .btn-secondary:disabled { background: var(--ink-5); cursor: not-allowed; }
+
+    /* ── GENERATING ── */
+    .generating-state {
+      padding: 40px 32px; text-align: center;
+    }
+    .generating-spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--line);
+      border-top-color: var(--sagan);
+      border-radius: 50%;
+      margin: 0 auto 18px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .generating-title { font-weight: 700; color: var(--ink); margin-bottom: 4px; font-size: 1rem; }
+    .generating-sub { font-size: 0.86rem; color: var(--ink-4); }
+    .scanner-head {
+      padding: 28px 32px 20px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, var(--white) 0%, var(--paper) 100%);
+    }
+    .scanner-title {
+      font-size: 1.05rem; font-weight: 700; color: var(--ink);
+      margin-bottom: 4px; letter-spacing: -0.01em;
+    }
+    .scanner-sub { font-size: 0.88rem; color: var(--ink-4); }
+
+    .scanner-tabs {
+      display: flex; gap: 4px; padding: 8px 12px 0;
+      border-bottom: 1px solid var(--line);
+      background: var(--paper);
+    }
+    .tab {
+      padding: 10px 18px; font-size: 0.85rem; font-weight: 600;
+      color: var(--ink-4); background: transparent; border: none;
+      cursor: pointer; border-radius: 8px 8px 0 0;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .tab:hover { color: var(--ink); }
+    .tab.active {
+      color: var(--sagan); background: var(--white);
+      border-bottom-color: var(--sagan);
+    }
+    .tab svg { width: 14px; height: 14px; }
+
+    .scanner-body { padding: 24px 32px 28px; }
+    .tab-panel { display: none; animation: fadeIn 0.25s ease; }
+    .tab-panel.active { display: block; }
+
+    textarea.roles-input {
+      width: 100%;
+      min-height: 220px;
+      padding: 16px 18px;
+      border: 1px solid var(--line-2);
+      border-radius: 12px;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: var(--ink);
+      resize: vertical;
+      background: var(--paper);
+      transition: all 0.15s;
+    }
+    textarea.roles-input:focus {
+      outline: none; border-color: var(--sagan);
+      box-shadow: 0 0 0 3px rgba(30,58,95,0.12);
+      background: var(--white);
+    }
+    textarea.roles-input::placeholder { color: var(--ink-5); }
+
+    .input-hint {
+      margin-top: 10px; font-size: 0.78rem; color: var(--ink-5);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .input-hint .kbd {
+      display: inline-block; padding: 2px 6px; background: var(--paper-warm);
+      border: 1px solid var(--line-2); border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.74rem;
+      color: var(--ink-3);
+    }
+
+    .upload-zone {
+      border: 2px dashed var(--line-2);
+      border-radius: 12px;
+      padding: 40px 20px;
+      text-align: center;
+      background: var(--paper);
+      transition: all 0.15s;
+      cursor: pointer;
+    }
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--sagan); background: var(--sagan-light);
+    }
+    .upload-zone svg { width: 34px; height: 34px; color: var(--ink-5); margin-bottom: 10px; }
+    .upload-zone-title { font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+    .upload-zone-sub { font-size: 0.82rem; color: var(--ink-5); }
+    .upload-zone input[type="file"] { display: none; }
+    .upload-zone.has-file { border-color: var(--green); background: var(--green-bg); }
+    .upload-zone.has-file svg { color: var(--green); }
+    .upload-zone.has-file .upload-zone-title { color: var(--green-ink); }
+
+    .scanner-footer {
+      padding: 20px 32px 24px;
+      background: var(--paper);
+      border-top: 1px solid var(--line);
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .count-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 12px;
+      background: var(--white);
+      border: 1px solid var(--line-2);
+      border-radius: 999px;
+      font-size: 0.82rem; color: var(--ink-3); font-weight: 500;
+    }
+    .count-pill strong { color: var(--ink); font-weight: 700; }
+    .count-pill-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--ink-5);
+    }
+    .count-pill.has-roles .count-pill-dot { background: var(--green); }
+
+    /* ── LOADING ── */
+    .loading {
+      max-width: 860px; margin: 0 auto; padding: 48px 32px;
+      text-align: center;
+      background: var(--white);
+      border: 1px solid var(--line); border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      display: none;
+    }
+    .loading.active { display: block; animation: fadeIn 0.3s ease; }
+    .loading-title { font-weight: 700; font-size: 1.1rem; color: var(--ink); margin-bottom: 8px; }
+    .loading-sub { color: var(--ink-4); font-size: 0.9rem; }
+    .loading-rows { margin-top: 28px; display: flex; flex-direction: column; gap: 10px; }
+    .loading-row {
+      height: 44px;
+      background: linear-gradient(90deg, var(--paper-warm) 0%, var(--paper) 50%, var(--paper-warm) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s linear infinite;
+      border-radius: 8px;
+    }
+
+    /* ── RESULTS SUMMARY ── */
+    .results {
+      max-width: 1120px; margin: 0 auto;
+      display: none;
+    }
+    .results.active { display: block; animation: fadeIn 0.35s ease; }
+
+    .results-header {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      padding: 32px 36px;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow-md);
+    }
+    .results-eyebrow {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em;
+      color: var(--ink-5); text-transform: uppercase; margin-bottom: 14px;
+    }
+    .results-verdict {
+      font-size: clamp(1.4rem, 2.6vw, 1.95rem);
+      font-weight: 800; color: var(--ink);
+      letter-spacing: -0.02em; line-height: 1.25;
+      margin-bottom: 8px;
+    }
+    .results-verdict em {
+      font-family: 'Newsreader', Georgia, serif;
+      font-style: italic; font-weight: 500;
+      color: var(--sagan);
+    }
+    .results-verdict-sub {
+      color: var(--ink-4); font-size: 0.98rem; line-height: 1.55;
+    }
+
+    .results-stats {
+      display: grid; grid-template-columns: 0.9fr 0.9fr 1.6fr;
+      gap: 14px; margin-top: 26px;
+      position: relative;
+    }
+    @media (max-width: 720px) { .results-stats { grid-template-columns: 1fr; } }
+
+    .stat-card {
+      padding: 22px 22px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      position: relative;
+    }
+    .stat-card.current { background: var(--white); border-color: var(--line-2); }
+    .stat-card.sagan { background: var(--sagan-light); border-color: #bfdcff; }
+
+    /* ── THE MONEY SHOT ── */
+    .stat-card.save {
+      padding: 26px 26px;
+      background:
+        radial-gradient(ellipse 120% 80% at 90% 10%, rgba(251,191,36,0.18) 0%, transparent 55%),
+        radial-gradient(ellipse 80% 60% at 10% 100%, rgba(239,68,68,0.12) 0%, transparent 60%),
+        linear-gradient(135deg, var(--ink) 0%, var(--navy) 100%);
+      border: 1px solid rgba(251,191,36,0.28);
+      color: var(--white);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 20px 40px -12px rgba(239,68,68,0.18),
+        0 8px 16px rgba(11,18,32,0.22);
+      overflow: hidden;
+      isolation: isolate;
+    }
+    /* Rotating conic-gradient halo */
+    .stat-card.save::before {
+      content: ""; position: absolute; inset: -60%;
+      background: conic-gradient(from 0deg, transparent 60%, rgba(251,191,36,0.4) 75%, rgba(239,68,68,0.5) 85%, transparent 100%);
+      animation: halo-rotate 8s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    /* Inner mask so the halo only shows at the edges */
+    .stat-card.save::after {
+      content: ""; position: absolute; inset: 1px;
+      background:
+        radial-gradient(ellipse 120% 80% at 90% 10%, rgba(251,191,36,0.18) 0%, transparent 55%),
+        radial-gradient(ellipse 80% 60% at 10% 100%, rgba(239,68,68,0.12) 0%, transparent 60%),
+        linear-gradient(135deg, #111a2e 0%, #0b1220 100%);
+      border-radius: 13px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .stat-card.save > * { position: relative; z-index: 2; }
+    @keyframes halo-rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .stat-card.save::before { animation: none; display: none; }
+    }
+
+    /* Label stays subtle but alive */
+    .stat-card.save .stat-label-dot {
+      background: #fbbf24;
+      animation: pulse-dot 1.8s ease-in-out infinite;
+      box-shadow: 0 0 8px rgba(251,191,36,0.7);
+    }
+
+    .stat-label {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--ink-5); margin-bottom: 8px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .stat-card.sagan .stat-label { color: var(--sagan-deep); }
+    .stat-card.save .stat-label { color: rgba(255,255,255,0.6); }
+    .stat-label-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    .stat-value {
+      font-size: 2rem; font-weight: 900; color: var(--ink);
+      line-height: 1.02; letter-spacing: -0.03em;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-card.sagan .stat-value { color: var(--sagan-deep); }
+    .stat-card.save .stat-value {
+      font-size: clamp(2.6rem, 5vw, 3.6rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      background: linear-gradient(100deg, #fde68a 0%, #fbbf24 28%, #f97316 62%, #ef4444 100%);
+      background-size: 220% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      animation: shimmer-text 5s linear infinite;
+      filter: drop-shadow(0 4px 18px rgba(251,191,36,0.28));
+      display: inline-block;
+      will-change: transform, background-position;
+    }
+    .stat-card.save.punch .stat-value {
+      animation: shimmer-text 5s linear infinite, money-punch 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes shimmer-text {
+      0% { background-position: 0% 50%; }
+      100% { background-position: -220% 50%; }
+    }
+    @keyframes money-punch {
+      0% { transform: scale(1); }
+      35% { transform: scale(1.1) rotate(-0.5deg); }
+      65% { transform: scale(0.98) rotate(0.25deg); }
+      100% { transform: scale(1) rotate(0); }
+    }
+    .stat-unit { font-size: 0.82rem; font-weight: 500; color: var(--ink-5); margin-top: 4px; line-height: 1.45; }
+    .stat-card.sagan .stat-unit { color: var(--sagan); opacity: 0.85; }
+    .stat-card.save .stat-unit {
+      color: rgba(251,191,36,0.85);
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    .stats-breakdown {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      margin-top: 18px;
+      font-size: 0.82rem; color: var(--ink-4);
+    }
+    .stats-breakdown-item {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+    }
+    .stats-breakdown-item strong { color: var(--ink); font-weight: 700; }
+    .stats-breakdown-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .stats-breakdown-dot.red { background: var(--red); }
+    .stats-breakdown-dot.yellow { background: var(--amber); }
+    .stats-breakdown-dot.green { background: var(--green); }
+    .stats-breakdown-dot.local { background: var(--ink-4); }
+
+    /* ── GATE OVERLAY ── */
+    .gate-wrap {
+      position: relative;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      min-height: 620px;
+    }
+    @media (max-width: 640px) { .gate-wrap { min-height: 680px; } }
+    .gate-preview {
+      padding: 28px 36px;
+      filter: blur(6px);
+      pointer-events: none;
+      user-select: none;
+    }
+    .gate-preview-rows { display: flex; flex-direction: column; gap: 10px; }
+    .gate-preview-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 18px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    .gate-preview-bar {
+      width: 6px; height: 32px; border-radius: 3px;
+    }
+    .gate-preview-bar.red { background: var(--red); }
+    .gate-preview-bar.yellow { background: var(--amber); }
+    .gate-preview-bar.green { background: var(--green); }
+    .gate-preview-text {
+      flex: 1; height: 10px; border-radius: 3px;
+      background: linear-gradient(90deg, var(--ink-5) 0%, var(--line-2) 100%);
+    }
+
+    .gate-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 32px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.98) 55%);
+    }
+    .gate-card {
+      max-width: 460px; width: 100%;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 32px 32px 28px;
+      box-shadow: var(--shadow-xl);
+    }
+    .gate-card-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 5px 12px;
+      background: var(--ink);
+      color: var(--white);
+      border-radius: 999px;
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .gate-card-badge svg { width: 12px; height: 12px; }
+    .gate-card h3 {
+      font-size: 1.35rem; font-weight: 800; color: var(--ink);
+      letter-spacing: -0.02em; line-height: 1.25; margin-bottom: 8px;
+    }
+    .gate-card p {
+      font-size: 0.92rem; color: var(--ink-4); line-height: 1.6; margin-bottom: 20px;
+    }
+    .form-row { display: flex; flex-direction: column; gap: 12px; }
+    .form-field { display: flex; flex-direction: column; gap: 6px; }
+    .form-label {
+      font-size: 0.78rem; font-weight: 600; color: var(--ink-3);
+      display: flex; justify-content: space-between;
+    }
+    .form-input {
+      padding: 11px 14px;
+      border: 1px solid var(--line-2);
+      border-radius: 8px;
+      font-family: 'Geist', sans-serif;
+      font-size: 0.93rem;
+      color: var(--ink);
+      background: var(--paper);
+      transition: all 0.15s;
+    }
+    .form-input:focus {
+      outline: none; border-color: var(--sagan);
+      box-shadow: 0 0 0 3px rgba(30,58,95,0.12);
+      background: var(--white);
+    }
+    .form-error {
+      color: var(--red); font-size: 0.82rem; margin-top: 4px;
+      display: none;
+    }
+    .form-error.active { display: block; }
+    .btn-submit {
+      width: 100%;
+      padding: 14px 20px; margin-top: 6px;
+      background: var(--ink); color: var(--white);
+      border: none; border-radius: 10px;
+      font-size: 0.96rem; font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+    }
+    .btn-submit:hover { background: var(--navy); }
+    .btn-submit:disabled { background: var(--ink-5); cursor: wait; }
+    .gate-fine {
+      font-size: 0.74rem; color: var(--ink-5);
+      margin-top: 14px; text-align: center; line-height: 1.5;
+    }
+
+    /* ── FULL RESULTS LIST ── */
+    .role-group { margin-bottom: 28px; }
+    .role-group-head {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 18px; margin-bottom: 10px;
+      border-radius: 12px;
+    }
+    .role-group-head.red { background: var(--red-bg); }
+    .role-group-head.yellow { background: var(--amber-bg); }
+    .role-group-head.green { background: var(--green-bg); }
+    .role-group-bar {
+      width: 4px; height: 28px; border-radius: 2px;
+    }
+    .role-group-bar.red { background: var(--red); }
+    .role-group-bar.yellow { background: var(--amber); }
+    .role-group-bar.green { background: var(--green); }
+    .role-group-title {
+      font-weight: 800; font-size: 1.02rem; letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+    .role-group-count {
+      margin-left: auto; font-size: 0.82rem; font-weight: 600;
+      padding: 4px 10px; border-radius: 999px;
+      background: var(--white);
+    }
+    .role-group-desc {
+      font-size: 0.84rem; color: var(--ink-4);
+      margin-left: 16px; flex: 1;
+    }
+    @media (max-width: 640px) { .role-group-desc { display: none; } }
+
+    .role-card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px; align-items: start;
+      padding: 18px 22px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      margin-bottom: 8px;
+      transition: all 0.15s;
+      animation: slideUp 0.35s ease backwards;
+    }
+    .role-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+    @media (max-width: 720px) {
+      .role-card { grid-template-columns: 1fr; gap: 10px; }
+    }
+
+    .role-main { min-width: 0; }
+    .role-head {
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+    .role-name {
+      font-weight: 700; font-size: 1.02rem; color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+    .role-count {
+      font-size: 0.82rem; font-weight: 600; color: var(--ink-5);
+      background: var(--paper-warm); padding: 2px 8px; border-radius: 5px;
+      font-variant-numeric: tabular-nums;
+    }
+    .role-sol-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px;
+      background: var(--sagan-light); color: var(--sagan-deep);
+      border-radius: 6px;
+      font-size: 0.78rem; font-weight: 700;
+      letter-spacing: 0;
+    }
+    .role-sol-chip.physical { background: var(--paper-warm); color: var(--ink-3); }
+    .role-sol-chip.self { background: #fef3c7; color: #78350f; }
+    .role-why {
+      font-size: 0.86rem; color: var(--ink-4);
+      line-height: 1.55; margin-bottom: 10px;
+    }
+    .role-math {
+      display: inline-flex; gap: 10px; align-items: center;
+      font-size: 0.82rem; color: var(--ink-4);
+      font-variant-numeric: tabular-nums;
+      flex-wrap: wrap;
+    }
+    .role-math strong { color: var(--ink); font-weight: 700; }
+    .role-math .arrow { color: var(--ink-5); font-weight: 700; }
+    .role-math .was {
+      text-decoration: line-through; text-decoration-color: var(--ink-5);
+      text-decoration-thickness: 1.5px;
+      color: var(--ink-5);
+    }
+
+    .role-savings-box {
+      text-align: right;
+      min-width: 110px;
+      padding: 8px 0 0;
+    }
+    @media (max-width: 720px) {
+      .role-savings-box { text-align: left; padding: 10px 0 0; border-top: 1px dashed var(--line); }
+    }
+    .role-savings-label {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--ink-5);
+      margin-bottom: 2px;
+    }
+    .role-savings-value {
+      font-size: 1.3rem; font-weight: 900; color: var(--green-ink);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    .role-savings-value.neutral { color: var(--ink-4); font-size: 1.02rem; font-weight: 700; }
+    .role-savings-sub {
+      font-size: 0.72rem; color: var(--ink-5); margin-top: 2px;
+      font-weight: 500;
+    }
+
+    /* ── PROOF ── */
+    .proof {
+      padding: 88px 24px; background: var(--ink);
+      color: var(--white);
+      position: relative; overflow: hidden;
+    }
+    .proof::before {
+      content: ""; position: absolute; inset: 0;
+      background-image:
+        radial-gradient(ellipse 40% 50% at 20% 20%, rgba(30,58,95,0.3) 0%, transparent 50%),
+        radial-gradient(ellipse 40% 50% at 80% 80%, rgba(220,38,38,0.12) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .proof-inner { max-width: 960px; margin: 0 auto; position: relative; }
+    .proof-eyebrow {
+      font-size: 0.74rem; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: rgba(255,255,255,0.5);
+      margin-bottom: 16px;
+    }
+    .proof h2 {
+      font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+      font-weight: 800; line-height: 1.15;
+      letter-spacing: -0.032em; margin-bottom: 24px; color: var(--white);
+    }
+    .proof h2 em {
+      font-family: 'Newsreader', serif; font-style: italic; font-weight: 500;
+      color: #94c5ff;
+    }
+    .proof-number {
+      font-size: clamp(3rem, 6vw, 5rem);
+      font-weight: 900; line-height: 1;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, #ffffff 0%, #94c5ff 100%);
+      -webkit-background-clip: text;
+      background-clip: text; color: transparent;
+      margin-bottom: 4px;
+    }
+    .proof-number-label {
+      font-size: 0.88rem; color: rgba(255,255,255,0.6);
+      font-weight: 500; margin-bottom: 32px;
+    }
+    .proof-body {
+      font-size: 1.04rem; line-height: 1.75;
+      color: rgba(255,255,255,0.78);
+      max-width: 680px;
+    }
+    .proof-body p { margin-bottom: 16px; }
+    .proof-body strong { color: var(--white); font-weight: 600; }
+
+    .proof-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 14px;
+      margin-top: 44px;
+    }
+    @media (max-width: 720px) { .proof-grid { grid-template-columns: 1fr; grid-template-rows: auto; } }
+    .proof-card {
+      padding: 24px 26px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+      display: flex; flex-direction: column; justify-content: flex-end;
+    }
+    .proof-card.feature {
+      grid-row: 1 / 3;
+      background: linear-gradient(135deg, rgba(148,197,255,0.10) 0%, rgba(255,255,255,0.03) 100%);
+      border-color: rgba(148,197,255,0.18);
+      min-height: 200px;
+    }
+    @media (max-width: 720px) { .proof-card.feature { grid-row: auto; min-height: 0; } }
+    .proof-card .proof-card-eyebrow {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.16em;
+      text-transform: uppercase; color: rgba(148,197,255,0.8);
+      margin-bottom: 10px;
+    }
+    .proof-card-stat {
+      font-size: 2rem; font-weight: 900; color: var(--white);
+      letter-spacing: -0.03em; line-height: 1; margin-bottom: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+    .proof-card.feature .proof-card-stat { font-size: 2.8rem; }
+    .proof-card-stat em {
+      font-family: 'Newsreader', serif; font-style: italic; font-weight: 500;
+      color: #94c5ff;
+    }
+    .proof-card-label {
+      font-size: 0.9rem; color: rgba(255,255,255,0.7);
+      line-height: 1.55;
+    }
+    .proof-card.feature .proof-card-label { font-size: 1rem; }
+
+    /* ── FINAL CTA ── */
+    .cta-final {
+      padding: 96px 24px; text-align: center;
+      background: var(--paper-warm);
+      border-top: 1px solid var(--line);
+    }
+    .cta-final h2 {
+      font-size: clamp(1.8rem, 3.4vw, 2.4rem);
+      font-weight: 800; letter-spacing: -0.03em;
+      line-height: 1.18; color: var(--ink);
+      margin-bottom: 16px;
+    }
+    .cta-final h2 em {
+      font-family: 'Newsreader', serif; font-style: italic; font-weight: 500;
+      color: var(--sagan);
+    }
+    .cta-final p {
+      color: var(--ink-4); font-size: 1.04rem;
+      max-width: 560px; margin: 0 auto 28px;
+      line-height: 1.65;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 32px 24px 40px;
+      background: var(--paper);
+      border-top: 1px solid var(--line);
+      text-align: center;
+      font-size: 0.82rem; color: var(--ink-5);
+    }
+    footer a { color: var(--ink-3); text-decoration: none; font-weight: 500; }
+    footer a:hover { color: var(--sagan); }
+
+    /* ── SUCCESS MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(11,18,32,0.64);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center;
+      z-index: 2000; padding: 24px;
+    }
+    .modal-overlay.active { display: flex; animation: fadeIn 0.2s ease; }
+    .modal-card {
+      background: var(--white);
+      border-radius: 20px;
+      max-width: 480px; width: 100%;
+      padding: 40px 36px 32px;
+      text-align: center;
+      box-shadow: 0 40px 80px rgba(11,18,32,0.5);
+      animation: modalIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      width: 34px; height: 34px;
+      border: none; background: var(--paper);
+      border-radius: 8px; cursor: pointer;
+      display: grid; place-items: center;
+      color: var(--ink-4);
+      transition: all 0.15s;
+    }
+    .modal-close:hover { background: var(--paper-warm); color: var(--ink); }
+    .modal-check {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+      display: grid; place-items: center;
+      margin: 0 auto 22px;
+      color: white;
+      box-shadow: 0 10px 24px rgba(4,120,87,0.24);
+      animation: checkPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+    }
+    @keyframes checkPop {
+      from { opacity: 0; transform: scale(0.3); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-card h3 {
+      font-size: 1.6rem; font-weight: 800;
+      color: var(--ink); letter-spacing: -0.025em;
+      line-height: 1.2; margin-bottom: 10px;
+    }
+    .modal-card h3 em {
+      font-family: 'Newsreader', serif; font-style: italic; font-weight: 500;
+      color: var(--sagan);
+    }
+    .modal-card .modal-body {
+      font-size: 0.98rem; color: var(--ink-4);
+      line-height: 1.6; margin-bottom: 26px;
+    }
+    .modal-card .modal-body strong { color: var(--ink); font-weight: 700; }
+    .modal-next {
+      display: block;
+      width: 100%;
+      padding: 15px 20px;
+      background: var(--ink); color: var(--white);
+      text-decoration: none; font-weight: 700; font-size: 0.98rem;
+      border-radius: 10px;
+      border: none; cursor: pointer;
+      transition: all 0.18s;
+      box-shadow: 0 4px 14px rgba(11,18,32,0.22);
+    }
+    .modal-next:hover { background: var(--navy); transform: translateY(-1px); box-shadow: 0 8px 22px rgba(11,18,32,0.3); }
+    .modal-next-sub {
+      display: block;
+      font-size: 0.78rem; font-weight: 500;
+      opacity: 0.72; margin-top: 4px;
+    }
+    .modal-footer {
+      margin-top: 18px;
+      font-size: 0.8rem; color: var(--ink-5);
+      display: flex; justify-content: center; gap: 6px;
+    }
+    .modal-countdown {
+      font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--ink-3);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+      padding: 12px 22px;
+      background: var(--ink); color: var(--white);
+      border-radius: 10px;
+      font-size: 0.88rem; font-weight: 600;
+      box-shadow: var(--shadow-xl);
+      z-index: 1000;
+      opacity: 0; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .toast.active { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast svg { width: 18px; height: 18px; color: var(--green-bg-2); }
+
+    /* ── UTILS ── */
+    .hidden { display: none !important; }
+    .success-state {
+      padding: 32px; text-align: center;
+      background: var(--green-bg); border-radius: var(--radius-lg);
+      border: 1px solid var(--green-bg-2);
+      margin-bottom: 24px;
+      display: none;
+    }
+    .success-state.active { display: block; animation: fadeIn 0.3s ease; }
+    .success-state-icon {
+      width: 46px; height: 46px; border-radius: 50%;
+      background: var(--green); color: white;
+      display: grid; place-items: center;
+      margin: 0 auto 14px;
+    }
+    .success-state h3 { font-weight: 700; color: var(--green-ink); margin-bottom: 4px; font-size: 1.08rem; }
+    .success-state p { color: var(--green-ink); opacity: 0.8; font-size: 0.92rem; }
+    </style>
+
+  <!-- Google Tag Manager (noscript) (disabled)
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KV7HKVSJ"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  End Google Tag Manager (noscript) -->
+
+  <nav class="top">
+    <div class="nav-inner">
+      <a href="https://getsagan.com" target="_blank" rel="noopener" class="nav-logo" aria-label="Sagan">
+        <img src="/ai-savings/sagan-logo.png" alt="Sagan" width="28" height="28" style="display:block;" />
+        <span style="color: var(--ink); font-weight: 800; letter-spacing: -0.02em;">Sagan</span>
+      </a>
+      <div class="nav-right">
+        <div class="nav-pill">
+          <span class="nav-pill-dot"></span>
+          Live tool · trained on Sagan's 2,500+ hire dataset
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow reveal">
+        <span class="hero-eyebrow-dot"></span>
+        AI Savings Scan · 60 seconds · Free
+      </div>
+      <h1 class="reveal reveal-d1">
+        AI is earning us an extra <span class="highlight">$267K/month</span>.<br />
+        <em>How much could it save you?</em>
+      </h1>
+      <p class="lede reveal reveal-d2">
+        Describe your team in a sentence. We'll show you what AI can do today, what needs a human plus an agent, and the monthly number sitting in your payroll. Built on Sagan's 2,500+ direct global hires. Ours.
+      </p>
+      <div class="hero-cta-row reveal reveal-d3">
+        <a href="#scanner" class="btn-primary">
+          Show me the number
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#proof" class="btn-ghost">See how we did it in-house →</a>
+      </div>
+      <div class="hero-proof reveal reveal-d3">
+        <span><strong>$267,781</strong>/mo earned back internally</span>
+        <span class="hero-proof-divider"></span>
+        <span>15-person screening team now <strong>runs on agents</strong></span>
+        <span class="hero-proof-divider"></span>
+        <span>No spam. No sales call.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST STRIP -->
+  <section class="trust-strip">
+    <div class="trust-inner">
+      <div class="trust-label">What operators say about Sagan</div>
+      <div class="trust-metrics">
+        <div class="trust-metric">
+          <div class="trust-metric-stars" aria-label="4.9 out of 5 on G2">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+          </div>
+          <div class="trust-metric-value">4.9<em>/5</em></div>
+          <div class="trust-metric-label">on G2</div>
+        </div>
+        <div class="trust-metric">
+          <div class="trust-metric-stars" aria-label="4.8 out of 5 on Clutch">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+          </div>
+          <div class="trust-metric-value">4.8<em>/5</em></div>
+          <div class="trust-metric-label">on Clutch</div>
+        </div>
+        <div class="trust-metric">
+          <div class="trust-metric-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+          </div>
+          <div class="trust-metric-value"><em>#</em>20</div>
+          <div class="trust-metric-label">Clutch 100 fastest growing</div>
+        </div>
+        <div class="trust-metric">
+          <div class="trust-metric-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="trust-metric-value">2,500<em>+</em></div>
+          <div class="trust-metric-label">Direct global hires</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCANNER -->
+  <section id="scanner" class="scanner">
+
+    <!-- STAGE A: DESCRIBE -->
+    <div id="stageDescribe" class="scanner-card">
+      <div class="scanner-head">
+        <div class="scanner-title">Tell us about your team in a sentence.</div>
+        <div class="scanner-sub">We'll draft a typical roster for your industry. You tweak it, we scan. No roster-typing required.</div>
+      </div>
+      <div class="scanner-body">
+        <form id="describeForm" class="form-row" novalidate>
+          <div class="form-field">
+            <label class="form-label" for="bizDesc">What does your business do?</label>
+            <textarea id="bizDesc" class="form-input describe-textarea" rows="2" placeholder="HVAC repair and installation in Phoenix &mdash; or &lsquo;Signarama franchise&rsquo;, &lsquo;digital marketing agency&rsquo;, &lsquo;independent plumbing co&rsquo;&hellip;" required></textarea>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="bizHead">How many people on the team?</label>
+            <input id="bizHead" class="form-input" type="number" min="1" max="500" placeholder="18" required />
+          </div>
+          <div class="form-error" id="describeError">Add a short description and headcount.</div>
+          <button id="generateBtn" type="submit" class="btn-primary" style="width:100%;justify-content:center;padding:15px;">
+            <span id="generateBtnText">Draft my team</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+        </form>
+        <div class="describe-fine">
+          Drafted against Sagan's 2,500-hire dataset, matched to our internal agent catalog. Edit before you scan. We don't store it.
+        </div>
+        <div class="advanced-toggle" id="advToggle">Already have a roster to paste? →</div>
+        <div class="advanced-panel hidden" id="advPanel">
+          <textarea id="rolesText" class="roles-input" placeholder="One job title per line.&#10;&#10;Account Manager&#10;Bookkeeper&#10;Dispatcher&#10;Field Technician&#10;Field Technician&#10;Operations Manager"></textarea>
+          <button type="button" id="advScanBtn" class="btn-secondary" style="margin-top:12px;width:100%;padding:12px;" disabled>Scan pasted roster →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAGE B: EDIT ROSTER -->
+    <div id="stageEdit" class="scanner-card hidden">
+      <div class="scanner-head">
+        <div class="scanner-title" id="editTitle">Here's a plausible team.</div>
+        <div class="scanner-sub">Edit roles, adjust counts, add your own. When it looks right, scan.</div>
+      </div>
+      <div class="scanner-body">
+        <div id="rosterList" class="roster-list"></div>
+        <div class="roster-add">
+          <input id="newRole" type="text" placeholder="Add a role we missed… (e.g. Estimator)" autocomplete="off" />
+          <button type="button" id="addRoleBtn" class="btn-secondary">Add</button>
+        </div>
+      </div>
+      <div class="scanner-footer">
+        <div class="count-pill has-roles">
+          <span class="count-pill-dot"></span>
+          <span><strong id="rosterTotal">0</strong> people · <strong id="rosterRoleCount">0</strong> distinct roles</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" id="restartBtn" class="btn-ghost" style="padding:12px 14px;border:1px solid var(--line-2);border-radius:8px;background:var(--white);cursor:pointer;">← Start over</button>
+          <button type="button" id="scanBtn" class="btn-primary" disabled>
+            Scan my team
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAGE C: GENERATING (LLM call in flight) -->
+    <div id="generating" class="scanner-card hidden">
+      <div class="generating-state">
+        <div class="generating-spinner"></div>
+        <div class="generating-title" id="genTitle">Drafting a typical team&hellip;</div>
+        <div class="generating-sub">Drafting a typical roster against Sagan's 2,500-hire dataset. Takes about 8 seconds.</div>
+      </div>
+    </div>
+
+    <!-- STAGE D: SCANNING (classifier running) -->
+    <div id="loading" class="loading">
+      <div class="loading-title">Scanning your roster&hellip;</div>
+      <div class="loading-sub">Matching <span id="loadingCount">0</span> roles against Sagan's agent catalog and 2,500-hire index.</div>
+      <div class="loading-rows">
+        <div class="loading-row"></div>
+        <div class="loading-row" style="animation-delay: 0.15s"></div>
+        <div class="loading-row" style="animation-delay: 0.3s"></div>
+      </div>
+    </div>
+
+    <!-- RESULTS (shown after analysis; includes gate + list) -->
+    <div id="results" class="results">
+
+      <!-- HEADER / STATS -->
+      <div class="results-header">
+        <div class="results-eyebrow">Your scan · Updated just now</div>
+        <h2 class="results-verdict" id="verdictHead">Your verdict, <em>in one sentence</em>.</h2>
+        <p class="results-verdict-sub" id="verdictSub">Analyzing your org.</p>
+        <div class="results-stats">
+          <div class="stat-card current">
+            <div class="stat-label"><span class="stat-label-dot"></span>Currently (US payroll)</div>
+            <div class="stat-value">$<span id="statUs">0</span></div>
+            <div class="stat-unit">/month, fully loaded</div>
+          </div>
+          <div class="stat-card sagan">
+            <div class="stat-label"><span class="stat-label-dot"></span>Sagan plan</div>
+            <div class="stat-value">$<span id="statSag">0</span></div>
+            <div class="stat-unit">/month · Global Talent + AI</div>
+          </div>
+          <div class="stat-card save">
+            <div class="stat-label"><span class="stat-label-dot"></span>Monthly savings</div>
+            <div class="stat-value">$<span id="statSave">0</span></div>
+            <div class="stat-unit">back into your P&amp;L, every month</div>
+          </div>
+        </div>
+        <div class="stats-breakdown">
+          <div class="stats-breakdown-item"><span class="stats-breakdown-dot red"></span><strong id="statRed">0</strong> agent-ready</div>
+          <div class="stats-breakdown-item"><span class="stats-breakdown-dot yellow"></span><strong id="statYellow">0</strong> global talent + AI</div>
+          <div class="stats-breakdown-item"><span class="stats-breakdown-dot green"></span><strong id="statGreen">0</strong> global talent</div>
+          <div class="stats-breakdown-item"><span class="stats-breakdown-dot local"></span><strong id="statLocal">0</strong> stay local</div>
+        </div>
+      </div>
+
+      <!-- GATE (blurred preview + form) -->
+      <div id="gateWrap" class="gate-wrap">
+        <div class="gate-preview">
+          <div class="gate-preview-rows">
+            <div class="gate-preview-row"><div class="gate-preview-bar red"></div><div class="gate-preview-text"></div></div>
+            <div class="gate-preview-row"><div class="gate-preview-bar red"></div><div class="gate-preview-text"></div></div>
+            <div class="gate-preview-row"><div class="gate-preview-bar yellow"></div><div class="gate-preview-text"></div></div>
+            <div class="gate-preview-row"><div class="gate-preview-bar yellow"></div><div class="gate-preview-text"></div></div>
+            <div class="gate-preview-row"><div class="gate-preview-bar green"></div><div class="gate-preview-text"></div></div>
+          </div>
+        </div>
+        <div class="gate-overlay">
+          <div class="gate-card">
+            <div class="gate-card-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Unlock your savings report
+            </div>
+            <h3 id="gateHead">Where do we send it?</h3>
+            <p id="gatePara">Full role-by-role breakdown. Agent blueprints and monthly costs. The playbook we'd use.</p>
+            <form id="gateForm" class="form-row" novalidate>
+              <!-- Honeypot: real users can't see this; bots auto-fill it and get silently dropped. -->
+              <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;overflow:hidden;opacity:0;pointer-events:none;">
+                <label for="websiteField">Website (leave blank)</label>
+                <input id="websiteField" name="website" type="text" tabindex="-1" autocomplete="off" />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="firstName">First name</label>
+                <input id="firstName" name="firstName" type="text" class="form-input" placeholder="Jon" autocomplete="given-name" required />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="email">Work email</label>
+                <input id="email" name="email" type="email" class="form-input" placeholder="jon@company.com" autocomplete="email" required />
+                <div class="form-error" id="emailError">Please enter a valid work email.</div>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="company">Company</label>
+                <input id="company" name="company" type="text" class="form-input" placeholder="Acme HVAC" autocomplete="organization" required />
+              </div>
+              <button id="gateSubmit" type="submit" class="btn-submit">
+                <span id="gateBtnText">Send me the full report</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              </button>
+            </form>
+            <div class="gate-fine">Your data stays yours.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FULL LIST (hidden until unlocked) -->
+      <div id="fullList" class="hidden">
+        <div class="success-state" id="successState">
+          <div class="success-state-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h3>Report sent to your inbox.</h3>
+          <p>Check <span id="confirmEmail">your email</span> — you'll also find everything below.</p>
+        </div>
+
+        <div id="redGroup" class="role-group"></div>
+        <div id="yellowGroup" class="role-group"></div>
+        <div id="greenGroup" class="role-group"></div>
+        <div id="physicalGroup" class="role-group"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PROOF -->
+  <section id="proof" class="proof">
+    <div class="proof-inner">
+      <div class="proof-eyebrow">Receipts</div>
+      <h2>We didn't read about this. <em>We did it to ourselves first.</em></h2>
+      <div class="proof-number" id="proofNumber" data-target="267781">$0</div>
+      <div class="proof-number-label">Earned back every month inside Sagan, six months in.</div>
+      <div class="proof-body">
+        <p>Six months ago we started replacing our own admin work with AI agents. We had a <strong>15-person screening team</strong> burning through thousands of applications a week. All human. That team is now a small fraction of what it was.</p>
+        <p>The repetitive, process-driven, admin-heavy work that was the core of the BPO value prop? Screening. Scheduling. Data cleanup. Basic customer triage. <strong>AI agents do it now.</strong></p>
+        <p>What's left is judgment, relationships, selling, and navigating a pissed-off customer on the phone. That work has a completely different profile. It's the work you should actually pay humans for.</p>
+        <p>This tool does the same audit on your team. Red means an agent can eat it. Yellow means keep the human, but they need an agent riding shotgun. Green means lock them in, empower them, and pay them what they're worth.</p>
+      </div>
+      <div class="proof-grid">
+        <div class="proof-card feature">
+          <div class="proof-card-eyebrow">Member case study</div>
+          <div class="proof-card-stat">$5M <em>→</em> $30M</div>
+          <div class="proof-card-label">J Blanton Plumbing in 3 years. Dozens of direct global hires, zero BPO markup.</div>
+        </div>
+        <div class="proof-card">
+          <div class="proof-card-stat">2,500<em>+</em></div>
+          <div class="proof-card-label">Direct global hires. The dataset powering this scan.</div>
+        </div>
+        <div class="proof-card">
+          <div class="proof-card-stat">$500 <em>+ usage</em></div>
+          <div class="proof-card-label">What a Sagan agent costs to build. No retainer. No seats.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="cta-final">
+    <div class="container-narrow">
+      <h2>Ready to start <em>printing these savings?</em></h2>
+      <p>If your scan surfaced a five-figure monthly number, there's a real conversation to have. We'll tell you exactly which agent to build first, what it'll cost to run, and where to hire globally for the humans you're doubling down on.</p>
+      <a href="https://getsagan.com/book" target="_blank" rel="noopener" class="btn-primary">
+        Book a 20-min intro with Sagan
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div>© Sagan · <a href="https://getsagan.com" target="_blank" rel="noopener">getsagan.com</a></div>
+    </div>
+  </footer>
+
+  <!-- SUCCESS MODAL (after email submission) -->
+  <div id="successModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="modalClose" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <div class="modal-check">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h3 id="modalTitle">Check your inbox<em>.</em></h3>
+      <div class="modal-body">
+        Your full Savings Report is flying to <strong id="modalEmail">your email</strong>. Check your <strong>spam folder</strong> if it's not there in a minute or two.
+      </div>
+      <a id="modalNextBtn" href="https://www.shipyourweekendproject.com/" class="modal-next">
+        Start building your agents
+        <span class="modal-next-sub">Ship Your Weekend Project →</span>
+      </a>
+      <div class="modal-footer">
+        <span>Auto-continuing in</span>
+        <span class="modal-countdown" id="modalCountdown">6</span>
+        <span>seconds</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    <span id="toastMsg">Done.</span>
+  </div>
+
+  <script is:inline>
+    // ============================================================
+    // CLASSIFIER — Sagan's role-to-color mapping
+    // Each entry: keywords to match, color, the agent we'd build,
+    // the monthly cost we'd save (per headcount), and a one-liner.
+    // Order matters: most specific keywords first.
+    // ============================================================
+
+    // Each entry:
+    //   color  → red | yellow | green
+    //   us     → fully-loaded US monthly cost assumption (per headcount)
+    //   sag    → Sagan monthly cost (agent runtime, global hire, or blend)
+    //   sol    → solution label shown to user
+    //   why    → 1-line rationale
+    //   physical (optional) → true for roles that must stay local (field/trade/clinical)
+    //   self (optional) → true for owner/founder (skip math)
+    const CLASSIFIER = [
+      // ─── RED: Agent does the work ──────────────────────────
+      { keys: ['data entry', 'data clerk', 'data entry clerk'], color: 'red', us: 3800, sag: 80, sol: 'Data Pipeline Agent', why: 'Pulls, cleans, categorizes, posts. The #1 ROI agent in our catalog. Zero errors. Zero sick days.' },
+      { keys: ['appointment setter', 'appointment setting'], color: 'red', us: 4000, sag: 150, sol: 'Appointment Agent', why: 'Books, confirms, reschedules against your calendar 24/7. Never forgets. Never double-books.' },
+      { keys: ['dispatcher', 'dispatch coordinator', 'dispatch specialist'], color: 'red', us: 4500, sag: 120, sol: 'Dispatch Agent', why: 'Runs your dispatch board around the clock. Matches every job to the closest tech. HVAC and plumbing members love this one.' },
+      { keys: ['scheduler', 'scheduling coordinator', 'scheduling specialist'], color: 'red', us: 4200, sag: 100, sol: 'Scheduling Agent', why: 'Owns the calendar. Rescheduling, confirmations, reminders. A human handles only the weird exceptions.' },
+      { keys: ['transcription', 'transcriber', 'transcribe', 'transcriptionist'], color: 'red', us: 3800, sag: 50, sol: 'Transcript + Summary Agent', why: 'Eats every meeting. Spits out clean summaries, action items, and a searchable archive.' },
+      { keys: ['sdr', 'sales development', 'business development rep', 'bdr', 'lead qualifier', 'lead qualification'], color: 'red', us: 5500, sag: 200, sol: 'Inbound Qualifier Agent', why: 'Screens every new lead in under 60 seconds. Routes the hot ones to closers. Kills junk before it touches your pipeline.' },
+      { keys: ['list builder', 'lead research', 'data researcher', 'prospect researcher'], color: 'red', us: 3800, sag: 120, sol: 'Prospect Research Agent', why: 'Combs LinkedIn, the web, and your CRM on a 24/7 loop. Perfect consistency. No coffee breaks.' },
+      { keys: ['email triage', 'inbox manager', 'email coordinator', 'inbox coordinator'], color: 'red', us: 4500, sag: 100, sol: 'Inbox Triage Agent', why: 'Sorts, labels, drafts, escalates. Saves our own execs 15 hours a week. Your inbox running itself.' },
+      { keys: ['receptionist', 'virtual receptionist', 'front desk coordinator'], color: 'red', us: 4200, sag: 150, sol: 'Front Desk Agent', why: 'Answers, routes, books, FAQs. Voice and chat. A full receptionist, 24/7, for $150 a month.' },
+      { keys: ['invoice', 'accounts payable', 'ap clerk', 'ap specialist', 'billing clerk'], color: 'red', us: 4500, sag: 100, sol: 'AP/AR Agent', why: 'Invoice match, PO reconciliation, payment posting. Clean books without the clerk payroll.' },
+      { keys: ['accounts receivable', 'ar clerk', 'ar specialist', 'collections specialist'], color: 'red', us: 4500, sag: 120, sol: 'AR Collections Agent', why: 'Aging reports, dunning sequences, payment follow-ups. Your receivables on autopilot.' },
+      { keys: ['content formatter', 'content assistant', 'content operations', 'content coordinator'], color: 'red', us: 4200, sag: 80, sol: 'Content Ops Agent', why: 'Formats, tags, publishes, repurposes. Your content pipeline running itself while you sleep.' },
+      { keys: ['social media scheduler', 'social scheduler', 'social media assistant', 'social media coordinator'], color: 'red', us: 3800, sag: 60, sol: 'Social Ops Agent', why: 'Schedules posts, handles basic responses, repurposes winners. Your social ops in the background for sixty bucks.' },
+      { keys: ['cold caller', 'telemarketer'], color: 'red', us: 4500, sag: 400, sol: 'Voice Outreach Agent', why: 'Voice AI that hits 80% of human cold-caller performance at 5% of the cost. No burnout. No turnover. No calling in sick on a Tuesday.' },
+      { keys: ['intake specialist', 'intake coordinator', 'intake associate'], color: 'red', us: 4200, sag: 100, sol: 'Intake Agent', why: 'Forms, routing, initial triage. Every new inquiry handled the moment it arrives.' },
+      { keys: ['screener', 'screening specialist', 'resume screener', 'application screener'], color: 'red', us: 4500, sag: 150, sol: 'Recruiter Screening Agent', why: 'We collapsed our own 15-person screening team with this exact agent. Yours is next.' },
+      { keys: ['bookkeeping assistant', 'junior bookkeeper', 'bookkeeping clerk', 'accounting clerk'], color: 'red', us: 4500, sag: 150, sol: 'Books Reconciliation Agent', why: 'Categorization, reconciliation, monthly close prep. Agent owns 80%. Your human focuses on the exceptions.' },
+      { keys: ['data scraper', 'web scraper', 'research assistant', 'research associate'], color: 'red', us: 4200, sag: 120, sol: 'Deep Research Agent', why: 'Four-hour research projects, finished in ten minutes. For any task an analyst used to spend an afternoon on.' },
+      { keys: ['chat agent', 'live chat', 'chat support', 'chat specialist'], color: 'red', us: 4200, sag: 100, sol: 'Chat Support Agent', why: 'Handles Tier 1 chat in real time. Your humans keep the escalations that actually need judgment.' },
+      { keys: ['quality assurance analyst', 'qa analyst', 'call qa', 'call auditor'], color: 'red', us: 4500, sag: 180, sol: 'Call QA Agent', why: 'Scores every single call against your rubric. Not 5%. Every one. Your top agents get coached, not audited by luck.' },
+      { keys: ['estimator', 'estimating clerk', 'quote specialist'], color: 'red', us: 5500, sag: 250, sol: 'Estimating Agent', why: 'Structured quotes from photos, specs, and your price book. One of the biggest ROI wins we deploy for trades.' },
+      { keys: ['data analyst', 'reporting analyst'], color: 'red', us: 6500, sag: 300, sol: 'Reporting Agent', why: 'Scheduled reports, dashboards, ad-hoc pulls. Done overnight. Your senior analysts move up to insight work.' },
+      { keys: ['content moderator', 'moderator'], color: 'red', us: 4200, sag: 100, sol: 'Moderation Agent', why: 'Policy enforcement at scale. 1000x the volume of a human, zero drift.' },
+
+      // ─── YELLOW: Global Talent + AI (blended hire) ─────────
+      { keys: ['bookkeeper'], color: 'yellow', us: 5500, sag: 1500, sol: 'Global Bookkeeper + reconciliation agent', why: 'Global hire ($1,400) plus a reconciliation agent ($100). The bookkeeper owns the close. The agent eats the categorization grind.' },
+      { keys: ['accountant', 'staff accountant', 'senior accountant'], color: 'yellow', us: 7500, sag: 2000, sol: 'Global Accountant + agent', why: 'Global hire ($1,800) plus an agent ($200). Reconciliation and data entry to the agent. Advisory, tax strategy, and judgment to the human.' },
+      { keys: ['customer service rep', 'customer support', 'csr', 'customer service representative', 'customer support specialist'], color: 'yellow', us: 4800, sag: 1450, sol: 'Global CSR + deflection agent', why: 'Global hire ($1,300) plus a deflection agent ($150). AI kills Tier 1 tickets. The human takes the escalations and the pissed-off calls.' },
+      { keys: ['virtual assistant', 'executive assistant', 'personal assistant', 'admin assistant', 'administrative assistant'], color: 'yellow', us: 5800, sag: 1650, sol: 'Global EA + agent', why: 'Global hire ($1,500) plus an agent ($150). The agent owns scheduling, research, drafts. The EA owns relationships, judgment, and your calendar war.' },
+      { keys: ['recruiter', 'talent acquisition', 'talent partner'], color: 'yellow', us: 6500, sag: 1900, sol: 'Global Recruiter + sourcing agent', why: 'Global hire ($1,700) plus a sourcing agent ($200). Sourcing and screening to the agent. Final interviews and the close stay human.' },
+      { keys: ['marketing coordinator', 'marketing assistant', 'marketing specialist', 'marketing manager'], color: 'yellow', us: 5500, sag: 1550, sol: 'Global Marketing + agent', why: 'Global hire ($1,400) plus an agent ($150). Execution and ops to the agent. Strategy and creative direction stay human.' },
+      { keys: ['copywriter', 'content writer', 'content creator', 'writer'], color: 'yellow', us: 5500, sag: 1650, sol: 'Global Writer + AI', why: 'Global hire ($1,500) plus an agent ($150). Drafts and research to the agent. Voice, taste, and editing stay human.' },
+      { keys: ['social media manager'], color: 'yellow', us: 5500, sag: 1550, sol: 'Global Social Manager + AI', why: 'Global hire ($1,400) plus an agent ($150). Production and scheduling to the agent. Community and strategy stay human.' },
+      { keys: ['project coordinator', 'operations coordinator', 'project manager'], color: 'yellow', us: 6000, sag: 1750, sol: 'Global PM + agent', why: 'Global hire ($1,600) plus an agent ($150). Status reports and doc prep to the agent. Stakeholder management stays human.' },
+      { keys: ['inside sales', 'sales rep', 'sales representative', 'sales associate'], color: 'yellow', us: 5800, sag: 1700, sol: 'Global Inside Sales + AI', why: 'Global hire ($1,500) plus an agent ($200). Research and first-touch to the agent. Discovery and close stay human.' },
+      { keys: ['hr coordinator', 'hr assistant', 'hr specialist', 'people ops'], color: 'yellow', us: 5200, sag: 1550, sol: 'Global HR + agent', why: 'Global hire ($1,400) plus an agent ($150). Policy lookup, forms, onboarding to the agent. People judgment stays human.' },
+      { keys: ['graphic designer', 'designer'], color: 'yellow', us: 5200, sag: 1500, sol: 'Global Designer + AI', why: 'Global hire ($1,400) plus an agent ($100). Drafts and variants to the agent. Taste and direction stay human.' },
+      { keys: ['paralegal', 'legal assistant'], color: 'yellow', us: 6500, sag: 1900, sol: 'Global Paralegal + agent', why: 'Global hire ($1,700) plus an agent ($200). Drafts, research, summarization to the agent. Filings and judgment stay human.' },
+
+      // ─── GREEN: Global Talent (direct hire, no agent) ──────
+      { keys: ['account executive', 'outside sales', 'closer', 'enterprise ae', 'ae'], color: 'green', us: 9000, sag: 2800, sol: 'Global Account Executive', why: 'Relationship-driven closing. The LAST thing to automate. Global AEs exist and they close. Pay them well.' },
+      { keys: ['account manager', 'customer success manager', 'csm'], color: 'green', us: 7500, sag: 2200, sol: 'Global Account Manager', why: 'Relationship plus expansion judgment. Global hire handles it. AI supports. Never replaces.' },
+      { keys: ['general manager', 'gm', 'operations manager', 'service manager', 'branch manager', 'site manager'], color: 'green', us: 10000, sag: 3500, sol: 'Global GM / Ops lead', why: 'Leadership and people work. J Blanton Plumbing hit $5M→$30M with dozens of global senior operators. Not a typo.' },
+      { keys: ['foreman', 'supervisor', 'shift lead', 'team lead'], color: 'green', physical: true, us: 6500, sag: 6500, sol: 'Stay local', why: 'Frontline supervision of field teams. Keep them on-site and promoted.' },
+      { keys: ['director', 'vp', 'vice president', 'coo', 'cfo', 'cto', 'cmo'], color: 'green', us: 15000, sag: 5500, sol: 'Global senior leadership', why: 'Strategic judgment. Global senior execs absolutely exist. We place them.' },
+      { keys: ['ceo', 'president', 'owner', 'founder'], color: 'green', self: true, us: 0, sag: 0, sol: 'You', why: 'This is you. Keep doing you. Everything below you has leverage hiding in it.' },
+
+      // ─── GREEN physical: keep local ─────────────────────────
+      // NOTE: keep keys as SPECIFIC COMPOUNDS only. Bare words like "technician",
+      // "apprentice", "supervisor" over-match non-physical roles (IT Technician,
+      // Marketing Supervisor, etc.). Sonnet re-classifies with business context.
+      { keys: ['field technician', 'service technician', 'installation technician', 'production technician', 'repair technician', 'maintenance technician', 'installer', 'installation specialist', 'field tech', 'service tech', 'repair tech', 'field crew', 'crew member', 'laborer'], color: 'green', physical: true, us: 6500, sag: 6500, sol: 'Stay local', why: 'Physical on-site work. Agents optimize dispatch around them. The tech stays human and local.' },
+      { keys: ['plumber', 'electrician', 'hvac technician', 'hvac tech', 'hvac installer', 'mechanic', 'carpenter', 'welder', 'roofer', 'painter', 'equipment operator', 'forklift operator', 'crane operator'], color: 'green', physical: true, us: 7500, sag: 7500, sol: 'Stay local', why: 'Trade skill plus on-site judgment. Untouchable. Protect them. Promote them.' },
+      { keys: ['registered nurse', 'rn', 'physician', 'doctor', 'dentist', 'therapist', 'dental hygienist'], color: 'green', physical: true, us: 9000, sag: 9000, sol: 'Stay local', why: 'Clinical judgment plus licensure. Local, forever.' },
+      { keys: ['inspector', 'safety officer', 'compliance officer', 'site inspector'], color: 'green', physical: true, us: 7000, sag: 7000, sol: 'Stay local', why: 'Compliance plus on-site judgment. Keep local.' },
+      { keys: ['senior engineer', 'staff engineer', 'principal engineer'], color: 'green', us: 14000, sag: 5000, sol: 'Global Senior Engineer', why: 'Architecture and system judgment. Elite global engineers exist. Pair with AI. Never replace.' },
+      { keys: ['chef', 'cook', 'line cook', 'sous chef', 'prep cook', 'driver', 'delivery driver', 'route driver', 'courier', 'warehouse worker', 'warehouse associate', 'stocker'], color: 'green', physical: true, us: 4500, sag: 4500, sol: 'Stay local', why: 'Physical work. Humans. Local. Forever.' }
+    ];
+
+    // Unmatched roles that still scream "physical trade" → tag local so we don't
+    // overpromise savings. Strict indicators only — bare "tech" / "field" are
+    // intentionally out because they hit software/sales roles.
+    const PHYSICAL_HINT = /\b(installer|installation|journey(?:man|person)|laborer|mechanic|roof|plumb|electric|hvac|weld|carpent|glazier|mason|concrete|landscap|delivery|courier|on-?site|shop floor|warehouse|fabricator|rigger)\b/i;
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    const state = {
+      description: '',
+      headcount: 0,
+      roster: [],       // [{role: 'Dispatcher', count: 2}, ...]
+      results: [],      // classified output
+      unlocked: false,
+    };
+
+    // ============================================================
+    // PARSING & CLASSIFICATION
+    // ============================================================
+    function parseInput(text) {
+      return (text || '')
+        .split(/\r?\n/)
+        .map(s => s.trim())
+        .filter(s => s.length > 1 && s.length < 120)
+        .slice(0, 200); // hard cap
+    }
+
+    function rosterToRoleList(roster) {
+      // Expand [{role, count}] into a flat list for the classifier
+      const out = [];
+      for (const r of roster) {
+        const n = Math.max(0, Math.min(50, r.count || 0));
+        for (let i = 0; i < n; i++) out.push(r.role);
+      }
+      return out;
+    }
+
+    function classify(roleText) {
+      const lower = roleText.toLowerCase();
+      // Score each entry by longest keyword match — most specific wins
+      let best = null;
+      let bestLen = 0;
+      for (const entry of CLASSIFIER) {
+        for (const k of entry.keys) {
+          if (lower.includes(k) && k.length > bestLen) {
+            best = entry;
+            bestLen = k.length;
+          }
+        }
+      }
+      if (!best) {
+        // Catch physical trade roles that don't hit a specific keyword
+        if (PHYSICAL_HINT.test(lower)) {
+          return {
+            color: 'green',
+            physical: true,
+            us: 6000,
+            sag: 6000,
+            sol: 'Stay local',
+            why: 'Physical / on-site work. Local only. Protect and promote your best people here.',
+            uncategorized: true,
+          };
+        }
+        return {
+          color: 'yellow',
+          us: 5500,
+          sag: 1700,
+          sol: 'Global Talent + AI (custom)',
+          why: "Doesn't match. We'd audit it against our live hiring data and propose a global hire plus agent blend.",
+          uncategorized: true,
+        };
+      }
+      const entry = { ...best };
+      entry.save = Math.max(0, (entry.us || 0) - (entry.sag || 0));
+      return entry;
+    }
+
+    function summarize(items) {
+      const totals = items.reduce((acc, c) => {
+        acc.us += (c.us || 0);
+        acc.sag += (c.sag || 0);
+        return acc;
+      }, { us: 0, sag: 0 });
+      return {
+        total: items.length,
+        red: items.filter(c => c.color === 'red').length,
+        yellow: items.filter(c => c.color === 'yellow').length,
+        green: items.filter(c => c.color === 'green').length,
+        greenGlobal: items.filter(c => c.color === 'green' && !c.physical && !c.self).length,
+        greenLocal: items.filter(c => c.color === 'green' && (c.physical || c.self)).length,
+        usTotal: totals.us,
+        sagTotal: totals.sag,
+        save: Math.max(0, totals.us - totals.sag),
+      };
+    }
+
+    function analyze(roles) {
+      const classified = roles.map(r => ({
+        label: r,
+        ...classify(r),
+      }));
+      return { items: classified, summary: summarize(classified) };
+    }
+
+    // ============================================================
+    // CSV PARSING
+    // ============================================================
+    function parseCSV(text) {
+      const lines = text.split(/\r?\n/).filter(l => l.trim());
+      if (!lines.length) return [];
+      // Very basic CSV — handles quoted cells, commas inside quotes
+      const parseLine = (line) => {
+        const out = []; let cur = ''; let q = false;
+        for (let i = 0; i < line.length; i++) {
+          const c = line[i];
+          if (c === '"') { q = !q; continue; }
+          if (c === ',' && !q) { out.push(cur); cur = ''; continue; }
+          cur += c;
+        }
+        out.push(cur);
+        return out.map(s => s.trim());
+      };
+      const header = parseLine(lines[0]).map(h => h.toLowerCase());
+      const titleKeys = ['title', 'job title', 'position', 'role', 'job_title', 'jobtitle'];
+      let titleIdx = header.findIndex(h => titleKeys.includes(h));
+      if (titleIdx === -1) titleIdx = 0; // fall back to first col
+      return lines.slice(1).map(parseLine).map(row => row[titleIdx]).filter(Boolean);
+    }
+
+    // ============================================================
+    // DOM
+    // ============================================================
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => [...document.querySelectorAll(s)];
+
+    const stageDescribe = $('#stageDescribe');
+    const stageEdit = $('#stageEdit');
+    const generatingEl = $('#generating');
+    const loadingEl = $('#loading');
+    const loadingCount = $('#loadingCount');
+    const resultsEl = $('#results');
+
+    function setStage(name) {
+      const panels = {
+        describe: stageDescribe,
+        edit: stageEdit,
+        generating: generatingEl,
+        scanning: loadingEl,
+        results: null, // results always visible after scan
+      };
+      stageDescribe.classList.toggle('hidden', name !== 'describe');
+      stageEdit.classList.toggle('hidden', name !== 'edit');
+      generatingEl.classList.toggle('hidden', name !== 'generating');
+      if (name === 'scanning') loadingEl.classList.add('active'); else loadingEl.classList.remove('active');
+    }
+
+    function scrollToEl(el, offset = 80) {
+      const y = el.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+
+    // ============================================================
+    // ADVANCED (paste) TOGGLE
+    // ============================================================
+    const advToggle = $('#advToggle');
+    const advPanel = $('#advPanel');
+    const rolesText = $('#rolesText');
+    const advScanBtn = $('#advScanBtn');
+
+    advToggle.addEventListener('click', () => {
+      const isOpen = !advPanel.classList.contains('hidden');
+      advPanel.classList.toggle('hidden', isOpen);
+      advToggle.textContent = isOpen ? 'Already have a roster to paste? →' : 'Hide paste option ↑';
+    });
+    rolesText.addEventListener('input', () => {
+      const parsed = parseInput(rolesText.value);
+      advScanBtn.disabled = parsed.length === 0;
+      advScanBtn.textContent = parsed.length === 0
+        ? 'Scan pasted roster →'
+        : `Scan ${parsed.length} role${parsed.length===1?'':'s'} →`;
+    });
+    advScanBtn.addEventListener('click', () => {
+      const parsed = parseInput(rolesText.value);
+      if (!parsed.length) return;
+      // Collapse into roster format
+      const counts = {};
+      parsed.forEach(r => counts[r] = (counts[r] || 0) + 1);
+      state.roster = Object.entries(counts).map(([role, count]) => ({ role, count }));
+      state.headcount = parsed.length;
+      state.description = 'pasted roster';
+      renderRoster();
+      $('#editTitle').textContent = `Here's your pasted roster.`;
+      setStage('edit');
+      scrollToEl(stageEdit, 90);
+    });
+
+    // ============================================================
+    // STAGE A → B : DESCRIBE → GENERATE
+    // ============================================================
+    const describeForm = $('#describeForm');
+    const bizDesc = $('#bizDesc');
+    const bizHead = $('#bizHead');
+    const describeError = $('#describeError');
+    const generateBtn = $('#generateBtn');
+    const generateBtnText = $('#generateBtnText');
+
+    describeForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      describeError.classList.remove('active');
+      const desc = bizDesc.value.trim();
+      const head = parseInt(bizHead.value, 10);
+      if (desc.length < 4 || !head || head < 1 || head > 500) {
+        describeError.textContent = desc.length < 4
+          ? 'Tell us a bit more about what your business does.'
+          : 'Enter a headcount between 1 and 500.';
+        describeError.classList.add('active');
+        return;
+      }
+      state.description = desc;
+      state.headcount = head;
+
+      $('#genTitle').innerHTML = `Drafting a typical <em style="font-family:'Newsreader',serif;font-style:italic;font-weight:500;color:var(--sagan);">${escapeHtml(desc.length > 40 ? desc.slice(0, 40) + '…' : desc)}</em> team at ${head} people…`;
+      setStage('generating');
+      scrollToEl(generatingEl, 90);
+
+      try {
+        const roster = await generateRoster(desc, head);
+        if (!roster.length) throw new Error('empty roster');
+        state.roster = roster;
+        renderRoster();
+        $('#editTitle').innerHTML = `Here's a plausible ${head}-person team for <em style="font-family:'Newsreader',serif;font-style:italic;font-weight:500;color:var(--sagan);">${escapeHtml(desc.length > 48 ? desc.slice(0, 48) + '…' : desc)}</em>.`;
+        setStage('edit');
+        scrollToEl(stageEdit, 90);
+      } catch (err) {
+        console.error('Generation failed', err);
+        // Fallback: generic roster scaled to headcount
+        state.roster = fallbackRoster(head);
+        renderRoster();
+        $('#editTitle').innerHTML = `Draft roster (generic fallback).`;
+        setStage('edit');
+        scrollToEl(stageEdit, 90);
+        showToast('Draft service hiccuped — using a generic fallback. Edit as needed.');
+      }
+    });
+
+    // ============================================================
+    // LLM: generate a plausible roster
+    // ============================================================
+    async function generateRoster(description, headcount) {
+      const system = `You are Sagan's Role Intelligence model. Sagan has placed 2,500+ direct global hires for US small businesses and maintains a proprietary index mapping industries and team sizes to typical role breakdowns. When asked, you produce a plausible, specific roster that reflects how real operators in that industry actually staff their business.`;
+      const user = `Business description: ${description}
+Total headcount: ${headcount}
+
+Return ONLY a valid JSON array of role objects, no prose, no markdown fencing. Structure:
+[{"role":"Field Technician","count":6},{"role":"Dispatcher","count":2}, ...]
+
+Rules:
+- The sum of counts must equal ${headcount} exactly.
+- 6-14 distinct roles. More distinct roles for larger teams.
+- Use specific, common job titles ("Dispatcher", "Field Technician", "Account Manager", "Bookkeeper", "Customer Service Rep") — not vague ones like "Team Member" or "Staff".
+- Include at least one leadership title (Owner, GM, or Operations Manager) for any team of 5+.
+- Match the industry: if trades/home-services, include field roles; if agency, include account/creative roles; if e-comm, include ops/CX/marketing; if franchise, match the brand's typical footprint.
+- Prefer roles that are commonly hired (so the red/yellow/green breakdown downstream is useful).`;
+
+      const res = await fetch('/ai-savings/api/generate-team', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'anthropic/claude-haiku-4.5',
+          messages: [
+            { role: 'system', content: system },
+            { role: 'user', content: user },
+          ],
+          temperature: 0.4,
+          max_tokens: 900,
+        }),
+      });
+      if (!res.ok) throw new Error(`LLM ${res.status}`);
+      const data = await res.json();
+      const raw = data?.choices?.[0]?.message?.content || '';
+      // Try to parse — sometimes the model returns {"roles":[...]} instead of raw array
+      let parsed;
+      try { parsed = JSON.parse(raw); } catch { parsed = null; }
+      if (!parsed) {
+        const match = raw.match(/\[[\s\S]*\]/);
+        if (match) try { parsed = JSON.parse(match[0]); } catch {}
+      }
+      if (!parsed) throw new Error('unparseable');
+      const arr = Array.isArray(parsed) ? parsed : (parsed.roles || parsed.team || parsed.roster || []);
+      return arr
+        .filter(r => r && typeof r.role === 'string' && r.role.length < 80)
+        .map(r => ({ role: r.role.trim(), count: Math.max(1, Math.min(50, parseInt(r.count, 10) || 1)) }))
+        .slice(0, 20);
+    }
+
+    // ============================================================
+    // LLM: Sonnet re-classifies and writes the rationale with business context.
+    //
+    // For each role it returns: color, physical, us, sag, sol, why.
+    // These override the static classifier's best-guess values. Since Sonnet
+    // sees the industry, "Production Technician" at Signarama gets tagged
+    // physical but the same label at a podcast studio goes yellow.
+    //
+    // Fails soft — on any error we keep the static classifier's values.
+    // ============================================================
+    async function enrichDescriptions(classified, description, headcount) {
+      if (!classified.length || !description) return;
+
+      // Cost control: only ask Sonnet about roles where business context actually
+      // matters. Physical / owner roles are already right from the static
+      // classifier — paying to re-rule-on them is wasted tokens. Cap at 20 to
+      // bound the prompt size even with abusive rosters.
+      const agg = aggregateByLabel(classified)
+        .filter(r => !r.physical && !r.self)
+        .slice(0, 20);
+      if (!agg.length) return;
+
+      const system = `You are Sagan's Role Intelligence analyst. Sagan specializes in Global Talent + AI: direct global hires paired with AI agents, no BPO middleman. Your job: for each role in an SMB roster, decide if an AI agent can do it (red), a global hire plus an agent is the right blend (yellow), a global direct hire handles it (green), or the role must stay local/on-site (green physical). Then write a 15-30 word rationale in Jon Matzner's voice: short fragments, periods not commas, active verbs, no em-dashes, no AI marketing-speak, specific to the business.`;
+
+      const rolesList = agg.map((r, i) => {
+        return `${i+1}. "${r.label}" — ${r.count} on team`;
+      }).join('\n');
+
+      const user = `Business: ${description}
+Team size: ${headcount}
+
+For each role below, return EXACTLY these fields in a JSON array.
+
+FIELD RULES (read carefully):
+- "label": exact role name (unchanged)
+- "color": one of "red", "yellow", "green"
+- "physical": boolean. true ONLY if role must be physically on-site in THIS business (trade, field service, clinical, food, warehouse, driving). Default false. Bias toward false when unsure.
+- "us": INTEGER monthly fully-loaded US salary IN DOLLARS. Typical ranges:
+    junior admin / coordinator: 3500-5000
+    specialist / associate: 4500-6500
+    experienced individual contributor: 5500-8000
+    senior / manager: 7500-11000
+    director / VP: 12000-18000
+    field tech / trade: 5500-8500
+    skilled trade (licensed): 7000-9500
+    owner / founder: 0
+- "sag": INTEGER monthly Sagan alternative cost IN DOLLARS:
+    red (AI agent does 80%+ of the work): 50 to 400
+    yellow (global direct hire plus an AI agent): 1200 to 2200
+    green non-physical (global direct hire, no agent): 1800 to 5500
+    green physical (stay local, no savings): EQUAL to us value
+    owner / founder: 0
+- "sol": SHORT label, 2-5 words max. NOT a description. Examples: "Dispatch Agent", "Global Bookkeeper + agent", "Global Account Manager", "Stay local", "You"
+- "why": 15-30 WORDS of Jon-voice rationale (short fragments, periods instead of commas, active verbs, no em-dashes, no AI marketing-speak). Reference the business where it sharpens the line.
+
+CLASSIFICATION GUIDANCE:
+- Use business context. A Production Technician at a sign printing franchise is physical (on-site fabrication). The same title at a podcast studio is yellow (remote-hirable).
+- Owner / Founder / CEO / President: color "green", physical true, us 0, sag 0, sol "You", why "This is you. Keep doing you. Everything below you has leverage hiding in it."
+- Sales / marketing / admin / bookkeeping / recruiting / CSR / design / content / ops coordinator / analyst / inside sales: almost always yellow or red. Bias against physical.
+- Field tech, installer, plumber, electrician, HVAC, delivery driver, warehouse, clinical, chef, line cook: physical.
+
+EXAMPLE of valid output format:
+{"roles":[
+  {"label":"Dispatcher","color":"red","physical":false,"us":4500,"sag":120,"sol":"Dispatch Agent","why":"Runs your dispatch board 24/7. Matches every job to the nearest tech. Never calls in sick."},
+  {"label":"Bookkeeper","color":"yellow","physical":false,"us":5500,"sag":1500,"sol":"Global Bookkeeper + agent","why":"Global hire plus a reconciliation agent. Human owns the close. Agent eats the categorization grind."},
+  {"label":"Field Technician","color":"green","physical":true,"us":6500,"sag":6500,"sol":"Stay local","why":"Physical on-site work. Can't be moved. Protect and promote your best field talent."}
+]}
+
+Roles to classify:
+${rolesList}
+
+Return ONLY valid JSON. No prose. No markdown fencing. Dollar fields must be real dollar amounts (thousands), not counts.`;
+
+      try {
+        const res = await fetch('/ai-savings/api/generate-team', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'anthropic/claude-sonnet-4.6',
+            messages: [
+              { role: 'system', content: system },
+              { role: 'user', content: user },
+            ],
+            temperature: 0.4,
+            max_tokens: 900,
+          }),
+        });
+        if (!res.ok) throw new Error(`Sonnet ${res.status}`);
+        const data = await res.json();
+        const raw = data?.choices?.[0]?.message?.content || '';
+        let parsed;
+        try { parsed = JSON.parse(raw); } catch {
+          const m = raw.match(/\{[\s\S]*\}/);
+          if (m) try { parsed = JSON.parse(m[0]); } catch {}
+        }
+        const roles = parsed?.roles || [];
+        if (!roles.length) return;
+
+        // Build label → enriched-entry map
+        const labelMap = {};
+        for (const r of roles) {
+          if (!r || typeof r.label !== 'string') continue;
+          const key = r.label.toLowerCase().trim();
+          labelMap[key] = r;
+        }
+
+        // Apply Sonnet's classification to every matching classified item.
+        // Only accept values that look SANE — if Sonnet fumbles a field
+        // (e.g. returns us=1 treating it as a count), keep the static default.
+        classified.forEach(item => {
+          const key = item.label.toLowerCase().trim();
+          const r = labelMap[key];
+          if (!r) return;
+
+          const isSelfRole = typeof r.sol === 'string' && /^you$/i.test(r.sol.trim());
+
+          if (r.color === 'red' || r.color === 'yellow' || r.color === 'green') item.color = r.color;
+          if (typeof r.physical === 'boolean') item.physical = r.physical;
+
+          // Dollar fields MUST be realistic. Reject obviously-wrong values
+          // (e.g. us=1 because the model treated it as a count).
+          // Owner/founder roles are allowed zeros.
+          const usOk = Number.isFinite(r.us) && ((isSelfRole && r.us === 0) || (r.us >= 1500 && r.us <= 60000));
+          if (usOk) item.us = Math.round(r.us);
+
+          const sagFloor = isSelfRole ? 0 : 30;
+          const sagOk = Number.isFinite(r.sag) && r.sag >= sagFloor && r.sag <= 60000;
+          if (sagOk) item.sag = Math.round(r.sag);
+
+          // sol must be SHORT (≤ 40 chars). Sonnet sometimes stuffs a full
+          // sentence in here — reject that and keep the static label.
+          if (typeof r.sol === 'string' && r.sol.length > 0 && r.sol.length <= 40) {
+            item.sol = r.sol.trim();
+          }
+
+          if (typeof r.why === 'string' && r.why.length > 10 && r.why.length <= 300) {
+            item.why = r.why.trim().replace(/—/g, '.').replace(/\s+\./g, '.');
+          }
+
+          // Owner/founder convention: zero out the math so the UI shows "You"
+          if (isSelfRole) { item.self = true; item.us = 0; item.sag = 0; }
+
+          item.save = Math.max(0, (item.us || 0) - (item.sag || 0));
+        });
+      } catch (err) {
+        console.warn('Sonnet enrichment failed, using static classification:', err);
+      }
+    }
+
+    function fallbackRoster(head) {
+      // Simple generic scaling
+      const n = Math.max(1, head);
+      const scaled = (pct, min = 0) => Math.max(min, Math.round(n * pct));
+      return [
+        { role: 'Owner / Operator', count: 1 },
+        { role: 'General Manager', count: n >= 15 ? 1 : 0 },
+        { role: 'Operations Coordinator', count: scaled(0.06, 1) },
+        { role: 'Customer Service Rep', count: scaled(0.10, 1) },
+        { role: 'Bookkeeper', count: n >= 8 ? 1 : 0 },
+        { role: 'Executive Assistant', count: n >= 12 ? 1 : 0 },
+        { role: 'Field Technician', count: scaled(0.30) },
+        { role: 'Dispatcher', count: scaled(0.05, 1) },
+        { role: 'Sales Rep', count: scaled(0.10, 1) },
+        { role: 'Marketing Coordinator', count: n >= 10 ? 1 : 0 },
+      ].filter(r => r.count > 0);
+    }
+
+    // ============================================================
+    // ROSTER EDITOR
+    // ============================================================
+    const rosterList = $('#rosterList');
+    const rosterTotal = $('#rosterTotal');
+    const rosterRoleCount = $('#rosterRoleCount');
+    const scanBtn = $('#scanBtn');
+    const newRoleInput = $('#newRole');
+    const addRoleBtn = $('#addRoleBtn');
+    const restartBtn = $('#restartBtn');
+
+    function renderRoster() {
+      rosterList.innerHTML = '';
+      state.roster.forEach((r, idx) => {
+        const row = document.createElement('div');
+        row.className = 'roster-row';
+        row.style.animationDelay = `${idx * 30}ms`;
+        row.innerHTML = `
+          <input type="text" class="roster-role" value="${escapeHtml(r.role)}" data-idx="${idx}" aria-label="Role name">
+          <div class="roster-counter">
+            <button type="button" class="counter-btn" data-act="dec" data-idx="${idx}" aria-label="Decrease">−</button>
+            <div class="counter-val">${r.count}</div>
+            <button type="button" class="counter-btn" data-act="inc" data-idx="${idx}" aria-label="Increase">+</button>
+          </div>
+          <button type="button" class="remove-btn" data-act="rm" data-idx="${idx}" aria-label="Remove role">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>`;
+        rosterList.appendChild(row);
+      });
+      updateRosterStats();
+    }
+
+    function updateRosterStats() {
+      const total = state.roster.reduce((s, r) => s + (r.count || 0), 0);
+      const roles = state.roster.filter(r => r.count > 0).length;
+      rosterTotal.textContent = total;
+      rosterRoleCount.textContent = roles;
+      scanBtn.disabled = total === 0;
+    }
+
+    rosterList.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-act]');
+      if (!btn) return;
+      const idx = parseInt(btn.dataset.idx, 10);
+      const act = btn.dataset.act;
+      if (act === 'inc') state.roster[idx].count = Math.min(50, state.roster[idx].count + 1);
+      else if (act === 'dec') state.roster[idx].count = Math.max(0, state.roster[idx].count - 1);
+      else if (act === 'rm') state.roster.splice(idx, 1);
+      renderRoster();
+    });
+
+    rosterList.addEventListener('input', (e) => {
+      if (!e.target.classList.contains('roster-role')) return;
+      const idx = parseInt(e.target.dataset.idx, 10);
+      state.roster[idx].role = e.target.value;
+    });
+
+    function addRole() {
+      const v = newRoleInput.value.trim();
+      if (!v) return;
+      state.roster.push({ role: v, count: 1 });
+      newRoleInput.value = '';
+      renderRoster();
+      // Focus the count of the newly added row
+      const rows = rosterList.querySelectorAll('.roster-row');
+      if (rows.length) rows[rows.length - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    addRoleBtn.addEventListener('click', addRole);
+    newRoleInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); addRole(); }
+    });
+
+    restartBtn.addEventListener('click', () => {
+      state.roster = [];
+      state.results = [];
+      state.unlocked = false;
+      bizDesc.value = '';
+      bizHead.value = '';
+      setStage('describe');
+      scrollToEl(stageDescribe, 90);
+    });
+
+    // ============================================================
+    // STAGE C : SCAN
+    // ============================================================
+    scanBtn.addEventListener('click', runAnalysis);
+
+    async function runAnalysis() {
+      const flat = rosterToRoleList(state.roster);
+      if (!flat.length) return;
+      setStage('scanning');
+      loadingCount.textContent = flat.length;
+      scrollToEl(loadingEl, 90);
+
+      // Just a brief pause so the "Drafting your playbook..." state feels substantive.
+      await new Promise(r => setTimeout(r, Math.min(1200 + flat.length * 30, 2400)));
+
+      // Classify synchronously with the static classifier. Sonnet enrichment is
+      // deferred to the email-submit handler — this keeps every scan free and
+      // only pays for LLM tokens when a lead actually converts.
+      const analysis = analyze(flat);
+      state.results = analysis;
+
+      setStage(null);
+      renderTeaser(analysis);
+      resultsEl.classList.add('active');
+      state.gateShownAt = Date.now();
+      scrollToEl(resultsEl, 80);
+    }
+
+    function verdictCopy(summary) {
+      const { total, red, yellow, green, save, usTotal, sagTotal } = summary;
+
+      if (!total) return { head: "We couldn't find any roles.", sub: "Head back and describe your team." };
+
+      const fmtK = (n) => n >= 1000 ? `$${Math.round(n/1000)}K` : `$${n}`;
+      const saveK = fmtK(save);
+      const pctSaved = usTotal > 0 ? Math.round((save / usTotal) * 100) : 0;
+
+      if (save === 0) {
+        return {
+          head: `Your team is <em>already built for humans.</em>`,
+          sub: `No automation wins in this mix. The leverage move isn't cutting. It's hiring more of these exact humans globally at Sagan rates.`,
+        };
+      }
+      if (red >= 3 || save >= 20000) {
+        return {
+          head: `<em>~${saveK}/month</em> back in your pocket.`,
+          sub: `Same team, same output. ${pctSaved}% lower payroll. ${red} roles an agent does today, ${yellow} that are Global Talent + AI, ${green} where humans are the product. Build it. Watch the number land.`,
+        };
+      }
+      if (save >= 5000) {
+        return {
+          head: `<em>~${saveK}/month</em> of leverage in your payroll.`,
+          sub: `That's ${pctSaved}% of current cost. ${red} agent play${red!==1?'s':''}, ${yellow} Global Talent + AI play${yellow!==1?'s':''}, ${green} human-essential. Tune-up, not tear-down. No one gets cut who shouldn't.`,
+        };
+      }
+      return {
+        head: `<em>Solid team. Leverage on the table.</em>`,
+        sub: `~${saveK}/month in savings (about ${pctSaved}%). ${yellow+green} roles to hire globally or pair with an agent. No one gets cut.`,
+      };
+    }
+
+    const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function countUp(el, target, { duration = 1200, prefix = '', suffix = '', bounce = false } = {}) {
+      if (!el) return;
+      if (prefersReducedMotion()) {
+        el.textContent = prefix + target.toLocaleString('en-US') + suffix;
+        return;
+      }
+      const start = performance.now();
+      const from = 0;
+      const diff = target - from;
+      const step = (now) => {
+        const t = Math.min(1, (now - start) / duration);
+        // easeOutCubic
+        const eased = 1 - Math.pow(1 - t, 3);
+        const val = Math.round(from + diff * eased);
+        el.textContent = prefix + val.toLocaleString('en-US') + suffix;
+        if (t < 1) {
+          requestAnimationFrame(step);
+        } else if (bounce) {
+          const card = el.closest('.stat-card');
+          if (card) {
+            card.classList.add('punch');
+            setTimeout(() => card.classList.remove('punch'), 750);
+          }
+        }
+      };
+      requestAnimationFrame(step);
+    }
+
+    function renderTeaser(analysis) {
+      const s = analysis.summary;
+      $('#statRed').textContent = s.red;
+      $('#statYellow').textContent = s.yellow;
+      $('#statGreen').textContent = s.greenGlobal;
+      $('#statLocal').textContent = s.greenLocal;
+      countUp($('#statUs'), s.usTotal, { duration: 900 });
+      countUp($('#statSag'), s.sagTotal, { duration: 1100 });
+      countUp($('#statSave'), s.save, { duration: 1800, bounce: true });
+
+      const v = verdictCopy(s);
+      $('#verdictHead').innerHTML = v.head;
+      $('#verdictSub').textContent = v.sub;
+    }
+
+    // Group individual role entries by label so "Dispatcher × 2" renders as one card.
+    function aggregateByLabel(items) {
+      const map = new Map();
+      for (const it of items) {
+        const key = it.label.toLowerCase().trim();
+        if (!map.has(key)) {
+          map.set(key, { ...it, count: 0, usSum: 0, sagSum: 0, saveSum: 0 });
+        }
+        const g = map.get(key);
+        g.count += 1;
+        g.usSum += (it.us || 0);
+        g.sagSum += (it.sag || 0);
+        g.saveSum += (it.save || 0);
+      }
+      return [...map.values()].sort((a, b) => b.saveSum - a.saveSum);
+    }
+
+    const fmtMoney = (n) => '$' + (n || 0).toLocaleString('en-US');
+
+    function renderCard(item, i) {
+      const isPhysical = !!item.physical;
+      const isSelf = !!item.self;
+      const showMath = !isPhysical && !isSelf && item.saveSum > 0;
+      const chipClass = isPhysical ? 'physical' : (isSelf ? 'self' : '');
+      const sol = item.sol || (item.color === 'green' ? 'Keep' : 'Custom');
+
+      const saveBox = (() => {
+        if (isSelf) {
+          return `
+            <div class="role-savings-label">You</div>
+            <div class="role-savings-value neutral">— you —</div>
+            <div class="role-savings-sub">Keep doing you</div>`;
+        }
+        if (isPhysical) {
+          return `
+            <div class="role-savings-label">Keep local</div>
+            <div class="role-savings-value neutral">On-site</div>
+            <div class="role-savings-sub">Physical work</div>`;
+        }
+        return `
+          <div class="role-savings-label">Save / month</div>
+          <div class="role-savings-value">${fmtMoney(item.saveSum)}</div>
+          <div class="role-savings-sub">${item.count > 1 ? `${fmtMoney(item.saveSum / item.count)} × ${item.count}` : 'per month'}</div>`;
+      })();
+
+      const mathLine = showMath
+        ? `<div class="role-math">
+             <span class="was">${fmtMoney(item.usSum)}</span>
+             <span class="arrow">→</span>
+             <strong>${fmtMoney(item.sagSum)}</strong>
+             <span style="color:var(--ink-5);">per month${item.count > 1 ? ` · across ${item.count} hires` : ''}</span>
+           </div>`
+        : '';
+
+      return `
+        <div class="role-card" style="animation-delay: ${i * 30}ms">
+          <div class="role-main">
+            <div class="role-head">
+              <span class="role-name">${escapeHtml(item.label)}</span>
+              ${item.count > 1 ? `<span class="role-count">× ${item.count}</span>` : ''}
+              <span class="role-sol-chip ${chipClass}">${escapeHtml(sol)}</span>
+            </div>
+            <div class="role-why">${escapeHtml(item.why)}</div>
+            ${mathLine}
+          </div>
+          <div class="role-savings-box">${saveBox}</div>
+        </div>`;
+    }
+
+    function renderGroup(containerId, color, rawItems, label, desc, filter) {
+      const container = $(`#${containerId}`);
+      const items = filter ? rawItems.filter(filter) : rawItems;
+      if (!items.length) { container.innerHTML = ''; return; }
+      const aggregated = aggregateByLabel(items);
+      const headcount = aggregated.reduce((s, a) => s + a.count, 0);
+      const groupSave = aggregated.reduce((s, a) => s + (a.saveSum || 0), 0);
+      const countLabel = groupSave > 0
+        ? `${fmtMoney(groupSave)}/mo`
+        : `${headcount} ${headcount === 1 ? 'person' : 'people'}`;
+      container.innerHTML = `
+        <div class="role-group-head ${color}">
+          <div class="role-group-bar ${color}"></div>
+          <div class="role-group-title">${label}</div>
+          <div class="role-group-desc">${desc}</div>
+          <div class="role-group-count">${countLabel}</div>
+        </div>
+        ${aggregated.map(renderCard).join('')}`;
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    // After submit: fire email, keep the blurred gate, open the success modal.
+    // The role-by-role breakdown lives only in the email — this is deliberate.
+    const REDIRECT_URL = 'https://www.shipyourweekendproject.com/';
+    const REDIRECT_SECONDS = 8;
+
+    function openSuccessModal(email) {
+      $('#modalEmail').textContent = email;
+      const modal = $('#successModal');
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      // Countdown then auto-redirect
+      let remaining = REDIRECT_SECONDS;
+      const cdEl = $('#modalCountdown');
+      cdEl.textContent = remaining;
+      const tick = setInterval(() => {
+        remaining -= 1;
+        cdEl.textContent = Math.max(0, remaining);
+        if (remaining <= 0) {
+          clearInterval(tick);
+          window.location.href = REDIRECT_URL;
+        }
+      }, 1000);
+
+      const cancelTimer = () => clearInterval(tick);
+      $('#modalNextBtn').addEventListener('click', cancelTimer, { once: true });
+      $('#modalClose').addEventListener('click', () => {
+        cancelTimer();
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }, { once: true });
+    }
+
+    function showToast(msg) {
+      const t = $('#toast');
+      $('#toastMsg').textContent = msg;
+      t.classList.add('active');
+      setTimeout(() => t.classList.remove('active'), 3400);
+    }
+
+    // ============================================================
+    // EMAIL / GATE
+    // ============================================================
+    function isValidEmail(e) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) && !/@(gmail|yahoo|hotmail|outlook|aol|icloud|proton|me)\.(com|net|org|io)$/i.test(e);
+    }
+
+    // HubSpot lead sync. Fire-and-forget, parallel to Resend — Resend still owns
+    // the personalized report; HubSpot just gets the contact for CRM/workflows.
+    const HUBSPOT_PORTAL_ID = '50517161';
+    const HUBSPOT_FORM_ID = 'daac2804-e5c3-48e7-8ab7-a5b41c9e7c38';
+    const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/2ccpsjqsst3arigocljg0trvlx7reu1n';
+
+    // UTM attribution: capture from URL on page load, persist first-touch for 30 days
+    // (matches HubSpot's default attribution window), pass to HubSpot on submit.
+    const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+    const UTM_STORAGE_KEY = 'sagan_utms_v1';
+    const UTM_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+
+    (function captureUtmsFromUrl() {
+      try {
+        const qs = new URLSearchParams(window.location.search);
+        const found = {};
+        let hasAny = false;
+        UTM_KEYS.forEach(k => {
+          const v = qs.get(k);
+          if (v) { found[k] = v; hasAny = true; }
+        });
+        if (!hasAny) return;
+
+        // First-touch wins: don't overwrite existing UTMs within the TTL window.
+        const raw = localStorage.getItem(UTM_STORAGE_KEY);
+        if (raw) {
+          try {
+            const prev = JSON.parse(raw);
+            if (prev && prev.ts && (Date.now() - prev.ts) < UTM_TTL_MS) return;
+          } catch (_) {}
+        }
+        localStorage.setItem(UTM_STORAGE_KEY, JSON.stringify({ ts: Date.now(), utms: found }));
+      } catch (err) {
+        console.warn('UTM capture failed:', err);
+      }
+    })();
+
+    function readStoredUtms() {
+      try {
+        const raw = localStorage.getItem(UTM_STORAGE_KEY);
+        if (!raw) return {};
+        const parsed = JSON.parse(raw);
+        if (!parsed || !parsed.ts || (Date.now() - parsed.ts) >= UTM_TTL_MS) return {};
+        return parsed.utms || {};
+      } catch { return {}; }
+    }
+
+    function readCookie(name) {
+      const m = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([.$?*|{}()\[\]\\\/\+^])/g, '\\$1') + '=([^;]*)'));
+      return m ? decodeURIComponent(m[1]) : '';
+    }
+
+    async function syncToHubspot({ firstName, email, company }) {
+      const utms = readStoredUtms();
+
+      // Make.com webhook — fire in parallel. Flat payload under `submission`.
+      if (MAKE_WEBHOOK_URL) {
+        const submission = Object.assign({
+          submittedAt: new Date().toISOString(),
+          pageUrl: window.location.href,
+          pageTitle: document.title,
+          firstName,
+          email,
+          company,
+        }, utms);
+        fetch(MAKE_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ submission }),
+          keepalive: true,
+        }).catch(err => console.warn('Make webhook failed (non-blocking):', err));
+      }
+
+      try {
+        const fields = [
+          { objectTypeId: '0-1', name: 'firstname', value: firstName },
+          { objectTypeId: '0-1', name: 'email', value: email },
+          { objectTypeId: '0-1', name: 'company', value: company },
+        ];
+        UTM_KEYS.forEach(k => {
+          if (utms[k]) fields.push({ objectTypeId: '0-1', name: k, value: utms[k] });
+        });
+
+        const payload = {
+          fields,
+          context: {
+            pageUri: window.location.href,
+            pageName: document.title,
+          },
+        };
+        const hutk = readCookie('hubspotutk');
+        if (hutk) payload.context.hutk = hutk;
+
+        const res = await fetch(`https://api.hsforms.com/submissions/v3/integration/submit/${HUBSPOT_PORTAL_ID}/${HUBSPOT_FORM_ID}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+          const body = await res.text();
+          console.error('[HubSpot] ' + res.status, body);
+        }
+      } catch (err) {
+        console.warn('HubSpot sync failed (non-blocking):', err);
+      }
+    }
+
+    function buildEmailHTML({ firstName, company, summary, items }) {
+      const red = aggregateByLabel(items.filter(i => i.color === 'red'));
+      const yellow = aggregateByLabel(items.filter(i => i.color === 'yellow'));
+      const greenGlobal = aggregateByLabel(items.filter(i => i.color === 'green' && !i.physical && !i.self));
+      const greenLocal = aggregateByLabel(items.filter(i => i.color === 'green' && (i.physical || i.self)));
+
+      const pctSaved = summary.usTotal > 0 ? Math.round((summary.save / summary.usTotal) * 100) : 0;
+
+      const row = (i) => {
+        const isPhysical = !!i.physical;
+        const isSelf = !!i.self;
+        const showMath = !isPhysical && !isSelf && i.saveSum > 0;
+        const saveText = isSelf ? '— you —' : isPhysical ? 'Keep local' : '$' + i.saveSum.toLocaleString('en-US');
+        const saveColor = (isPhysical || isSelf) ? '#64748b' : '#064e3b';
+        const chipBg = isPhysical ? '#f5f3ee' : (isSelf ? '#fef3c7' : '#dbeafe');
+        const chipInk = isPhysical ? '#334155' : (isSelf ? '#78350f' : '#152d4a');
+        return `
+          <tr>
+            <td style="padding:16px 18px;border-bottom:1px solid #e5e2d9;vertical-align:top;">
+              <div style="font-weight:700;color:#0f172a;font-size:15px;margin-bottom:4px;">
+                ${escapeHtml(i.label)}${i.count > 1 ? ` <span style="color:#64748b;font-weight:600;font-size:13px;">× ${i.count}</span>` : ''}
+              </div>
+              <span style="display:inline-block;padding:3px 9px;background:${chipBg};color:${chipInk};border-radius:5px;font-weight:700;font-size:11px;margin-bottom:8px;">${escapeHtml(i.sol || 'Keep')}</span>
+              <div style="font-size:13px;color:#475569;line-height:1.55;margin-bottom:${showMath ? '8' : '0'}px;">${escapeHtml(i.why)}</div>
+              ${showMath ? `<div style="font-size:12px;color:#64748b;font-variant-numeric:tabular-nums;">
+                <span style="text-decoration:line-through;color:#94a3b8;">$${i.usSum.toLocaleString('en-US')}</span>
+                <span style="margin:0 6px;color:#94a3b8;">→</span>
+                <strong style="color:#0f172a;">$${i.sagSum.toLocaleString('en-US')}</strong>
+                <span>/mo${i.count > 1 ? ` across ${i.count}` : ''}</span>
+              </div>` : ''}
+            </td>
+            <td style="padding:16px 18px;border-bottom:1px solid #e5e2d9;text-align:right;vertical-align:top;white-space:nowrap;">
+              <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#64748b;text-transform:uppercase;margin-bottom:2px;">${isSelf ? 'You' : isPhysical ? 'Status' : 'Save / mo'}</div>
+              <div style="font-size:17px;font-weight:900;color:${saveColor};font-variant-numeric:tabular-nums;letter-spacing:-0.01em;">${saveText}</div>
+            </td>
+          </tr>`;
+      };
+
+      const section = (title, subtitle, bg, ink, list) => !list.length ? '' : `
+        <div style="margin-top:24px;">
+          <div style="padding:12px 16px;background:${bg};border-radius:10px;margin-bottom:8px;">
+            <div style="font-weight:800;color:${ink};font-size:15px;">${title}</div>
+            <div style="font-size:13px;color:${ink};opacity:0.75;margin-top:2px;">${subtitle}</div>
+          </div>
+          <table style="width:100%;border-collapse:collapse;background:#ffffff;border:1px solid #e5e2d9;border-radius:10px;overflow:hidden;">
+            ${list.map(row).join('')}
+          </table>
+        </div>`;
+
+      const saveStr = summary.save >= 1000 ? `~$${Math.round(summary.save/1000)}K/month` : `$${summary.save}/month`;
+
+      return `<!DOCTYPE html>
+<html><body style="margin:0;padding:0;background:#fafaf7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;color:#0f172a;">
+  <div style="max-width:640px;margin:0 auto;padding:32px 24px;">
+    <div style="padding:24px 0 28px;border-bottom:1px solid #e5e2d9;">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;color:#64748b;text-transform:uppercase;margin-bottom:8px;">Sagan · AI Savings Scan</div>
+      <h1 style="font-size:24px;font-weight:800;letter-spacing:-0.02em;margin:0;line-height:1.3;">${escapeHtml(firstName)}, ${saveStr} back in your pocket.</h1>
+      <div style="font-size:15px;color:#475569;line-height:1.55;margin-top:10px;">Same team at ${escapeHtml(company)}, ${pctSaved}% lower payroll. Global Talent + AI, one playbook. Below is the role-by-role breakdown.</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:10px;margin:24px 0;">
+      <div style="padding:14px 16px;background:#ffffff;border:1px solid #d9d5c9;border-radius:10px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#64748b;text-transform:uppercase;">Currently</div>
+        <div style="font-size:20px;font-weight:900;color:#0f172a;margin-top:4px;font-variant-numeric:tabular-nums;">$${summary.usTotal.toLocaleString('en-US')}</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:2px;">US payroll, fully loaded</div>
+      </div>
+      <div style="padding:14px 16px;background:#dbeafe;border:1px solid #bfdcff;border-radius:10px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#152d4a;text-transform:uppercase;">Sagan plan</div>
+        <div style="font-size:20px;font-weight:900;color:#152d4a;margin-top:4px;font-variant-numeric:tabular-nums;">$${summary.sagTotal.toLocaleString('en-US')}</div>
+        <div style="font-size:11px;color:#1e3a5f;margin-top:2px;">Global Talent + AI</div>
+      </div>
+      <div style="padding:14px 16px;background:#0f172a;color:#ffffff;border-radius:10px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:rgba(255,255,255,0.6);text-transform:uppercase;">Monthly savings</div>
+        <div style="font-size:24px;font-weight:900;margin-top:4px;font-variant-numeric:tabular-nums;">$${summary.save.toLocaleString('en-US')}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px;">Back into your P&amp;L, every month</div>
+      </div>
+    </div>
+
+    ${section('Agent does this', 'AI handles it. Monthly cost is agent runtime only.', '#fef2f2', '#7f1d1d', red)}
+    ${section('Global Talent + AI', 'Direct global hire paired with an agent. The Sagan combo.', '#fffbeb', '#78350f', yellow)}
+    ${section('Global Talent · direct hire', 'Human-essential, no agent needed. Hire globally, skip the middleman markup.', '#ecfdf5', '#064e3b', greenGlobal)}
+    ${section('Stay local', 'Physical or on-site work. Keep local. Protect and promote.', '#f5f3ee', '#334155', greenLocal)}
+
+    <div style="margin-top:36px;padding:28px;background:#0f172a;color:#ffffff;border-radius:12px;">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:12px;">What now?</div>
+      <div style="font-size:17px;line-height:1.55;margin-bottom:18px;">We ran this same scan on ourselves six months ago. It's earning us <strong style="color:#94c5ff;">$267,781/month</strong> today. Your number above is what the same playbook gets you. Which agent to build first, which roles to hire globally, who to protect. One call.</div>
+      <a href="https://getsagan.com/book" style="display:inline-block;padding:14px 26px;background:#ffffff;color:#0f172a;text-decoration:none;border-radius:8px;font-weight:700;font-size:15px;">Book a 20-min intro with Sagan</a>
+    </div>
+
+    <div style="margin-top:32px;padding-top:24px;border-top:1px solid #e5e2d9;font-size:13px;color:#64748b;line-height:1.6;">
+      Reply to this email with questions — it goes straight to the team.<br>
+      Yallah Habibi,<br>
+      <strong style="color:#0f172a;">Jon Matzner</strong> · Sagan
+    </div>
+  </div>
+</body></html>`;
+    }
+
+    // Gate form submission
+    $('#gateForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const firstName = $('#firstName').value.trim();
+      const email = $('#email').value.trim();
+      const company = $('#company').value.trim();
+      const honeypot = $('#websiteField') ? $('#websiteField').value : '';
+      const errEl = $('#emailError');
+      errEl.classList.remove('active');
+
+      // Honeypot: invisible field that real users can't see. Bots auto-fill it.
+      // Silent success — show the modal so they don't know they tripped it.
+      if (honeypot) {
+        state.unlocked = true;
+        openSuccessModal(email || 'your inbox');
+        return;
+      }
+
+      // Time-gate: real humans take > 3s to read the teaser and fill 3 fields.
+      // Bots hit submit in <100ms. Silent success so bots don't retune.
+      const elapsedMs = state.gateShownAt ? Date.now() - state.gateShownAt : 99999;
+      if (elapsedMs < 3000) {
+        state.unlocked = true;
+        openSuccessModal(email || 'your inbox');
+        return;
+      }
+
+      if (!firstName || !company) return;
+      if (!isValidEmail(email)) {
+        errEl.textContent = /@(gmail|yahoo|hotmail|outlook|aol|icloud|proton|me)\./i.test(email)
+          ? 'Please use your work email. Personal inboxes go to spam.'
+          : 'Please enter a valid email.';
+        errEl.classList.add('active');
+        return;
+      }
+
+      const btn = $('#gateSubmit');
+      const btnText = $('#gateBtnText');
+      btn.disabled = true;
+      btnText.textContent = 'Sending…';
+
+      // Silent HubSpot CRM sync, in parallel with Resend. Don't await — if HubSpot
+      // is slow or down, the user still gets their scan email on time.
+      syncToHubspot({ firstName, email, company });
+
+      const { summary, items } = state.results;
+
+      // Sonnet enrichment happens HERE (post-submit) so scanners who bounce
+      // cost nothing. Capped at ~12s — falls back to static copy on timeout.
+      try {
+        const enrich = enrichDescriptions(items, state.description, state.headcount);
+        const timeout = new Promise(r => setTimeout(r, 12000));
+        await Promise.race([enrich, timeout]);
+        state.results.summary = summarize(items);
+      } catch (err) {
+        console.warn('Enrichment skipped:', err);
+      }
+
+      const updatedSummary = state.results.summary;
+      const html = buildEmailHTML({ firstName, company, summary: updatedSummary, items });
+      const subject = updatedSummary.save >= 1000
+        ? `${firstName}, $${updatedSummary.save.toLocaleString('en-US')}/mo`
+        : `${firstName}, your scan from Sagan`;
+
+      const plainLines = [
+        `${firstName}, here's your scan for ${company}.`,
+        ``,
+        `Red (${updatedSummary.red}):   ${items.filter(i=>i.color==='red').map(i=>i.label).join(', ') || 'none'}`,
+        `Yellow (${updatedSummary.yellow}): ${items.filter(i=>i.color==='yellow').map(i=>i.label).join(', ') || 'none'}`,
+        `Green (${updatedSummary.green}):  ${items.filter(i=>i.color==='green').map(i=>i.label).join(', ') || 'none'}`,
+        ``,
+        `Est. monthly savings: $${updatedSummary.save.toLocaleString('en-US')}/mo`,
+        ``,
+        `Book a call: https://getsagan.com/book`,
+      ];
+
+      try {
+        const res = await fetch('/ai-savings/api/email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            from: 'Jon Matzner <jon@globalandremote.com>',
+            to: [email],
+            reply_to: 'jon@getsagan.com',
+            subject,
+            html,
+            text: plainLines.join('\n'),
+          }),
+        });
+        if (!res.ok) {
+          const body = await res.text();
+          console.error('Resend error', res.status, body);
+        }
+      } catch (err) {
+        console.error('Email dispatch failed', err);
+      }
+
+      state.unlocked = true;
+      openSuccessModal(email);
+    });
+
+    // Hero CTA → scanner
+    $$('a[href="#scanner"]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        scrollToEl($('#scanner'));
+      });
+    });
+
+    // Reveal animations
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => e.isIntersecting && e.target.classList.add('visible'));
+    }, { threshold: 0.15 });
+    $$('.reveal').forEach(el => io.observe(el));
+
+    // Count-up trigger for $267K proof number when it enters the viewport
+    const proofNumberEl = $('#proofNumber');
+    if (proofNumberEl) {
+      const proofIo = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            const target = parseInt(e.target.dataset.target, 10) || 0;
+            countUp(e.target, target, { duration: 1800, prefix: '$' });
+            proofIo.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.35 });
+      proofIo.observe(proofNumberEl);
+    }
+
+    // Init — start on describe stage
+    setStage('describe');
+  </script>
+</LandingLayout>

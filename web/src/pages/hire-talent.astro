@@ -1,0 +1,20 @@
+---
+/* /hire-talent. One route per bespoke landing page (not a shared [slug] route) so
+ * each page bundles ONLY its own global CSS — these ported pages reuse generic
+ * class names (.hero, .heading, …) that would collide if merged. Content comes
+ * from the matching `landingPage` Sanity doc (slug: hire-talent). */
+import LandingLayout from '../layouts/LandingLayout.astro';
+import HireTalentPage from '../components/landing/HireTalentPage.astro';
+import { getLandingPageBySlug } from '../lib/landingPages';
+
+export const prerender = true;
+const data = (await getLandingPageBySlug('hire-talent'))!;
+---
+
+<LandingLayout
+  title={data.seoTitle ?? 'Hire World-Class Global Talent from $1,100/mo | Sagan Passport'}
+  description={data.seoDescription}
+  canonical={data.canonical}
+>
+  <HireTalentPage data={data} />
+</LandingLayout>

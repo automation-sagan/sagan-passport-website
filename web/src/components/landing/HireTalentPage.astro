@@ -1,0 +1,519 @@
+---
+/* Faithful 1:1 port of the bespoke /hire-talent landing page. The full bespoke
+ * layout + persuasive copy are preserved verbatim from the source HTML; only the
+ * hero (eyebrow / headline / lead) is driven by the `landingPage` Sanity doc, and
+ * the primary booking/Calendly CTA resolves from `data.ctaUrl`. The page's exact
+ * original CSS (incl. base64 PP Mori fonts) is extracted to
+ * styles/landing/hire-talent.css. */
+import type { LandingPageData } from '../../lib/landingPages';
+import '../../styles/landing/hire-talent.css';
+
+interface Props {
+  data: LandingPageData;
+}
+const { data } = Astro.props;
+
+const cta =
+  data.ctaUrl ??
+  'https://calendly.com/d/5j7-3xv-p5k/global-talent-hiring-consultation?utm_source=meta_retargeting&utm_medium=paid&utm_campaign=retargeting-v1&hide_gdpr_banner=1&hide_event_type_details=1&background_color=ffffff&text_color=093a3e&primary_color=093a3e';
+---
+
+<!-- ─── NAV BAR: Sagan logo + Schedule a Call only ─── -->
+<header class="bar">
+  <a href="https://saganpassport.com" class="bar-logo" aria-label="Sagan — home">
+    <img src="https://framerusercontent.com/images/ECyEDC4V3Il9rjq10opn3xtlDPY.png?width=80&height=80" alt="" width="26" height="26" />
+    <span>Sagan</span>
+  </a>
+  <a href="#book" class="bar-cta">Schedule a Call</a>
+</header>
+
+<!-- ════════════════════════════════════════════════
+     HERO — single column, centered (main-website feel)
+════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-inner">
+
+    {data.heroEyebrow && (
+      <div class="eyebrow"><span class="e-dot"></span>{data.heroEyebrow}</div>
+    )}
+
+    <h1 class="h1" set:html={data.heroHeadlineHtml}></h1>
+
+    <p class="sub" set:html={data.heroLeadHtml}></p>
+
+    <ul class="bullets">
+      <li>
+        <div class="b-icon">✓</div>
+        <span><strong>You meet 3 finalists</strong>: every candidate passes skill tests, live English interviews, and US culture screening before you see them</span>
+      </li>
+      <li>
+        <div class="b-icon">✓</div>
+        <span><strong>0-2 hour time zone overlap</strong>: most talent is in Latin America; they work your hours, join your standups, and use your tools</span>
+      </li>
+      <li>
+        <div class="b-icon">✓</div>
+        <span><strong>90-day free replacement guarantee</strong>: if it isn't a perfect fit for any reason, we replace them at zero additional cost</span>
+      </li>
+    </ul>
+
+    <div class="cta-wrap">
+      <a href="#book" class="btn-fill">
+        <span class="btn-fill__label">Get a Free Hiring Consultation</span>
+        <span class="btn-fill__circle">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════
+     TALENT TICKER — auto-scrolling marquee (like the
+     main site). Cards rendered twice for a seamless loop;
+     pauses on hover. Real Sagan placements + real photos.
+════════════════════════════════════════════════ -->
+<section class="ticker" aria-label="Real Sagan placements">
+  <div class="marquee">
+    <div class="marquee__track">
+      <article class="personx"><img src="https://framerusercontent.com/images/vSt7nb9t3DaHFuzc1y56VQGwm18.jpg" alt="Marjorie, Paralegal" loading="lazy" /><div class="personx__overlay"></div><div class="personx__content"><div class="personx__info"><span class="personx__name">Marjorie</span><span class="personx__role">Paralegal</span></div><span class="personx__rate">$1,750/month</span></div></article>
+      <article class="personx"><img src="https://framerusercontent.com/images/TiA6S2G3USn1z6Yfkh3iXHFNmw.png" alt="Agostina, Customer Service Rep." loading="lazy" /><div class="personx__overlay"></div><div class="personx__content"><div class="personx__info"><span class="personx__name">Agostina</span><span class="personx__role">Customer Service Rep.</span></div><span class="personx__rate">$1,200/month</span></div></article>
+      <article class="personx"><img src="https://framerusercontent.com/images/9B4nbheGCkylXPMEqKfeQL4264.png" alt="Nivah, Sr. Product Designer" loading="lazy" /><div class="personx__overlay"></div><div class="personx__content"><div class="personx__info"><span class="personx__name">Nivah</span><span class="personx__role">Sr. Product Designer</span></div><span class="personx__rate">$2,250/month</span></div></article>
+      <article class="personx"><img src="https://framerusercontent.com/images/DAMgEM6rQq4fpZSwkUXKGsxLmE.png" alt="Sreejith, Certified Accountant" loading="lazy" /><div class="personx__overlay"></div><div class="personx__content"><div class="personx__info"><span class="personx__name">Sreejith</span><span class="personx__role">Certified Accountant</span></div><span class="personx__rate">$1,950/month</span></div></article>
+      <article class="personx"><img src="https://framerusercontent.com/images/nRWIyMkOuHG7M0pozlFagicyHM.png" alt="Franco, Executive Assistant" loading="lazy" /><div class="personx__overlay"></div><div class="personx__content"><div class="personx__info"><span class="personx__name">Franco</span><span class="personx__role">Executive Assistant</span></div><span class="personx__rate">$1,120/month</span></div></article>
+      <!-- duplicate set for the seamless loop -->
+      <article class="personx" aria-hidden="true"><img src="https://framerusercontent.com/images/vSt7nb9t3DaHFuzc1y56VQGwm18.jpg" alt="" loading="lazy" /><div class="personx__overlay"></div><div class="personx__content"><div class="personx__info"><span class="personx__name">Marjorie</span><span class="personx__role">Paralegal</span></div><span class="personx__rate">$1,750/month</span></div></article>
+      <article class="personx" aria-hidden="true"><img src="https://framerusercontent.com/images/TiA6S2G3USn1z6Yfkh3iXHFNmw.png" alt="" loading="lazy" /><div class="personx__overlay"></div><div class="personx__content"><div class="personx__info"><span class="personx__name">Agostina</span><span class="personx__role">Customer Service Rep.</span></div><span class="personx__rate">$1,200/month</span></div></article>
+      <article class="personx" aria-hidden="true"><img src="https://framerusercontent.com/images/9B4nbheGCkylXPMEqKfeQL4264.png" alt="" loading="lazy" /><div class="personx__overlay"></div><div class="personx__content"><div class="personx__info"><span class="personx__name">Nivah</span><span class="personx__role">Sr. Product Designer</span></div><span class="personx__rate">$2,250/month</span></div></article>
+      <article class="personx" aria-hidden="true"><img src="https://framerusercontent.com/images/DAMgEM6rQq4fpZSwkUXKGsxLmE.png" alt="" loading="lazy" /><div class="personx__overlay"></div><div class="personx__content"><div class="personx__info"><span class="personx__name">Sreejith</span><span class="personx__role">Certified Accountant</span></div><span class="personx__rate">$1,950/month</span></div></article>
+      <article class="personx" aria-hidden="true"><img src="https://framerusercontent.com/images/nRWIyMkOuHG7M0pozlFagicyHM.png" alt="" loading="lazy" /><div class="personx__overlay"></div><div class="personx__content"><div class="personx__info"><span class="personx__name">Franco</span><span class="personx__role">Executive Assistant</span></div><span class="personx__rate">$1,120/month</span></div></article>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════ BELOW THE FOLD ════════════════════════════════════════════════ -->
+
+<!-- How it works: 3 steps -->
+<section class="section section-white">
+  <div class="wrap">
+    <p class="label">The process</p>
+    <h2 class="heading">One call. Your next hire<br><em>in 2-4 weeks.</em></h2>
+    <p class="subhead">You never touch a job board. We do the heavy lifting and deliver vetted finalists directly to you.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="sn">1</div>
+        <div class="sb">
+          <h3>We define your perfect hire in one strategy call</h3>
+          <p>We build a detailed scorecard, run a tailored search across global markets, and screen hundreds of candidates so you don't have to.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">2</div>
+        <div class="sb">
+          <h3>You meet 2-3 vetted finalists with 360 profiles</h3>
+          <p>Every finalist comes with resume, video intro, strengths assessment, and recruiter evaluation. Pick your favourite and go straight to final interviews.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">3</div>
+        <div class="sb">
+          <h3>Your hire starts fast. 30-90 day onboarding plan included</h3>
+          <p>Offer templates, custom onboarding milestones, and a 90-day replacement guarantee. We stay involved until it works.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Social proof -->
+<section class="section section-bg">
+  <div class="wrap">
+    <p class="label">What founders say</p>
+    <h2 class="heading">Don't take our word for it.<br><em>Take theirs.</em></h2>
+    <div class="t-grid">
+
+      <article class="t-card">
+        <div class="t-head">
+          <span class="t-avwrap">
+            <img class="t-av" src="https://framerusercontent.com/images/8u1vEzAJ5XyEKVBEqsRhqSHQfk.jpg?width=400&height=400" alt="Alex Kirby" loading="lazy" />
+            <img class="t-badge" src="https://framerusercontent.com/images/yJo3UUAYt6EgqcY1psGtJijPAbQ.jpg?width=733&height=716" alt="" loading="lazy" />
+          </span>
+          <span class="t-who"><span class="t-name">Alex Kirby</span><span class="t-sub">From X</span></span>
+        </div>
+        <p class="t-quote">My global talent team is up to 5 now, all thanks to @MatznerJon and Sagan. I've found a lot of success with Argentinians; and they are only a one hour time difference. Amazing people. Much more skilled than I ever dreamed.</p>
+      </article>
+
+      <article class="t-card">
+        <div class="t-head">
+          <span class="t-avwrap">
+            <img class="t-av" src="https://framerusercontent.com/images/JiagS7bDXgNobinX4lv8WgLa6I.jpg?width=400&height=400" alt="Josh Schulz" loading="lazy" />
+            <img class="t-badge" src="https://framerusercontent.com/images/yJo3UUAYt6EgqcY1psGtJijPAbQ.jpg?width=733&height=716" alt="" loading="lazy" />
+          </span>
+          <span class="t-who"><span class="t-name">Josh Schulz</span><span class="t-sub">From X</span></span>
+        </div>
+        <p class="t-quote">The economics on hiring through Passport are crazy. I've used them for 4 hires - each one amazing and crushing it!</p>
+      </article>
+
+      <article class="t-card">
+        <div class="t-head">
+          <span class="t-avwrap">
+            <img class="t-av" src="https://framerusercontent.com/images/M4cIFNZXUxMzzn7dGC1zoRJIi8Q.jpg?width=400&height=400" alt="Greg Van Horn" loading="lazy" />
+            <img class="t-badge" src="https://framerusercontent.com/images/yJo3UUAYt6EgqcY1psGtJijPAbQ.jpg?width=733&height=716" alt="" loading="lazy" />
+          </span>
+          <span class="t-who"><span class="t-name">Greg Van Horn</span><span class="t-sub">From X</span></span>
+        </div>
+        <p class="t-quote">Onboarded an executive admin today. (Thank you @SaganPassport ) She's from Colombia and is going to be a star.</p>
+      </article>
+
+      <article class="t-card">
+        <div class="t-head">
+          <span class="t-avwrap">
+            <img class="t-av" src="https://framerusercontent.com/images/mbnSG60dpb8dSFDSkCCBCWkXR1M.jpg?width=400&height=400" alt="Rich Jordan" loading="lazy" />
+            <img class="t-badge" src="https://framerusercontent.com/images/yJo3UUAYt6EgqcY1psGtJijPAbQ.jpg?width=733&height=716" alt="" loading="lazy" />
+          </span>
+          <span class="t-who"><span class="t-name">Rich Jordan</span><span class="t-sub">From X</span></span>
+        </div>
+        <p class="t-quote">Sagan's easily the highest value service we use - and I wouldn't say that if it wasn't far-and-away true.</p>
+      </article>
+
+      <article class="t-card">
+        <div class="t-head">
+          <span class="t-avwrap">
+            <img class="t-av" src="https://framerusercontent.com/images/Kg9WMmkC5z1qATu9mNnvdsVAgEU.jpg?width=400&height=400" alt="Chad Nelson" loading="lazy" />
+            <img class="t-badge" src="https://framerusercontent.com/images/yJo3UUAYt6EgqcY1psGtJijPAbQ.jpg?width=733&height=716" alt="" loading="lazy" />
+          </span>
+          <span class="t-who"><span class="t-name">Chad Nelson</span><span class="t-sub">From X</span></span>
+        </div>
+        <p class="t-quote">In the past two weeks I've received several cold DMs and emails pitching me on hiring remote talent. If we ever made the decision to hire remote talent, Sagan Passport is the only company we would ever use.</p>
+      </article>
+
+      <article class="t-card">
+        <div class="t-head">
+          <span class="t-avwrap">
+            <img class="t-av" src="https://framerusercontent.com/images/mkJtGkJh0keM0Uox84qlN8mdxU.jpg?width=400&height=400" alt="Wes Gay" loading="lazy" />
+            <img class="t-badge" src="https://framerusercontent.com/images/yJo3UUAYt6EgqcY1psGtJijPAbQ.jpg?width=733&height=716" alt="" loading="lazy" />
+          </span>
+          <span class="t-who"><span class="t-name">Wes Gay</span><span class="t-sub">From X</span></span>
+        </div>
+        <p class="t-quote">I've been a solo consultant since 2016. Hired a BELAY VA in 2017. Just hired a PM through @SaganPassport last month. Probably 6 years too late. Next up is an AI/automation person & marketing coordinator. Finally building a team. Let's go.</p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section section-white">
+  <div class="wrap">
+    <p class="label">Common concerns</p>
+    <h2 class="heading">Every concern answered.<br><em>Every risk removed.</em></h2>
+    <div class="faq">
+
+      <div class="fi open">
+        <button class="fq" onclick="toggleFaq(this)">Will the quality actually be there?
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="fa"><div class="fa-inner">We don't send resumes. We send finalists. Every candidate passes: direct sourcing from proven global markets (LATAM, South Africa, Eastern Europe, Asia-Pacific), role-specific experience validation, live English and communication interviews, US business culture alignment screening, and skills assessments or portfolio review. Only candidates who meet our standards are ever introduced to you.</div></div>
+      </div>
+
+      <div class="fi">
+        <button class="fq" onclick="toggleFaq(this)">What about time zones and communication?
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="fa"><div class="fa-inner">Most of our talent is based in Latin America, typically 0-2 hour time difference from US time zones. They work your hours, join your standups, and integrate into your Slack and tools exactly like a local hire. Sagan University trains every placement specifically on bridging cultural and communication gaps.</div></div>
+      </div>
+
+      <div class="fi">
+        <button class="fq" onclick="toggleFaq(this)">What if it doesn't work out?
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="fa"><div class="fa-inner">All placements come with a 90-day free replacement guarantee. If the hire isn't a fit for any reason, we run a full replacement search at no additional cost. Sagan members get unlimited free replacements for voluntary departures. No time limits, no extra fees, for as long as their membership is active.</div></div>
+      </div>
+
+      <div class="fi">
+        <button class="fq" onclick="toggleFaq(this)">How is this different from Upwork or a staffing agency?
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="fa"><div class="fa-inner"><strong>Focus:</strong> we specialize in remote global talent for US companies; it's not an add-on, it's our core business. <strong>Precision:</strong> we present a curated shortlist, not a flood of applications. <strong>Dual alignment:</strong> we prepare both employer and candidate for a successful working relationship. Upwork gives you freelancers. We place full-time team members who are all-in on your mission.</div></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── BOOKING — single centered column: title + calendar ─── -->
+<section class="book" id="book">
+  <div class="book-card">
+    <div class="book-card__form">
+      <p class="label">Book your call</p>
+      <h2 class="heading book-card__title">Get a global hiring plan<br><em>in 30 minutes.</em></h2>
+      <p class="book-note">No commitment. No sales pitch. One conversation about your next hire.</p>
+      <form class="lead-form" id="leadForm" novalidate>
+        <label class="lead-form__label" for="leadEmail">Work email</label>
+        <div class="lead-form__row">
+          <input
+            class="lead-form__input"
+            id="leadEmail"
+            name="email"
+            type="email"
+            inputmode="email"
+            autocomplete="email"
+            placeholder="you@company.com"
+            required
+          />
+          <button class="lead-form__btn" type="submit">Book my call</button>
+        </div>
+        <p class="lead-form__msg" id="leadFormMsg" role="status" aria-live="polite"></p>
+      </form>
+      <div class="lead-form__success" id="leadFormSuccess" hidden>
+        <p class="lead-form__success-title">Thanks — now book your call.</p>
+        <a class="lead-form__btn" data-calendly href={cta} target="_blank" rel="noopener">
+          Open my booking calendar →
+        </a>
+      </div>
+    </div>
+    <aside class="book-card__hook">
+      <span class="hook-eyebrow">What you'll walk away with</span>
+      <ul class="hook-list">
+        <li><i>01</i><span>The exact role your team should hire next</span></li>
+        <li><i>02</i><span>Which global markets produce the best candidates for it</span></li>
+        <li><i>03</i><span>Realistic salary ranges and the savings vs. a US hire</span></li>
+        <li><i>04</i><span>A clear path to a vetted shortlist — or honest advice if it isn't a fit</span></li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<!-- ─── Sagan footer (ported from web/src/components/Footer.astro) ─── -->
+<footer class="footerx">
+  <div class="footerx__content">
+    <div class="footerx__brand">
+      <h3 class="footerx__tagline">Source and scale with Sagan.</h3>
+    </div>
+
+    <div class="footerx__cols">
+      <div class="footerx__col">
+        <h4 class="footerx__heading">Sagan</h4>
+        <div class="footerx__links">
+          <a class="footerx__link" href="https://saganpassport.com/how-it-works" target="_blank" rel="noreferrer">How it Works</a>
+          <a class="footerx__link" href="https://saganpassport.com/pricing" target="_blank" rel="noreferrer">Pricing</a>
+          <a class="footerx__link" href="https://saganpassport.com/sagan-university" target="_blank" rel="noreferrer">Sagan University</a>
+          <a class="footerx__link" href="https://saganpassport.com/resources" target="_blank" rel="noreferrer">Resources</a>
+          <a class="footerx__link" href="https://saganpassport.com/blog" target="_blank" rel="noreferrer">Blog</a>
+        </div>
+      </div>
+
+      <div class="footerx__col">
+        <h4 class="footerx__heading">Services</h4>
+        <div class="footerx__links">
+          <a class="footerx__link" href="https://saganpassport.com/customers/home-services" target="_blank" rel="noreferrer">Home Services</a>
+          <a class="footerx__link" href="https://saganpassport.com/customers/private-equity" target="_blank" rel="noreferrer">Private Equity &amp; Holding</a>
+          <a class="footerx__link" href="https://saganpassport.com/customers/small-businesses" target="_blank" rel="noreferrer">Small Businesses</a>
+          <a class="footerx__link" href="https://saganpassport.com/customers/franchises" target="_blank" rel="noreferrer">Franchises</a>
+          <a class="footerx__link" href="https://saganpassport.com/customers/professional-services" target="_blank" rel="noreferrer">Professional Services</a>
+          <a class="footerx__link" href="https://saganpassport.com/customers/real-estate" target="_blank" rel="noreferrer">Real Estate</a>
+          <a class="footerx__link" href="https://saganpassport.com/customers/health-wellness" target="_blank" rel="noreferrer">Health &amp; Wellness</a>
+        </div>
+      </div>
+
+      <div class="footerx__col">
+        <h4 class="footerx__heading">Contact</h4>
+        <div class="footerx__links">
+          <a class="footerx__link" href="#book">Schedule a Call</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footerx__wordmark">
+    <img src="https://framerusercontent.com/images/jBgV1WJ5AIUfSz7porI87LWTNXk.png?width=4165&height=983" alt="Sagan" loading="lazy" />
+  </div>
+</footer>
+
+<script is:inline>
+  function toggleFaq(btn) {
+    const item = btn.closest('.fi');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.fi.open').forEach(el => el.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+  document.querySelectorAll('a[href="#book"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.getElementById('book').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // Navbar scroll morph — transparent docked → white floating pill past 60px
+  // (mirrors saganpassport.com's NavigationScroll, toggled at scrollY > 80 there).
+  const navBar = document.querySelector('.bar');
+  const onScroll = () => navBar.classList.toggle('is-scrolled', window.scrollY > 60);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  /* ---- HubSpot email capture ----
+     Same portal + form used on hire-global-talent (and site-wide).
+     Both IDs are public and safe to keep in this file. On submit we send the
+     email + any UTM params to HubSpot, then open Calendly in a new tab. */
+  const HUBSPOT = {
+    portalId: "50517161",
+    formGuid: "daac2804-e5c3-48e7-8ab7-a5b41c9e7c38",
+  };
+  const CALENDLY_URL =
+    "https://calendly.com/d/5j7-3xv-p5k/global-talent-hiring-consultation";
+
+  /* Make.com webhook — fires a parallel POST on every submission, mirroring
+     hubspot-capture.js. Body shape: { submission: { submittedAt, pageUrl,
+     pageTitle, ...fields } } — all keys flat. */
+  const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/2ccpsjqsst3arigocljg0trvlx7reu1n";
+
+  /* Fire-and-forget POST to the Make scenario. `raw` is the flat set of
+     submitted fields (email + any UTMs); page context is merged on top. */
+  const sendToMake = (raw) => {
+    if (!MAKE_WEBHOOK_URL) return;
+    const submission = Object.assign(
+      {
+        submittedAt: new Date().toISOString(),
+        pageUrl: window.location.href,
+        pageTitle: document.title,
+      },
+      raw
+    );
+    const payload = { submission: submission };
+    try {
+      fetch(MAKE_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      }).catch((err) => console.warn("[Make Webhook] Network error:", err));
+    } catch (e) {
+      console.warn("[Make Webhook] Failed to send:", e);
+    }
+  };
+
+  /* Capture UTM params and persist them in sessionStorage so they survive a
+     multi-page journey — mirrors hire-global-talent. Returns a flat
+     { utm_source: "...", ... } object for whatever is present. */
+  const captureUTMs = () => {
+    const params = new URLSearchParams(window.location.search);
+    const keys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
+    const found = {};
+    keys.forEach((k) => {
+      const v = params.get(k);
+      if (v) found[k] = v;
+    });
+    if (Object.keys(found).length > 0) {
+      try { sessionStorage.setItem("_sg_utms", JSON.stringify(found)); } catch (e) {}
+    }
+    let stored = {};
+    try { stored = JSON.parse(sessionStorage.getItem("_sg_utms") || "{}"); } catch (e) {}
+    const result = Object.assign({}, stored, found); // URL params win over stored
+    // Fallback: if the visitor arrived with no utm_source, tag the lead source
+    // as "HSA". A real utm_source from an ad/campaign is always kept. Applied
+    // only to the returned value — never written to sessionStorage.
+    return result;
+  };
+
+  (function initLeadForm() {
+    const form = document.getElementById("leadForm");
+    if (!form) return;
+
+    const emailInput = document.getElementById("leadEmail");
+    const msg = document.getElementById("leadFormMsg");
+    const successMsg = document.getElementById("leadFormSuccess");
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    const showSuccess = () => {
+      form.hidden = true;
+      successMsg.hidden = false;
+      // Best-effort: open Calendly. If the browser blocks it, the button below still works.
+      try {
+        window.open(CALENDLY_URL, "_blank", "noopener");
+      } catch (e) {}
+    };
+
+    const isConfigured =
+      HUBSPOT.portalId &&
+      HUBSPOT.formGuid &&
+      HUBSPOT.portalId !== "YOUR_PORTAL_ID" &&
+      HUBSPOT.formGuid !== "YOUR_FORM_GUID";
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const email = emailInput.value.trim();
+      msg.textContent = "";
+      msg.classList.remove("is-error");
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        msg.textContent = "Please enter a valid email address.";
+        msg.classList.add("is-error");
+        emailInput.focus();
+        return;
+      }
+
+      const originalLabel = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Sending…";
+
+      if (!isConfigured) {
+        console.warn("[HubSpot] Set HUBSPOT.portalId and HUBSPOT.formGuid to enable capture.");
+        showSuccess();
+        return;
+      }
+
+      try {
+        // Build the field list: email + any UTM params we captured.
+        const fields = [{ name: "email", value: email }];
+        const utms = captureUTMs();
+        const raw = { email: email };
+        ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"].forEach((k) => {
+          if (utms[k]) {
+            fields.push({ name: k, value: utms[k] });
+            raw[k] = utms[k];
+          }
+        });
+
+        // Fire the Make.com webhook in parallel — same email + UTMs + page context.
+        sendToMake(raw);
+
+        const res = await fetch(
+          "https://api.hsforms.com/submissions/v3/integration/submit/" +
+            HUBSPOT.portalId +
+            "/" +
+            HUBSPOT.formGuid,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              fields: fields,
+              context: {
+                pageUri: window.location.href,
+                pageName: document.title,
+              },
+            }),
+          }
+        );
+        if (!res.ok) throw new Error("HubSpot responded " + res.status);
+        showSuccess();
+      } catch (err) {
+        console.error(err);
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalLabel;
+        msg.textContent = "Something went wrong — please try again.";
+        msg.classList.add("is-error");
+      }
+    });
+
+    // CTAs across the page point at #book (smooth-scroll). Focus the email
+    // field once they land, so capturing the email is clearly the first step.
+    document.querySelectorAll('a[href="#book"]').forEach((link) => {
+      link.addEventListener("click", () => {
+        if (form.hidden) return; // already submitted — leave the success state alone
+        window.setTimeout(function () {
+          emailInput.focus({ preventScroll: true });
+        }, 500);
+      });
+    });
+  })();
+</script>

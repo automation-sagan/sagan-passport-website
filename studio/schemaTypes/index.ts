@@ -37,6 +37,7 @@ import {comparison} from './comparison'
 import {comparisonRow} from './comparisonRow'
 import {comparisonTestimonial} from './comparisonTestimonial'
 import {agentDemo} from './agentDemo'
+import {landingPage} from './landingPage'
 
 export const schemaTypes = [
   navigation,
@@ -78,4 +79,5 @@ export const schemaTypes = [
   comparisonRow,
   comparisonTestimonial,
   agentDemo,
+  landingPage,
 ]
