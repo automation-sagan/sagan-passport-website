@@ -1,0 +1,642 @@
+---
+/* Faithful port of /vs/growth-assistant-vs-sagan. Bespoke layout + persuasive
+ * copy are preserved verbatim; the hero, comparison table, calculator numbers,
+ * and testimonials are driven by the `comparison` Sanity document (key editable
+ * fields). CSS is the page's exact original, extracted to
+ * styles/vs/growth-assistant.css. */
+import type { ComparisonData } from '../../lib/comparisons';
+import '../../styles/vs/growth-assistant.css';
+
+interface Props {
+  data: ComparisonData;
+}
+const { data } = Astro.props;
+
+const slug = data.slug ?? 'growth-assistant-vs-sagan';
+const cal = (term: string) =>
+  `${data.calendlyUrl ?? 'https://calendly.com/d/5j7-3xv-p5k/global-talent-hiring-consultation'}?utm_source=${slug}&utm_term=${term}`;
+
+const rows = data.comparisonRows ?? [];
+const testimonials = data.testimonials ?? [];
+
+const competitorCellClass = (s?: string) => (s === 'cross' ? 'cross' : s === 'neutral' ? 'neutral' : '');
+const saganCellClass = (s?: string) => (s === 'check' ? 'check' : s === 'neutral' ? 'neutral' : '');
+const cellHtml = (text?: string, small?: string) =>
+  `${text ?? ''}${small ? `<small>${small}</small>` : ''}`;
+
+const calc = data.calc ?? {};
+const C = data.competitor ?? 'Growth Assistant';
+---
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">{C} <span>vs</span> Sagan</a>
+    <a href={cal('nav')} class="nav-cta" target="_blank" rel="noopener">See How Much You'd Save</a>
+  </div>
+</nav>
+
+<!-- HERO (Asymmetric Split) -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge reveal">
+      <span class="dot"></span>
+      They keep 73% of what you pay
+    </div>
+    <h1 class="reveal reveal-d1">{data.heroHeadlineLead} <span class="highlight">{data.heroHeadlineEm}</span></h1>
+    <p class="hero-desc reveal reveal-d2">{data.heroBody}</p>
+    <div class="hero-actions reveal reveal-d3">
+      <a href={cal('hero')} class="btn-primary" target="_blank" rel="noopener">Get Your Custom Savings Breakdown <span class="arrow">&rarr;</span></a>
+    </div>
+    <div class="hero-note reveal reveal-d4">{data.heroSub}</div>
+    <div class="hero-trust reveal reveal-d4">
+      <span class="hero-trust-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+      <span class="hero-trust-text">4.8 from 45 verified reviews on <a href="https://clutch.co/profile/sagan-passport" target="_blank" rel="noopener">Clutch</a></span>
+      <span class="hero-trust-sep">&middot;</span>
+      <span class="hero-trust-text">Trusted by 300+ business owners</span>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-stat-card danger-card reveal">
+      <div class="hero-stat-label">What {C} keeps</div>
+      <div class="hero-stat-number">$2,200<span style="font-size:0.5em;color:var(--zinc-500)">/mo</span></div>
+      <div class="hero-stat-desc">73% of your $3,000 monthly bill goes to the middleman</div>
+      <div class="hero-stat-bar"><div class="hero-stat-bar-fill" style="width:73%"></div></div>
+    </div>
+    <div class="hero-stat-card success-card reveal reveal-d1">
+      <div class="hero-stat-label">With Sagan, your hire gets</div>
+      <div class="hero-stat-number">100%</div>
+      <div class="hero-stat-desc">Direct hire. Every dollar of salary goes to your team member.</div>
+      <div class="hero-stat-bar"><div class="hero-stat-bar-fill" style="width:100%"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- RATINGS BAR -->
+<section class="ratings-bar" aria-label="Customer ratings and awards">
+  <div class="ratings-inner">
+    <div class="rating-card">
+      <div class="rating-mark rating-mark--g2" aria-hidden="true">
+        <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#FF492C" d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24Zm.122 5.143c.45 0 .9.044 1.342.132l-1.342 2.806C9.962 8.08 8.203 9.84 8.203 12s1.76 3.92 3.92 3.92c.937 0 1.844-.338 2.553-.951l1.483 2.572A6.856 6.856 0 0 1 5.266 12a6.856 6.856 0 0 1 6.856-6.856Zm3.498.49a1.262 1.262 0 0 1 .026 0c.427 0 .792.113 1.101.34.31.229.466.546.466.946 0 .639-.36 1.03-1.035 1.376l-.377.191c-.403.204-.602.385-.657.706h2.05v.85h-3.101v-.144c0-.526.103-.96.314-1.306.211-.345.576-.65 1.102-.917l.242-.117c.427-.216.538-.401.538-.625 0-.266-.228-.458-.6-.458-.44 0-.773.228-1.004.694l-.592-.595c.13-.279.338-.502.619-.675a1.7 1.7 0 0 1 .908-.266Zm-2.094 5.388h3.394l1.697 2.937-1.697 2.94-1.697-2.94H11.83l1.696-2.937Z"></path></svg>
+        <span>G2</span>
+      </div>
+      <div class="rating-body">
+        <span class="rating-score">4.9<small>/5</small></span>
+        <span class="rating-stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+      </div>
+      <div class="rating-meta">Category leader &middot; Verified reviews</div>
+    </div>
+    <a href="https://clutch.co/profile/sagan-passport" target="_blank" rel="noopener" class="rating-card">
+      <div class="rating-mark rating-mark--clutch" aria-hidden="true">
+        <span>Clutch</span><span class="clutch-dot"></span>
+      </div>
+      <div class="rating-body">
+        <span class="rating-score">4.8<small>/5</small></span>
+        <span class="rating-stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+      </div>
+      <div class="rating-meta">45 verified client reviews</div>
+    </a>
+    <a href="https://clutch.co/profile/sagan-passport" target="_blank" rel="noopener" class="rating-card rating-card--featured">
+      <div class="rating-mark rating-mark--award" aria-hidden="true">Clutch 100 &middot; 2025</div>
+      <div class="rating-body">
+        <span class="rating-score">#20</span>
+      </div>
+      <div class="rating-meta">Fastest-growing companies, globally</div>
+    </a>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="ticker-item"><span class="num">$3,000</span> GA Monthly Bill</span>
+    <span class="ticker-item"><span class="num">$800</span> What Talent Gets</span>
+    <span class="ticker-item"><span class="num">73%</span> GA's Cut</span>
+    <span class="ticker-item"><span class="num">$499</span>/mo Sagan Membership</span>
+    <span class="ticker-item"><span class="num">$0</span> Per-Person Monthly After Hire</span>
+    <span class="ticker-item"><span class="num">100%</span> Salary Goes to Your Hire</span>
+    <span class="ticker-item"><span class="num">$3,000</span> GA Monthly Bill</span>
+    <span class="ticker-item"><span class="num">$800</span> What Talent Gets</span>
+    <span class="ticker-item"><span class="num">73%</span> GA's Cut</span>
+    <span class="ticker-item"><span class="num">$499</span>/mo Sagan Membership</span>
+    <span class="ticker-item"><span class="num">$0</span> Per-Person Monthly After Hire</span>
+    <span class="ticker-item"><span class="num">100%</span> Salary Goes to Your Hire</span>
+  </div>
+</div>
+
+<!-- PAY GAP (Dark Bento) -->
+<section class="paygap">
+  <div class="container">
+    <div class="paygap-grid">
+      <div class="reveal">
+        <div class="section-label">The Math They Don't Want You to Do</div>
+        <h2 class="section-title">Your assistant gets $800. Growth Assistant keeps $2,200. Every month.</h2>
+        <p class="section-subtitle">The person you hire costs $800/mo no matter what. With GA, you pay $3,000 and they pocket $2,200 &mdash; every month, forever. With Sagan, you pay a $499/mo membership and a one-time finder's fee. And your hire works for you &mdash; not them.</p>
+      </div>
+      <div class="paygap-visual reveal reveal-d1">
+        <div class="pay-bar ga-bar">
+          <div class="pay-bar-label">Growth Assistant<small>You pay $3,000/mo</small></div>
+          <div class="pay-bar-amount">$2,200 to GA</div>
+        </div>
+        <div class="pay-bar-track">
+          <div class="pay-bar-segment talent-seg">
+            <div class="seg-amount">$800</div>
+            <div class="seg-label">Your assistant</div>
+            <div class="seg-pct">27%</div>
+          </div>
+          <div class="pay-bar-segment middleman-seg">
+            <div class="seg-amount">$2,200</div>
+            <div class="seg-label">GA's cut</div>
+            <div class="seg-pct">73%</div>
+          </div>
+        </div>
+        <div class="pay-bar sagan-bar">
+          <div class="pay-bar-label">Sagan<small>You set the salary directly</small></div>
+          <div class="pay-bar-amount">100% to your hire</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RECEIPTS -->
+<section class="receipts">
+  <div class="container">
+    <div class="receipts-header reveal">
+      <div class="section-label">The Receipts</div>
+      <h2 class="section-title">Don't take our word for it. Google theirs.</h2>
+      <p class="section-subtitle">We didn't have to dig hard. Their own employees post about it on Reddit. One called it "diabolical." Accurate.</p>
+    </div>
+    <div class="evidence-stack">
+      <div class="evidence-card hot reveal">
+        <div class="evidence-badge source-badge">Indeed Philippines</div>
+        <div class="evidence-quote">"Average GrowthAssistant salaries: &#8369;36,772 - &#8369;51,863/mo (~$638-$900/mo)"</div>
+        <div class="evidence-detail">Based on 1,600+ salary reports from current and past GrowthAssistant employees</div>
+        <a href="https://ph.indeed.com/cmp/Growthassistant/salaries" class="evidence-link" target="_blank" rel="noopener">See on Indeed &rarr;</a>
+      </div>
+      <div class="evidence-card reveal reveal-d1">
+        <div class="evidence-badge neutral-badge">Reddit r/buhaydigital</div>
+        <div class="evidence-quote">"Bills their clients $2,000-$3,000 but only pays their PH GA $800. Is diabolical."</div>
+        <div class="evidence-detail">Multiple threads reference this exact dynamic</div>
+        <a href="https://www.reddit.com/r/buhaydigital/comments/1io7mpc/does_anyone_here_work_at_growth_assistant/" class="evidence-link" target="_blank" rel="noopener">See on Reddit &rarr;</a>
+      </div>
+      <div class="evidence-card reveal reveal-d2">
+        <div class="evidence-badge neutral-badge">Reddit r/buhaydigital</div>
+        <div class="evidence-quote">"I just knew that the client was paying them +$3,500 then they were paying me way less."</div>
+        <div class="evidence-detail">GA team member discovering the markup for the first time</div>
+        <a href="https://www.reddit.com/r/buhaydigital/comments/11suark/reviews_about_growth_assistant_no_info_yet_here/" class="evidence-link" target="_blank" rel="noopener">See on Reddit &rarr;</a>
+      </div>
+      <div class="evidence-card hot reveal reveal-d3">
+        <div class="evidence-badge source-badge">GrowthAssistant.com</div>
+        <div class="evidence-quote">"$3K to $4K per month for a full-time Growth Assistant"</div>
+        <div class="evidence-detail">Listed publicly on their own pricing page</div>
+        <a href="https://growthassistant.com/pricing" class="evidence-link" target="_blank" rel="noopener">See on GrowthAssistant.com &rarr;</a>
+      </div>
+    </div>
+    <div class="receipts-callout reveal">
+      Indeed reports GA salaries at &#8369;37,000&ndash;52,000/mo (~$640&ndash;$900). You pay $3,000&ndash;$4,000/mo. <strong>That means Growth Assistant keeps $2,100&ndash;$2,360+/mo &mdash; roughly 70&ndash;73% of what you pay. Every single month. Their own people called it "diabolical."</strong>
+    </div>
+  </div>
+</section>
+
+<!-- MID-PAGE CTA: After Receipts -->
+<div class="mid-cta">
+  <div class="container">
+    <div class="mid-cta-inner">
+      <div class="mid-cta-text">Seen enough? <strong>Find out what you'd actually save.</strong></div>
+      <a href={cal('mid-receipts')} class="mid-cta-btn" target="_blank" rel="noopener">Get Your Savings Breakdown &rarr;</a>
+    </div>
+  </div>
+</div>
+
+<!-- TALENT QUALITY -->
+<section class="talent-section">
+  <div class="container">
+    <div class="talent-header reveal">
+      <div class="section-label">Talent Quality</div>
+      <h2 class="section-title">Direct hire = better talent</h2>
+      <p class="section-subtitle">Would you take a job knowing you get $800 while your boss charges the client $3,000? Imagine the morale.</p>
+    </div>
+    <div class="talent-grid">
+      <div class="talent-card bad-card reveal">
+        <h3>At a Staffing Agency</h3>
+        <div class="talent-card-sub">What your hire experiences at Growth Assistant</div>
+        <div class="talent-item"><div class="talent-icon">&#10007;</div><div>Gets paid <strong>$800/mo</strong> while the client pays $3,000 &mdash; they know the math</div></div>
+        <div class="talent-item"><div class="talent-icon">&#10007;</div><div>Feels <strong>undervalued and underpaid</strong> &mdash; no matter how hard they work</div></div>
+        <div class="talent-item"><div class="talent-icon">&#10007;</div><div><strong>No promotion path</strong> &mdash; they're a replaceable resource, not a team member</div></div>
+        <div class="talent-item"><div class="talent-icon">&#10007;</div><div><strong>No direct recognition</strong> &mdash; credit goes to the agency, not the person</div></div>
+        <div class="talent-item"><div class="talent-icon">&#10007;</div><div><strong>The best people leave</strong> &mdash; great talent won't stay at $800 when they can earn more</div></div>
+        <div class="talent-item"><div class="talent-icon">&#10007;</div><div><strong>Stuck in a staffing agency</strong> with no equity, no growth, no real career</div></div>
+      </div>
+      <div class="talent-card good-card reveal reveal-d1">
+        <h3>As a Direct Hire</h3>
+        <div class="talent-card-sub">What your hire experiences through Sagan</div>
+        <div class="talent-item"><div class="talent-icon">&#10003;</div><div>Gets <strong>100% of the salary you set</strong> &mdash; fair pay, no hidden cuts</div></div>
+        <div class="talent-item"><div class="talent-icon">&#10003;</div><div>Feels <strong>valued and invested in</strong> &mdash; they're building YOUR company</div></div>
+        <div class="talent-item"><div class="talent-icon">&#10003;</div><div><strong>Real promotion paths</strong> &mdash; they can grow into leadership roles</div></div>
+        <div class="talent-item"><div class="talent-icon">&#10003;</div><div><strong>Direct recognition</strong> &mdash; raises, bonuses, and equity potential</div></div>
+        <div class="talent-item"><div class="talent-icon">&#10003;</div><div><strong>Great people apply</strong> &mdash; the best talent wants real jobs, not agency gigs</div></div>
+        <div class="talent-item"><div class="talent-icon">&#10003;</div><div><strong>More loyal, more motivated</strong> &mdash; because they're YOUR team member</div></div>
+      </div>
+    </div>
+    <div class="talent-note reveal">
+      <strong>Great people don't want to work for a staffing agency that keeps 73% of what you pay.</strong> They want a real job. With GA, you're not getting their best &mdash; you're getting whoever hasn't found a way out yet.
+    </div>
+  </div>
+</section>
+
+<!-- BUSINESS MODEL -->
+<section class="model-section">
+  <div class="container">
+    <div class="model-header reveal">
+      <div class="section-label">Business Model</div>
+      <h2 class="section-title">Outsourcing vs. direct hire</h2>
+      <p class="section-subtitle">Growth Assistant charges $3,000/mo and keeps most of it. Sagan helps you hire someone directly &mdash; they work for you, not a middleman.</p>
+    </div>
+    <div class="model-grid">
+      <div class="model-card ga-card reveal">
+        <h3>Growth Assistant</h3>
+        <div class="model-tag">Outsourcing / Staffing</div>
+        <div class="model-price">$3,000/mo</div>
+        <div class="model-price-note">Only $800 reaches your assistant. GA takes $2,200 every month. It never stops.</div>
+        <div class="model-item"><div class="model-icon">&#10007;</div><div>Growth Assistant <strong>employs</strong> your assistant &mdash; they work for GA, not you</div></div>
+        <div class="model-item"><div class="model-icon">&#10007;</div><div>Your assistant gets $800. GA pockets $2,200. Every single month.</div></div>
+        <div class="model-item"><div class="model-icon">&#10007;</div><div>Can't promote, give raises, or build loyalty directly</div></div>
+        <div class="model-item"><div class="model-icon">&#10007;</div><div>Cancel GA, lose your assistant &mdash; they work for Growth Assistant, not you</div></div>
+        <div class="model-item"><div class="model-icon">&#10007;</div><div>Philippines and Latin America &mdash; still a narrow pool</div></div>
+        <div class="model-item"><div class="model-icon">&#10007;</div><div>73 cents of every dollar goes to GA &mdash; not your assistant</div></div>
+      </div>
+      <div class="model-card sagan-card reveal reveal-d1">
+        <h3>Sagan</h3>
+        <div class="model-tag">Hiring Membership</div>
+        <div class="model-price">$499/mo + finder's fee</div>
+        <div class="model-price-note">$499/mo membership + a one-time finder's fee per hire. Your hire gets the same $800/mo &mdash; you just stop paying $2,200/mo to a middleman.</div>
+        <div class="model-item"><div class="model-icon">&#10003;</div><div><strong>Direct hire</strong> &mdash; the person is YOUR team member from day one</div></div>
+        <div class="model-item"><div class="model-icon">&#10003;</div><div>Your hire gets the same $800/mo &mdash; with no $2,200 skimmed off the top</div></div>
+        <div class="model-item"><div class="model-icon">&#10003;</div><div>Promote, give raises, and build real loyalty</div></div>
+        <div class="model-item"><div class="model-icon">&#10003;</div><div><strong>Leave Sagan? Your team member stays.</strong> They work for you, not us. Cancel anytime.</div></div>
+        <div class="model-item"><div class="model-icon">&#10003;</div><div>Latin America, Africa, Asia &mdash; global talent pool</div></div>
+        <div class="model-item"><div class="model-icon">&#10003;</div><div>Every dollar of salary goes to your hire &mdash; zero middleman cut</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON TABLE (from Sanity) -->
+<section class="comparison-section">
+  <div class="container">
+    <div class="comparison-header reveal">
+      <div class="section-label">Side-by-Side</div>
+      <h2 class="section-title">How they actually compare</h2>
+      <p class="section-subtitle">One charges you $3,000/mo to rent a person. The other helps you hire one.</p>
+    </div>
+    <div class="comparison-table-wrapper reveal">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>{C}</th>
+            <th>Sagan <span class="winner-badge">Better Value</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rows.map((r) => (
+              <tr>
+                <td>{r.label}{r.labelSmall && <small>{r.labelSmall}</small>}</td>
+                <td class={competitorCellClass(r.competitorState)} set:html={cellHtml(r.competitorText, r.competitorSmall)} />
+                <td class={saganCellClass(r.saganState)} set:html={cellHtml(r.saganText, r.saganSmall)} />
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- MID-PAGE CTA: After Comparison -->
+<div class="mid-cta mid-cta-dark">
+  <div class="container">
+    <div class="mid-cta-inner">
+      <div class="mid-cta-text" style="color:var(--zinc-300)">Same talent. Same salary. <strong style="color:var(--white)">Completely different cost structure.</strong></div>
+      <a href={cal('mid-comparison')} class="mid-cta-btn mid-cta-btn-light" target="_blank" rel="noopener">Get Your Savings Breakdown &rarr;</a>
+    </div>
+  </div>
+</div>
+
+<!-- CALCULATOR (numbers from Sanity) -->
+<section class="calc-section">
+  <div class="container">
+    <div class="calc-header reveal">
+      <div class="section-label">Cost Calculator</div>
+      <h2 class="section-title">See how much you actually save</h2>
+      <p class="section-subtitle">{C} is counting on you not running these numbers.</p>
+    </div>
+    <div class="calc-card reveal">
+      <div class="calc-inputs">
+        <div class="calc-field">
+          <label for="hires">Number of Assistants</label>
+          <select id="hires">
+            <option value="1" selected>1 assistant</option>
+            <option value="2">2 assistants</option>
+            <option value="3">3 assistants</option>
+            <option value="5">5 assistants</option>
+            <option value="10">10 assistants</option>
+          </select>
+        </div>
+        <div class="calc-field">
+          <label for="years">Timeframe</label>
+          <select id="years">
+            <option value="1">1 year</option>
+            <option value="2" selected>2 years</option>
+            <option value="3">3 years</option>
+            <option value="5">5 years</option>
+          </select>
+        </div>
+      </div>
+      <div class="calc-divider"></div>
+      <div class="calc-results">
+        <div class="calc-result-card ga-calc">
+          <div class="calc-result-label">Money Going to {C}</div>
+          <div class="calc-result-amount" id="ga-cost">$52,800</div>
+          <div class="calc-result-detail" id="ga-detail">$2,200/mo x 1 person x 24 months</div>
+        </div>
+        <div class="calc-result-card sagan-calc">
+          <div class="calc-result-label">Money Going to Sagan</div>
+          <div class="calc-result-amount" id="sagan-cost">$13,704</div>
+          <div class="calc-result-detail" id="sagan-detail">$1,728 finder's fee + $11,976 membership</div>
+          <div class="calc-result-detail" id="sagan-membership-note" style="margin-top:4px;opacity:0.6;font-size:.82em">Same $499/mo membership whether you hire 1 person or 10.</div>
+        </div>
+      </div>
+      <div class="calc-savings">
+        <div class="calc-savings-label">You Save</div>
+        <div class="calc-savings-amount" id="savings-amount">$39,096</div>
+        <div class="calc-savings-note" id="savings-note">Your hire gets paid the same ~$800/mo either way. The only question is how much goes to the middleman.</div>
+      </div>
+      <div class="calc-talent-note">
+        <strong>Sagan finds you great people. GA rents them to you.</strong> With Sagan, you pay $499/mo membership + a one-time finder's fee per person. They work for you. Cancel anytime &mdash; keep your whole team.
+      </div>
+      <div class="calc-cta-row">
+        <a href={cal('calculator')} class="calc-cta-btn" target="_blank" rel="noopener">Lock In These Savings &mdash; Book a Free Call &rarr;</a>
+        <div class="calc-cta-note">15 minutes. No commitment. We'll walk you through exactly how it works.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EVERYONE WINS -->
+<section class="wins-section">
+  <div class="container">
+    <div class="wins-header reveal">
+      <div class="section-label">The Bottom Line</div>
+      <h2 class="section-title">Everyone wins. Except the middleman.</h2>
+      <p class="section-subtitle">You save money. Your hire gets paid fairly. The only loser? The middleman.</p>
+    </div>
+    <div class="wins-grid reveal">
+      <div class="win-card winner reveal">
+        <div class="win-card-number">01</div>
+        <div class="win-card-label">Winner</div>
+        <div class="win-card-title">You Save Money</div>
+        <div class="win-card-desc">Same person, same pay. You just stop giving GA $2,200 every month. The finder's fee is one-time.</div>
+      </div>
+      <div class="win-card winner reveal reveal-d1">
+        <div class="win-card-number">02</div>
+        <div class="win-card-label">Winner</div>
+        <div class="win-card-title">Your Hire Earns Fairly</div>
+        <div class="win-card-desc">All of their pay goes to them &mdash; not 27%. They're happier and more loyal.</div>
+      </div>
+      <div class="win-card winner reveal reveal-d2">
+        <div class="win-card-number">03</div>
+        <div class="win-card-label">Winner</div>
+        <div class="win-card-title">You Get Better People</div>
+        <div class="win-card-desc">Great people want real jobs, not agency gigs. They'll build a career with you.</div>
+      </div>
+      <div class="win-card loser reveal reveal-d3">
+        <div class="win-card-number">&times;</div>
+        <div class="win-card-label">Loser</div>
+        <div class="win-card-title">The Middleman</div>
+        <div class="win-card-desc">They lose their $2,200/mo cut. Thoughts and prayers.</div>
+      </div>
+    </div>
+    <div class="wins-bottom reveal">
+      <strong>You save money. Your hire earns more. You get better people.</strong> The only ones upset? The middleman.
+    </div>
+  </div>
+</section>
+
+<!-- FAQ (Objection Handling) -->
+<section class="faq-section">
+  <div class="container">
+    <div class="faq-header reveal" style="text-align:center;margin-bottom:56px;">
+      <div class="section-label">Common Questions</div>
+      <h2 class="section-title">Still on the fence? Fair.</h2>
+      <p class="section-subtitle" style="margin:0 auto;">Here's what people ask before they switch.</p>
+    </div>
+    <div class="faq-grid">
+      <div class="faq-item reveal">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span>What's the catch? This seems too good to be true.</span>
+          <span class="faq-arrow">+</span>
+        </button>
+        <div class="faq-a">No catch. Growth Assistant charges $3,000/mo and employs your assistant themselves. We charge a $499/mo membership and a one-time finder's fee, then connect you with a great candidate who works directly for you. Same talent pool, same caliber person &mdash; you just stop paying a 73% middleman cut every month. The math checks out because we don't need to skim $2,200/mo from your payroll forever.</div>
+      </div>
+      <div class="faq-item reveal reveal-d1">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span>What if the hire doesn't work out?</span>
+          <span class="faq-arrow">+</span>
+        </button>
+        <div class="faq-a">We offer a replacement guarantee. If your hire doesn't work out within the guarantee period, we'll find you a replacement at no additional finder's fee. That's more protection than GA offers &mdash; with them, you're paying $3,000/mo whether or not the person is a fit, and if they leave, you start over at $3,000/mo again.</div>
+      </div>
+      <div class="faq-item reveal reveal-d2">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span>How fast can I get someone?</span>
+          <span class="faq-arrow">+</span>
+        </button>
+        <div class="faq-a">Most members receive their first shortlist of vetted candidates within 7-10 business days. From there, you interview, pick your favorite, and they can start within 1-2 weeks. Total time from sign-up to day-one is typically 3-4 weeks.</div>
+      </div>
+      <div class="faq-item reveal reveal-d3">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span>Do I have to handle payroll and compliance myself?</span>
+          <span class="faq-arrow">+</span>
+        </button>
+        <div class="faq-a">We help you set up compliant payroll through our recommended partners (like Deel or Remote). It takes about 15 minutes. Your hire is a contractor or employee depending on your preference &mdash; either way, we walk you through every step. Most members say it's far simpler than they expected.</div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span>What happens if I cancel my Sagan membership?</span>
+          <span class="faq-arrow">+</span>
+        </button>
+        <div class="faq-a">Your team members stay. They work for you, not us. If you cancel, you keep every single person you hired through Sagan. Compare that to Growth Assistant: cancel GA, and you lose your assistant immediately because they're GA's employee, not yours.</div>
+      </div>
+      <div class="faq-item reveal reveal-d1">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span>Is the talent really the same quality?</span>
+          <span class="faq-arrow">+</span>
+        </button>
+        <div class="faq-a">It's the same talent pool &mdash; and often better. The best candidates in Latin America, Africa, and Asia prefer direct-hire positions over staffing agency gigs. They earn more, get real career growth, and feel valued. That's why our members consistently report higher retention and better performance than agency-placed assistants.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS (from Sanity) -->
+<section class="testimonials-section">
+  <div class="container">
+    <div class="testimonials-header reveal">
+      <div class="section-label">Wall of Love</div>
+      <h2 class="section-title">Don't take our word for it</h2>
+      <p class="section-subtitle">Real posts. Real reviews. From real business owners who chose Sagan.</p>
+      <a href="https://clutch.co/profile/sagan-passport" target="_blank" rel="noopener" class="clutch-link">4.8 from 45 verified Clutch reviews &rarr;</a>
+    </div>
+    <div class="wall-grid">
+      <div class="wall-card tweet-card reveal">
+        <blockquote class="twitter-tweet" data-conversation="none" data-dnt="true"><a href="https://twitter.com/StrongpointRich/status/1822046644256260219"></a></blockquote>
+      </div>
+      {
+        testimonials.map((t) => (
+          <div class="wall-card quote-card reveal">
+            <div class="quote-source"><span class="clutch-dot"></span> Verified on Clutch</div>
+            <div class="quote-text">&ldquo;{t.text}&rdquo;</div>
+            <div class="quote-divider"></div>
+            <div class="quote-author">{t.author}</div>
+            <div class="quote-role">{t.role}</div>
+          </div>
+        ))
+      }
+      <div class="wall-card tweet-card reveal">
+        <blockquote class="twitter-tweet" data-dnt="true"><a href="https://twitter.com/joshuamschultz/status/1787224837980635274"></a></blockquote>
+      </div>
+      <div class="wall-card tweet-card reveal">
+        <blockquote class="twitter-tweet" data-dnt="true"><a href="https://twitter.com/Chad_Nelson_/status/1801277850193973269"></a></blockquote>
+      </div>
+      <div class="wall-card tweet-card reveal">
+        <blockquote class="twitter-tweet" data-dnt="true"><a href="https://twitter.com/DIBookkeeping/status/1793025290760798350"></a></blockquote>
+      </div>
+      <div class="wall-card tweet-card reveal">
+        <blockquote class="twitter-tweet" data-dnt="true"><a href="https://twitter.com/jakelywakely/status/1782529918565310975"></a></blockquote>
+      </div>
+      <div class="wall-card tweet-card reveal">
+        <blockquote class="twitter-tweet" data-dnt="true"><a href="https://twitter.com/brandonadixon/status/1798342882702790712"></a></blockquote>
+      </div>
+      <div class="wall-card tweet-card reveal">
+        <blockquote class="twitter-tweet" data-dnt="true"><a href="https://twitter.com/BroknClok/status/1776285301062729752"></a></blockquote>
+      </div>
+    </div>
+    <div class="wall-cta-row reveal">
+      <a href="https://clutch.co/profile/sagan-passport" target="_blank" rel="noopener">Read all 45 verified reviews on Clutch &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="container reveal">
+    <h2>Stop paying a <span class="highlight">73% markup.</span></h2>
+    <p>Same talent, same salary. $499/mo membership + a one-time finder's fee &mdash; instead of $2,200 to a middleman every month. Cancel anytime. Your team member stays.</p>
+    <a href={cal('bottom-cta')} class="btn-final" target="_blank" rel="noopener">Get Your Custom Savings Breakdown <span class="arrow">&rarr;</span></a>
+    <div class="final-sub">No commitment &bull; No pressure &bull; Just a conversation Growth Assistant would rather you didn't have</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <p>&copy; 2026 Sagan. All information based on publicly available data. <a href="https://saganpassport.com" target="_blank" rel="noopener">saganpassport.com</a></p>
+  </div>
+</footer>
+
+<!-- STICKY MOBILE CTA -->
+<div class="sticky-cta" id="sticky-cta">
+  <a href={cal('sticky')} class="sticky-cta-btn" target="_blank" rel="noopener">See How Much You'd Save &rarr;</a>
+</div>
+
+<!-- Twitter embed widget -->
+<script is:inline async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<!-- Scroll reveal + calculator (numbers injected from Sanity) + sticky CTA -->
+<script
+  is:inline
+  define:vars={{
+    talentMonthly: calc.talentMonthly ?? 800,
+    middlemanMonthly: calc.middlemanMonthly ?? 2200,
+    membershipMonthly: calc.membershipMonthly ?? 499,
+    finderFeePct: calc.finderFeePct ?? 18,
+    competitor: C,
+  }}
+>
+  // Scroll reveal with spring-like timing
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Calculator
+  const hiresSelect = document.getElementById('hires');
+  const yearsSelect = document.getElementById('years');
+  const TALENT = talentMonthly;
+  const MIDDLEMAN = middlemanMonthly;
+  const MEMBERSHIP = membershipMonthly;
+  const FINDER = finderFeePct / 100;
+
+  function fmt(n) { return '$' + n.toLocaleString('en-US'); }
+
+  function calculate() {
+    const hires = parseInt(hiresSelect.value) || 1;
+    const years = parseInt(yearsSelect.value) || 2;
+    const months = years * 12;
+    const annualSalary = TALENT * 12;
+
+    const gaMiddleman = MIDDLEMAN * hires * months;
+    const saganPlacement = Math.round(annualSalary * FINDER * hires);
+    const saganMembership = MEMBERSHIP * months;
+    const saganTotal = saganPlacement + saganMembership;
+
+    document.getElementById('ga-cost').textContent = fmt(gaMiddleman);
+    document.getElementById('ga-detail').textContent =
+      fmt(MIDDLEMAN) + '/mo × ' + hires + (hires > 1 ? ' people' : ' person') + ' × ' + months + ' months';
+
+    document.getElementById('sagan-cost').textContent = fmt(saganTotal);
+    document.getElementById('sagan-detail').textContent =
+      fmt(saganPlacement) + ' finder’s fee + ' + fmt(saganMembership) + ' membership';
+
+    document.getElementById('sagan-membership-note').textContent =
+      hires > 1
+        ? 'Same ' + fmt(MEMBERSHIP) + '/mo membership whether you hire ' + hires + ' people or 1.'
+        : 'Same ' + fmt(MEMBERSHIP) + '/mo membership whether you hire 1 person or 10.';
+
+    const savings = gaMiddleman - saganTotal;
+    document.getElementById('savings-amount').textContent = fmt(savings);
+    document.getElementById('savings-note').textContent =
+      'Your hire gets paid the same either way. The only difference is how much goes to the middleman.';
+
+    var talentNote = document.querySelector('.calc-talent-note');
+    talentNote.innerHTML =
+      '<strong>Sagan finds you great people. ' + competitor + ' rents them to you.</strong> ' + competitor + ' takes ' + fmt(gaMiddleman) + ' over ' + years + (years === 1 ? ' year' : ' years') + '. Sagan takes ' + fmt(saganTotal) + '. You save ' + fmt(savings) + '. Cancel anytime — keep your whole team.';
+  }
+
+  hiresSelect.addEventListener('change', calculate);
+  yearsSelect.addEventListener('change', calculate);
+  calculate();
+
+  // Sticky mobile CTA - show after scrolling past hero
+  const stickyCta = document.getElementById('sticky-cta');
+  const heroSection = document.querySelector('.hero');
+  if (stickyCta && heroSection) {
+    const stickyObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) {
+          stickyCta.classList.add('visible');
+        } else {
+          stickyCta.classList.remove('visible');
+        }
+      });
+    }, { threshold: 0 });
+    stickyObserver.observe(heroSection);
+  }
+</script>
+
+<!-- Universal HubSpot capture (no guide slug — just lead capture) -->
+<script is:inline src="/hubspot-capture.js" data-portal-id="50517161" data-form-guid="daac2804-e5c3-48e7-8ab7-a5b41c9e7c38"></script>

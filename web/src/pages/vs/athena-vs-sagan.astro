@@ -1,0 +1,20 @@
+---
+/* /vs/athena-vs-sagan. One route per vs page (not a shared [slug] route) so each
+ * page bundles ONLY its own global CSS — these bespoke pages reuse generic class
+ * names (.hero, .section-title, …) that would collide if merged. Content comes
+ * from the matching `comparison` Sanity doc. */
+import LandingLayout from '../../layouts/LandingLayout.astro';
+import AthenaVs from '../../components/vs/AthenaVs.astro';
+import { getComparisonBySlug } from '../../lib/comparisons';
+
+export const prerender = true;
+const data = (await getComparisonBySlug('athena-vs-sagan'))!;
+---
+
+<LandingLayout
+  title={data.seoTitle ?? 'Athena vs Sagan'}
+  description={data.seoDescription}
+  canonical={data.canonical}
+>
+  <AthenaVs data={data} />
+</LandingLayout>

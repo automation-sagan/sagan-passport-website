@@ -1,0 +1,17 @@
+---
+/* /vs/somewhere-vs-sagan — own route so only this page's CSS bundles. */
+import LandingLayout from '../../layouts/LandingLayout.astro';
+import SomewhereVs from '../../components/vs/SomewhereVs.astro';
+import { getComparisonBySlug } from '../../lib/comparisons';
+
+export const prerender = true;
+const data = (await getComparisonBySlug('somewhere-vs-sagan'))!;
+---
+
+<LandingLayout
+  title={data.seoTitle ?? 'Somewhere vs Sagan'}
+  description={data.seoDescription}
+  canonical={data.canonical}
+>
+  <SomewhereVs data={data} />
+</LandingLayout>

@@ -1,0 +1,669 @@
+---
+/* Faithful port of /vs/scalesource-vs-sagan. Bespoke layout + persuasive copy
+ * are preserved verbatim; the hero, comparison table, calculator numbers, and
+ * testimonials are driven by the `comparison` Sanity document (key editable
+ * fields). CSS is the page's exact original, extracted to styles/vs/scalesource.css. */
+import type { ComparisonData } from '../../lib/comparisons';
+import '../../styles/vs/scalesource.css';
+
+interface Props {
+  data: ComparisonData;
+}
+const { data } = Astro.props;
+
+const slug = data.slug ?? 'scalesource-vs-sagan';
+const cal = (term: string) =>
+  `${data.calendlyUrl ?? 'https://calendly.com/d/5j7-3xv-p5k/global-talent-hiring-consultation'}?utm_source=${slug}&utm_term=${term}`;
+
+const rows = data.comparisonRows ?? [];
+const testimonials = data.testimonials ?? [];
+
+const competitorCellClass = (s?: string) => (s === 'cross' ? 'cross' : s === 'neutral' ? 'neutral' : '');
+const saganCellClass = (s?: string) => (s === 'check' ? 'check' : s === 'neutral' ? 'neutral' : '');
+const cellHtml = (text?: string, small?: string) =>
+  `${text ?? ''}${small ? `<small>${small}</small>` : ''}`;
+
+// Avatar initials derived from each testimonial author (source uses hardcoded 2-letter initials).
+const initials = (name?: string) =>
+  (name ?? '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase();
+const delayClass = (i: number) => (i % 3 === 1 ? ' reveal-delay-1' : i % 3 === 2 ? ' reveal-delay-2' : '');
+
+const calc = data.calc ?? {};
+const C = data.competitor ?? 'Scale Source';
+---
+
+<!-- NAV -->
+<nav>
+    <div class="nav-inner">
+        <a href="#" class="nav-brand">{C} vs <span>Sagan</span></a>
+        <a href={cal('nav')} class="nav-cta" target="_blank">Book a Free Call</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-badge reveal">For <strong>Superior Fence &amp; Rail</strong> franchise owners</div>
+        <h1 class="reveal reveal-delay-1">
+            {data.heroHeadlineLead} <span class="amt">$2,083/mo.</span><br />
+            Your Hire Sees <span class="highlight">{data.heroHeadlineEm}</span>
+        </h1>
+        <p class="reveal reveal-delay-2">{data.heroBody}</p>
+        <a href={cal('hero')} class="hero-cta reveal reveal-delay-3" target="_blank">Book a Free Consultation</a>
+        <span class="hero-sub-cta reveal reveal-delay-4">{data.heroSub}</span>
+    </div>
+</section>
+
+<!-- RATINGS BAR -->
+<section class="ratings-bar" aria-label="Customer ratings and awards">
+    <div class="ratings-inner">
+        <div class="rating-card">
+            <div class="rating-mark rating-mark--g2" aria-hidden="true">
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#FF492C" d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24Zm.122 5.143c.45 0 .9.044 1.342.132l-1.342 2.806C9.962 8.08 8.203 9.84 8.203 12s1.76 3.92 3.92 3.92c.937 0 1.844-.338 2.553-.951l1.483 2.572A6.856 6.856 0 0 1 5.266 12a6.856 6.856 0 0 1 6.856-6.856Zm3.498.49a1.262 1.262 0 0 1 .026 0c.427 0 .792.113 1.101.34.31.229.466.546.466.946 0 .639-.36 1.03-1.035 1.376l-.377.191c-.403.204-.602.385-.657.706h2.05v.85h-3.101v-.144c0-.526.103-.96.314-1.306.211-.345.576-.65 1.102-.917l.242-.117c.427-.216.538-.401.538-.625 0-.266-.228-.458-.6-.458-.44 0-.773.228-1.004.694l-.592-.595c.13-.279.338-.502.619-.675a1.7 1.7 0 0 1 .908-.266Zm-2.094 5.388h3.394l1.697 2.937-1.697 2.94-1.697-2.94H11.83l1.696-2.937Z"></path></svg>
+                <span>G2</span>
+            </div>
+            <div class="rating-body">
+                <span class="rating-score">4.9<small>/5</small></span>
+                <span class="rating-stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+            </div>
+            <div class="rating-meta">Category leader &middot; Verified reviews</div>
+        </div>
+        <a href="https://clutch.co/profile/sagan-passport" target="_blank" rel="noopener" class="rating-card">
+            <div class="rating-mark rating-mark--clutch" aria-hidden="true">
+                <span>Clutch</span><span class="clutch-dot"></span>
+            </div>
+            <div class="rating-body">
+                <span class="rating-score">4.8<small>/5</small></span>
+                <span class="rating-stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+            </div>
+            <div class="rating-meta">45 verified client reviews</div>
+        </a>
+        <a href="https://clutch.co/profile/sagan-passport" target="_blank" rel="noopener" class="rating-card rating-card--featured">
+            <div class="rating-mark rating-mark--award" aria-hidden="true">Clutch 100 &middot; 2025</div>
+            <div class="rating-body">
+                <span class="rating-score">#20</span>
+            </div>
+            <div class="rating-meta">Fastest-growing companies, globally</div>
+        </a>
+    </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+    <div class="stats-grid">
+        <div class="stat-item reveal">
+            <div class="stat-num" data-target="2000" data-suffix="+">0</div>
+            <div class="stat-label">Successful hires</div>
+        </div>
+        <div class="stat-item reveal reveal-delay-1">
+            <div class="stat-num" data-target="29" data-suffix="+">0</div>
+            <div class="stat-label">Franchise networks</div>
+        </div>
+        <div class="stat-item reveal reveal-delay-2">
+            <div class="stat-num" data-target="4.8" data-suffix="★" data-decimal="true">0</div>
+            <div class="stat-label">Clutch rating (45 reviews)</div>
+        </div>
+        <div class="stat-item reveal reveal-delay-3">
+            <div class="stat-num" data-target="100" data-suffix="+">0</div>
+            <div class="stat-label">Person vetting team</div>
+        </div>
+    </div>
+</div>
+
+<!-- TRUST BAR -->
+<div class="logo-bar">
+    <p class="reveal">Already trusted by 29+ franchise networks — including <strong>Superior Fence &amp; Rail</strong></p>
+    <div class="brand-list reveal">
+        <span class="brand-highlight">Superior Fence &amp; Rail</span><span class="brand-sep">·</span>
+        <span>FastSigns</span><span class="brand-sep">·</span>
+        <span>Massage Envy</span><span class="brand-sep">·</span>
+        <span>Primrose Schools</span><span class="brand-sep">·</span>
+        <span>Bumble Roofing</span><span class="brand-sep">·</span>
+        <span>Mighty Dog Roofing</span><span class="brand-sep">·</span>
+        <span>Koala Insulation</span><span class="brand-sep">·</span>
+        <span>Rolling Suds</span><span class="brand-sep">·</span>
+        <span>Scenthound</span><span class="brand-sep">·</span>
+        <span>Zen Windows</span><span class="brand-sep">·</span>
+        <span>Signarama</span><span class="brand-sep">·</span>
+        <span>Fully Promoted</span><span class="brand-sep">·</span>
+        <span>Fastest Labs</span><span class="brand-sep">·</span>
+        <span>Turbo Tint</span><span class="brand-sep">·</span>
+        <span>FMS Franchise</span><span class="brand-sep">·</span>
+        <span>Transworld</span><span class="brand-sep">·</span>
+        <span>Oakscale</span><span class="brand-sep">·</span>
+        <span>United Franchise Group</span>
+    </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- THE MATH -->
+<section id="math" class="math-section">
+    <div class="container">
+        <div class="section-label reveal">The Math They Don't Want You to Do</div>
+        <h2 class="section-title reveal">Your hire gets <em>$900.</em><br />{C} keeps <em>$1,183.</em> Every month.</h2>
+        <p class="section-sub reveal">{C} advertises "no recruitment fee." That's because they take their cut every single month — forever. Here's where your $2,083 actually goes.</p>
+
+        <div class="math-cards">
+            <div class="math-card bad reveal">
+                <div class="math-card-label">With {C}</div>
+                <div class="math-price">$2,083/mo</div>
+                <div class="math-price-sub">billed to you</div>
+                <div class="bar-container">
+                    <div class="bar" data-animate-bar>
+                        <div class="bar-talent">~$900 to talent</div>
+                        <div class="bar-markup">~$1,183 to SS</div>
+                    </div>
+                </div>
+                <div class="math-price-sub">Your hire: 43% &nbsp;·&nbsp; {C}'s cut: 57%</div>
+            </div>
+            <div class="math-card good reveal reveal-delay-1">
+                <div class="math-card-label">With Sagan</div>
+                <div class="math-price">You set the salary</div>
+                <div class="math-price-sub">100% goes to your team member</div>
+                <div class="bar-container">
+                    <div class="bar" data-animate-bar>
+                        <div class="bar-direct">100% goes to YOUR team member</div>
+                    </div>
+                </div>
+                <div class="math-price-sub">Your hire: 100% &nbsp;·&nbsp; Middleman cut: $0</div>
+            </div>
+        </div>
+
+        <div class="math-callout reveal">
+            <strong>The person you hire gets ~$900/mo either way.</strong> With {C}, you pay $2,083 and they pocket ~$1,183 — every month, forever. With Sagan, you pay a small one-time finder's fee and a $499/mo membership. Your hire works for <strong>you</strong> — not them.
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- RECEIPTS -->
+<section>
+    <div class="container">
+        <div class="section-label reveal">The Receipts</div>
+        <h2 class="section-title reveal">We didn't have to dig. <em>Their own site</em> tells the story.</h2>
+        <p class="section-sub reveal">{C}'s own pricing shows the math. They call it "no recruitment fee." We call it a monthly fee that never stops.</p>
+
+        <div class="receipt-grid">
+            <div class="receipt-card reveal">
+                <div class="receipt-source">ScaleSource.com</div>
+                <div class="receipt-quote">"Simple, Monthly Billing. Pay a flat monthly fee — no surprises. We handle payroll, admin, and compliance on your behalf."</div>
+                <div class="receipt-translation">Translation: they employ your person, take a cut, and you never build real loyalty.</div>
+            </div>
+            <div class="receipt-card reveal reveal-delay-1">
+                <div class="receipt-source">ScaleSource Pricing</div>
+                <div class="receipt-quote">Administrative Assistant: $21,600/year ($1,800/mo). Project Manager: $26,400/year ($2,200/mo). Minimum: $2,083/month.</div>
+                <div class="receipt-translation">That's $25,000/year — for someone who costs them $10,800.</div>
+            </div>
+            <div class="receipt-card reveal reveal-delay-2">
+                <div class="receipt-source">ScaleSource.com — FAQ</div>
+                <div class="receipt-quote">"Why can't I see the workers' contact information?"</div>
+                <div class="receipt-translation">Because if you could contact them directly, you'd realize you don't need {C}.</div>
+            </div>
+            <div class="receipt-card reveal reveal-delay-3">
+                <div class="receipt-source">The Industry Standard</div>
+                <div class="receipt-quote">Staffing markup agencies like {C}, DOXA Talent, and others advertise low prices but take 40-60% of what you pay as their ongoing monthly spread.</div>
+                <div class="receipt-translation">Same playbook. Same math. Different logo.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- TALENT QUALITY -->
+<section>
+    <div class="container">
+        <div class="section-label reveal">Talent Quality</div>
+        <h2 class="section-title reveal">Direct Hire = <em>Better</em> Talent</h2>
+        <p class="section-sub reveal">Would you take a job knowing you get $900 while your employer charges the client $2,083? Good talent won't either. Here's what that means for your franchise.</p>
+
+        <div class="quality-grid">
+            <div class="quality-card bad reveal">
+                <h3>At {C}</h3>
+                <div class="card-sub">What your scheduler, CSR, or bookkeeper experiences</div>
+                <div class="quality-item neg"><span class="icon">✗</span><span>Gets paid ~$900/mo while you pay $2,083 — they know the math</span></div>
+                <div class="quality-item neg"><span class="icon">✗</span><span>Feels undervalued — no matter how well they handle your customers</span></div>
+                <div class="quality-item neg"><span class="icon">✗</span><span>No promotion path — they're a replaceable resource, not a team member</span></div>
+                <div class="quality-item neg"><span class="icon">✗</span><span>No direct recognition — credit goes to {C}, not the person</span></div>
+                <div class="quality-item neg"><span class="icon">✗</span><span>The best people leave — great talent won't stay when they can earn more</span></div>
+                <div class="quality-item neg"><span class="icon">✗</span><span>Cancel {C} = lose your person. They work for SS, not you.</span></div>
+            </div>
+            <div class="quality-card good reveal reveal-delay-1">
+                <h3>As a Direct Hire</h3>
+                <div class="card-sub">What your hire experiences through Sagan</div>
+                <div class="quality-item pos"><span class="icon">✓</span><span>Gets 100% of the salary you set — fair pay, no hidden cuts</span></div>
+                <div class="quality-item pos"><span class="icon">✓</span><span>Feels valued and invested in — they're building YOUR franchise</span></div>
+                <div class="quality-item pos"><span class="icon">✓</span><span>Real promotion paths — they can grow into leadership roles</span></div>
+                <div class="quality-item pos"><span class="icon">✓</span><span>Direct recognition — raises, bonuses, and real career growth</span></div>
+                <div class="quality-item pos"><span class="icon">✓</span><span>Great people apply — the best talent wants real jobs, not agency gigs</span></div>
+                <div class="quality-item pos"><span class="icon">✓</span><span>Cancel Sagan? Keep your team. They work for you, not us.</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- COMPARISON TABLE (from Sanity) -->
+<section>
+    <div class="container">
+        <div class="section-label reveal">Side by Side</div>
+        <h2 class="section-title reveal">How They <em>Actually</em> Compare</h2>
+        <p class="section-sub reveal">One charges you $2,083/mo to rent a person. The other helps you hire one.</p>
+
+        <div class="table-wrapper reveal">
+        <table class="compare-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>{C}</th>
+                    <th>Sagan <span class="table-winner">Better Value</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                {
+                    rows.map((r) => (
+                        <tr>
+                            <td>{r.label}{r.labelSmall && <small>{r.labelSmall}</small>}</td>
+                            <td class={competitorCellClass(r.competitorState)} set:html={cellHtml(r.competitorText, r.competitorSmall)} />
+                            <td class={saganCellClass(r.saganState)} set:html={cellHtml(r.saganText, r.saganSmall)} />
+                        </tr>
+                    ))
+                }
+            </tbody>
+        </table>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- CALCULATOR -->
+<section>
+    <div class="container">
+        <div class="section-label reveal">Cost Calculator</div>
+        <h2 class="section-title reveal">See How Much You <em>Actually</em> Save</h2>
+        <p class="section-sub reveal">{C} is counting on you not running these numbers. Go ahead.</p>
+
+        <div class="calc-wrapper reveal">
+            <div class="calc-controls">
+                <div class="calc-control">
+                    <label>Number of Hires</label>
+                    <select id="calc-hires">
+                        <option value="1">1 person</option>
+                        <option value="2" selected>2 people</option>
+                        <option value="3">3 people</option>
+                        <option value="5">5 people</option>
+                    </select>
+                </div>
+                <div class="calc-control">
+                    <label>Timeframe</label>
+                    <select id="calc-years">
+                        <option value="1">1 year</option>
+                        <option value="2" selected>2 years</option>
+                        <option value="3">3 years</option>
+                        <option value="5">5 years</option>
+                    </select>
+                </div>
+            </div>
+            <div class="calc-results">
+                <div class="calc-result bad">
+                    <div class="calc-result-label">To {C}</div>
+                    <div class="calc-result-value" id="calc-ss">$56,784</div>
+                    <div class="calc-result-sub" id="calc-ss-sub">$1183/mo × 2 people × 24 months</div>
+                </div>
+                <div class="calc-result good">
+                    <div class="calc-result-label">To Sagan</div>
+                    <div class="calc-result-value" id="calc-sagan">$15,432</div>
+                    <div class="calc-result-sub" id="calc-sagan-sub">$1,728 × 2 finder's fees + $11,976 membership</div>
+                </div>
+                <div class="calc-result savings">
+                    <div class="calc-result-label">You Save</div>
+                    <div class="calc-result-value" id="calc-save">$41,352</div>
+                    <div class="calc-result-sub">Same talent. Same salary. Less to the middleman.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- TESTIMONIALS (from Sanity) -->
+<section class="testimonial-section">
+    <div class="container">
+        <div class="section-label reveal">What Franchise Owners Say</div>
+        <h2 class="section-title reveal">Trusted by Owners Scaling With <em>Global Talent</em></h2>
+        <p class="section-sub reveal">Verified reviews on Clutch — 4.8★ from 45 reviews. These are real franchise owners like you.</p>
+
+        <div class="testimonial-grid">
+            {
+                testimonials.map((t, i) => (
+                    <div class={`testimonial reveal${delayClass(i)}`}>
+                        <div class="testimonial-stars">★★★★★</div>
+                        <div class="testimonial-text" set:html={`&ldquo;${t.text ?? ''}&rdquo;`} />
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar">{initials(t.author)}</div>
+                            <div>
+                                <div class="testimonial-name">{t.author}</div>
+                                <div class="testimonial-role">{t.role}</div>
+                            </div>
+                        </div>
+                    </div>
+                ))
+            }
+        </div>
+        <a href="https://clutch.co/profile/sagan-passport" class="clutch-link reveal" target="_blank">Read all 45 verified reviews on Clutch →</a>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- VIDEO TESTIMONIALS -->
+<section class="credibility-section">
+    <div class="container">
+        <div class="section-label reveal">See It. Hear It. Believe It.</div>
+        <h2 class="section-title reveal">Real Owners. <em>Real Video Testimonials.</em></h2>
+        <p class="section-sub reveal">Not hand-picked quotes — real franchise owners on camera explaining what happened after they hired with Sagan.</p>
+
+        <div style="text-align: center;" class="reveal">
+            <div class="credibility-badge">
+                <div class="badge-stars">★★★★★</div>
+                <div class="badge-text"><strong>4.8 / 5.0</strong> on Clutch · 45 verified reviews</div>
+            </div>
+        </div>
+
+        <div class="video-grid">
+            <div class="video-card featured reveal">
+                <div class="video-thumb-wrap">
+                    <img src="https://embed-ssl.wistia.com/deliveries/2540f2cb9a42e665f908ae39ab120d5eafc0786a.webp?image_crop_resized=1920x1080" alt="Rich Jordan testimonial" class="video-thumb" />
+                    <div class="video-play"></div>
+                </div>
+                <div class="video-info">
+                    <div class="video-name">Rich Jordan</div>
+                    <div class="video-role">CEO, Strongpoint Services</div>
+                    <div class="video-quote">"Every single Sagan hire we've made is doing well. It's not just global talent — it's about building leverage in general."</div>
+                </div>
+            </div>
+            <div class="video-card reveal">
+                <div class="video-thumb-wrap">
+                    <img src="https://embed-ssl.wistia.com/deliveries/6cc34211e4fbb0ed2435351e63e069b1.webp?image_crop_resized=1920x1080" alt="Mike Okhravi testimonial" class="video-thumb" />
+                    <div class="video-play"></div>
+                    <div class="video-ifa-badge">IFA Speaker</div>
+                </div>
+                <div class="video-info">
+                    <div class="video-name">Mike Okhravi</div>
+                    <div class="video-role">Franchise Owner</div>
+                </div>
+            </div>
+            <div class="video-card reveal reveal-delay-1">
+                <div class="video-thumb-wrap">
+                    <img src="https://embed-ssl.wistia.com/deliveries/6ad7d2b69678ad749e0010fa2f0c6ac70eaca3e4.webp?image_crop_resized=1920x1080" alt="Greg Van Horn testimonial" class="video-thumb" />
+                    <div class="video-play"></div>
+                    <div class="video-ifa-badge">IFA Speaker</div>
+                </div>
+                <div class="video-info">
+                    <div class="video-name">Greg Van Horn</div>
+                    <div class="video-role">Franchisee, Bumble Roofing</div>
+                </div>
+            </div>
+            <div class="video-card reveal reveal-delay-2">
+                <div class="video-thumb-wrap">
+                    <img src="https://embed-ssl.wistia.com/deliveries/5aed09678875e473b42a341d107a3c863b427627.webp?image_crop_resized=1920x1080" alt="Jake Wakely testimonial" class="video-thumb" />
+                    <div class="video-play"></div>
+                    <div class="video-ifa-badge">IFA Speaker</div>
+                </div>
+                <div class="video-info">
+                    <div class="video-name">Jake Wakely</div>
+                    <div class="video-role">Franchise Owner</div>
+                </div>
+            </div>
+            <div class="video-card reveal reveal-delay-3">
+                <div class="video-thumb-wrap">
+                    <img src="https://embed-ssl.wistia.com/deliveries/b83e8cca51500aef84868cf58e16ec85.webp?image_crop_resized=1920x1080" alt="David Williams testimonial" class="video-thumb" />
+                    <div class="video-play"></div>
+                </div>
+                <div class="video-info">
+                    <div class="video-name">David Williams</div>
+                    <div class="video-role">Franchise Owner</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- FRANCHISE NETWORK -->
+<section>
+    <div class="container">
+        <div class="section-label reveal">The Network</div>
+        <h2 class="section-title reveal">29+ Franchise Networks. <em>2,000+ Hires.</em></h2>
+        <p class="section-sub reveal">These aren't logos we bought. These are franchise systems whose owners hire through Sagan — and keep coming back.</p>
+
+        <div class="network-grid">
+            <div class="network-logo-card highlight-card reveal">Superior Fence & Rail</div>
+            <div class="network-logo-card reveal">FastSigns</div>
+            <div class="network-logo-card reveal">Koala Insulation</div>
+            <div class="network-logo-card reveal">Signarama</div>
+            <div class="network-logo-card reveal">United Franchise Group</div>
+            <div class="network-logo-card reveal">Bumble Roofing</div>
+            <div class="network-logo-card reveal">Mighty Dog Roofing</div>
+            <div class="network-logo-card reveal">Rolling Suds</div>
+            <div class="network-logo-card reveal">Primrose Schools</div>
+            <div class="network-logo-card reveal">Scenthound</div>
+            <div class="network-logo-card reveal">Massage Envy</div>
+            <div class="network-logo-card reveal">Zen Windows</div>
+            <div class="network-logo-card reveal">Turbo Tint</div>
+            <div class="network-logo-card reveal">Fastest Labs</div>
+            <div class="network-logo-card reveal">Fully Promoted</div>
+            <div class="network-logo-card reveal">Oakscale</div>
+            <div class="network-logo-card reveal">Transworld</div>
+            <div class="network-logo-card reveal">FMS Franchise</div>
+        </div>
+
+        <div class="network-count reveal">
+            <strong>18 franchise networks shown</strong> — 11+ more not listed here. Ask us on a call.
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- HOW IT WORKS -->
+<section>
+    <div class="container">
+        <div class="section-label reveal">How It Works</div>
+        <h2 class="section-title reveal">Three Steps. <em>That's It.</em></h2>
+        <p class="section-sub reveal">No contracts. No complexity. Tell us what you need, we find the person, you hire them directly.</p>
+
+        <div class="process-grid">
+            <div class="process-step reveal">
+                <div class="process-num">1</div>
+                <h4>Tell Us the Role</h4>
+                <p>Ops coordinator, CSR, bookkeeper, sales — we tailor the search to your franchise's exact needs.</p>
+            </div>
+            <div class="process-step reveal reveal-delay-1">
+                <div class="process-num">2</div>
+                <h4>We Vet. You Choose.</h4>
+                <p>Our 100+ person team screens hundreds of applicants. You get 3 pre-vetted finalists — in days, not weeks.</p>
+            </div>
+            <div class="process-step reveal reveal-delay-2">
+                <div class="process-num">3</div>
+                <h4>Hire and Grow</h4>
+                <p>Interview, choose, onboard. Your new team member works for YOU — not an agency. We support the transition.</p>
+            </div>
+        </div>
+
+        <div style="text-align: center;" class="reveal">
+            <a href={cal('process-cta')} class="hero-cta" target="_blank">Start Your Search — Free Consultation</a>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- BOTTOM LINE -->
+<section>
+    <div class="container">
+        <div class="section-label reveal">The Bottom Line</div>
+        <h2 class="section-title reveal">Everyone Wins. <em>Except the Middleman.</em></h2>
+
+        <div class="bottom-grid">
+            <div class="bottom-card reveal">
+                <div class="bottom-num">01 — Winner</div>
+                <h4>You Save Money</h4>
+                <p>Same person, same pay. You just stop giving {C} $1,183 every month.</p>
+            </div>
+            <div class="bottom-card reveal reveal-delay-1">
+                <div class="bottom-num">02 — Winner</div>
+                <h4>Your Hire Earns More</h4>
+                <p>100% of their pay goes to them. They're happier and more loyal.</p>
+            </div>
+            <div class="bottom-card reveal reveal-delay-2">
+                <div class="bottom-num">03 — Winner</div>
+                <h4>You Get Better People</h4>
+                <p>Great people want real jobs, not agency gigs. They'll build a career with your franchise.</p>
+            </div>
+            <div class="bottom-card loser reveal reveal-delay-3">
+                <div class="bottom-num">✗ — Loser</div>
+                <h4>The Middleman</h4>
+                <p>They lose their $1,183/mo cut. We're sure they'll be fine.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+    <div class="container">
+        <h2 class="reveal">Stop Paying a <em>57% Markup.</em></h2>
+        <p class="reveal reveal-delay-1">Same talent, same salary. $499/mo membership + a one-time finder's fee — instead of $1,183 to a middleman every month. And if you cancel? Your team member stays.</p>
+        <a href={cal('bottom-cta')} class="hero-cta reveal reveal-delay-2" target="_blank">Book a Free Consultation</a>
+        <div class="final-sub reveal reveal-delay-3">No commitment · No pressure · Just a conversation {C} would rather you didn't have</div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <p>© 2026 Sagan. All information based on publicly available data. <a href="https://saganpassport.com" target="_blank">saganpassport.com</a></p>
+</footer>
+
+<!-- Scroll reveal + animated counters + bar fills + calculator (verbatim from source) -->
+<script
+    is:inline
+    define:vars={{
+        // NOTE: source calculator hardcodes ssMonthly=1183, saganFinderFee=1728,
+        // saganMembership=499. talentMonthly/finderFeePct are not used by this page's
+        // calc model. Driving the mapping values from data.calc; the finder's fee is a
+        // flat dollar constant on this page (not a % of salary), so it stays inline.
+        ssMonthly: calc.middlemanMonthly ?? 1183,
+        saganMembership: calc.membershipMonthly ?? 499,
+    }}
+>
+    // ========== SCROLL REVEAL ==========
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // ========== ANIMATED COUNTERS ==========
+    const counterObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const el = entry.target;
+                const target = parseFloat(el.dataset.target);
+                const suffix = el.dataset.suffix || '';
+                const isDecimal = el.dataset.decimal === 'true';
+                const duration = 2000;
+                const start = performance.now();
+
+                function animate(now) {
+                    const elapsed = now - start;
+                    const progress = Math.min(elapsed / duration, 1);
+                    // Ease out cubic
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    const current = target * eased;
+
+                    if (isDecimal) {
+                        el.textContent = current.toFixed(1) + suffix;
+                    } else {
+                        el.textContent = Math.floor(current).toLocaleString() + suffix;
+                    }
+
+                    if (progress < 1) requestAnimationFrame(animate);
+                }
+                requestAnimationFrame(animate);
+                counterObserver.unobserve(el);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.stat-num[data-target]').forEach(el => counterObserver.observe(el));
+
+    // ========== ANIMATED BAR FILLS ==========
+    const barObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const bar = entry.target;
+                bar.querySelectorAll('.bar-talent, .bar-markup, .bar-direct').forEach(segment => {
+                    segment.classList.add('animated');
+                });
+                barObserver.unobserve(bar);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('[data-animate-bar]').forEach(el => barObserver.observe(el));
+
+    // ========== CALCULATOR ==========
+    function animateValue(el, newValue) {
+        el.style.transform = 'scale(0.95)';
+        el.style.opacity = '0.5';
+        setTimeout(() => {
+            el.textContent = newValue;
+            el.style.transform = 'scale(1)';
+            el.style.opacity = '1';
+        }, 150);
+    }
+
+    function updateCalc() {
+        const hires = parseInt(document.getElementById('calc-hires').value);
+        const years = parseInt(document.getElementById('calc-years').value);
+        const months = years * 12;
+
+        const saganFinderFee = 1728; // NOTE: flat per-hire finder's fee, inline (this page's calc is not %-based)
+
+        const ssTotal = ssMonthly * hires * months;
+        const saganTotal = (saganFinderFee * hires) + (saganMembership * months);
+        const savings = ssTotal - saganTotal;
+
+        animateValue(document.getElementById('calc-ss'), '$' + ssTotal.toLocaleString());
+        document.getElementById('calc-ss-sub').textContent = `$${ssMonthly}/mo × ${hires} ${hires === 1 ? 'person' : 'people'} × ${months} months`;
+
+        animateValue(document.getElementById('calc-sagan'), '$' + saganTotal.toLocaleString());
+        document.getElementById('calc-sagan-sub').textContent = `$${saganFinderFee.toLocaleString()} × ${hires} finder's fee${hires > 1 ? 's' : ''} + $${(saganMembership * months).toLocaleString()} membership`;
+
+        animateValue(document.getElementById('calc-save'), '$' + savings.toLocaleString());
+    }
+
+    document.getElementById('calc-hires').addEventListener('change', updateCalc);
+    document.getElementById('calc-years').addEventListener('change', updateCalc);
+    updateCalc();
+</script>
+
+<!-- Universal HubSpot capture (no guide slug — just lead capture) -->
+<script is:inline src="/hubspot-capture.js" data-portal-id="50517161" data-form-guid="daac2804-e5c3-48e7-8ab7-a5b41c9e7c38"></script>

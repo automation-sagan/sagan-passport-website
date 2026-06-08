@@ -1,0 +1,17 @@
+---
+/* /vs/growth-assistant-vs-sagan — own route so only this page's CSS bundles. */
+import LandingLayout from '../../layouts/LandingLayout.astro';
+import GrowthAssistantVs from '../../components/vs/GrowthAssistantVs.astro';
+import { getComparisonBySlug } from '../../lib/comparisons';
+
+export const prerender = true;
+const data = (await getComparisonBySlug('growth-assistant-vs-sagan'))!;
+---
+
+<LandingLayout
+  title={data.seoTitle ?? 'Growth Assistant vs Sagan'}
+  description={data.seoDescription}
+  canonical={data.canonical}
+>
+  <GrowthAssistantVs data={data} />
+</LandingLayout>

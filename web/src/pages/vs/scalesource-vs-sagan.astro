@@ -1,0 +1,17 @@
+---
+/* /vs/scalesource-vs-sagan — own route so only this page's CSS bundles. */
+import LandingLayout from '../../layouts/LandingLayout.astro';
+import ScaleSourceVs from '../../components/vs/ScaleSourceVs.astro';
+import { getComparisonBySlug } from '../../lib/comparisons';
+
+export const prerender = true;
+const data = (await getComparisonBySlug('scalesource-vs-sagan'))!;
+---
+
+<LandingLayout
+  title={data.seoTitle ?? 'Scale Source vs Sagan'}
+  description={data.seoDescription}
+  canonical={data.canonical}
+>
+  <ScaleSourceVs data={data} />
+</LandingLayout>
