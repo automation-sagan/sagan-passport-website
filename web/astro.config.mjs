@@ -2,9 +2,17 @@
 import { defineConfig } from 'astro/config';
 
 import sanity from '@sanity/astro';
+import netlify from '@astrojs/netlify';
 
 // https://astro.build/config
 export default defineConfig({
+  // Static by default. The Netlify adapter is here only so the handful of
+  // on-demand routes (the /api/* serverless endpoints + live demos) that set
+  // `export const prerender = false` can run as Netlify Functions. Adding the
+  // adapter does NOT make pages dynamic — every page stays prerendered at build
+  // time unless it explicitly opts out.
+  adapter: netlify(),
+
   // Serve clean URLs with NO trailing slash (/how-it-works, not /how-it-works/).
   // build.format: 'file' emits each page as a flat <page>.html file (instead of
   // <page>/index.html). Netlify's "Pretty URLs" then serves how-it-works.html at

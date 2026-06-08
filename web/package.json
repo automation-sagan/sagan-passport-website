@@ -14,6 +14,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@astrojs/netlify": "^7.0.12",
     "@sanity/astro": "^3.4.0",
     "@sanity/client": "^7.22.1",
     "@sanity/image-url": "^2.1.1",

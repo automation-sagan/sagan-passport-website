@@ -31,6 +31,8 @@ import {resourceTestimonial} from './resourceTestimonial'
 import {blog} from './blog'
 import {blogSection} from './blogSection'
 import {blogCostCard} from './blogCostCard'
+import {guide} from './guide'
+import {guideStat} from './guideStat'
 
 export const schemaTypes = [
   navigation,
@@ -66,4 +68,6 @@ export const schemaTypes = [
   blog,
   blogSection,
   blogCostCard,
+  guide,
+  guideStat,
 ]

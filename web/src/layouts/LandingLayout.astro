@@ -1,0 +1,49 @@
+---
+// Bare shell for the ported standalone landing pages (guides, vs, agent, hire,
+// etc.). Unlike Layout.astro, this intentionally does NOT import global.css and
+// does NOT render the shared Navbar/Footer — each ported page ships its own
+// full-page design (fonts, CSS, nav) and must stay isolated from the main
+// marketing site's design tokens. Keep this minimal: a <head> with the SEO
+// fields and a <slot/> for the page's own markup. Page-specific <link>/<style>
+// belong in the page's template component, not here.
+interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  /** Set false to allow indexing once a page goes public. Defaults to noindex
+   *  to match the rest of the staging site (see Layout.astro). */
+  index?: boolean;
+}
+const {
+  title = 'Sagan Passport',
+  description,
+  canonical,
+  index = false,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
+    {description && <meta name="description" content={description} />}
+    {canonical && <link rel="canonical" href={canonical} />}
+    {
+      !index && (
+        <>
+          <meta name="robots" content="noindex, nofollow" />
+          <meta name="googlebot" content="noindex, nofollow" />
+        </>
+      )
+    }
+    <title>{title}</title>
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

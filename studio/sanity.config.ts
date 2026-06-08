@@ -55,6 +55,10 @@ export default defineConfig({
               .id('blog')
               .child(S.documentTypeList('blog').title('Blog')),
             S.listItem()
+              .title('Guides')
+              .id('guide')
+              .child(S.documentTypeList('guide').title('Guides')),
+            S.listItem()
               .title('Navigation')
               .id('navigation')
               .child(S.document().schemaType('navigation').documentId('navigation')),
@@ -70,6 +74,7 @@ export default defineConfig({
                   'customer',
                   'resource',
                   'blog',
+                  'guide',
                   'navigation',
                 ].includes(li.getId()!),
             ),

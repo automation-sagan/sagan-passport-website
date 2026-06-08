@@ -1,0 +1,433 @@
+---
+/* Faithful port of the three /guides/* lead-magnet pages. One template, three
+ * cover layouts (designed / image / layered) selected by data.coverVariant.
+ * Accent colours come from Sanity as CSS custom properties so each guide keeps
+ * its exact palette. The form + HubSpot capture + Resend lead-magnet flow are
+ * preserved: hubspot-capture.js POSTs to /api/send-guide. */
+import type { GuideData } from '../../lib/guides';
+import { imgUrl } from '../../lib/sanityImage';
+
+interface Props {
+  data: GuideData;
+}
+const { data } = Astro.props;
+
+const a = data.accent ?? {};
+const styleVars = [
+  `--cta:${a.cta ?? '#1a1a1a'}`,
+  `--cta-hover:${a.ctaHover ?? a.cta ?? '#000'}`,
+  `--cta-active:${a.ctaActive ?? a.cta ?? '#000'}`,
+  `--focus:${a.focus ?? a.cta ?? '#1a1a1a'}`,
+  `--bright:${a.bright ?? a.focus ?? a.cta ?? '#1a1a1a'}`,
+].join(';');
+
+const coverImg = data.coverImage ? imgUrl(data.coverImage) : '';
+const layeredPhoto = data.layered?.photo ? imgUrl(data.layered.photo) : '';
+const bulletClass = `bullets ${data.bulletStyle === 'squares' ? 'squares' : 'disc'}`;
+---
+
+<div class="page" style={styleVars}>
+  <!-- LEFT: cover -->
+  <div class={`left left--${data.coverVariant ?? 'image'}`}>
+    {
+      data.coverVariant === 'designed' && data.designed && (
+        <div class="cover">
+          <div class="cover-top">
+            {data.designed.tag && <div class="cover-tag">{data.designed.tag}</div>}
+            <div class="cover-title">
+              {data.designed.titleLead} <em>{data.designed.titleAccent}</em>
+            </div>
+            {data.designed.subtitle && <div class="cover-sub">{data.designed.subtitle}</div>}
+          </div>
+          <div class="cover-stats">
+            {(data.designed.stats ?? []).map((s) => (
+              <div class="cover-stat">
+                <span class="cover-stat-num">{s.num}</span>
+                <span class="cover-stat-label">{s.label}</span>
+              </div>
+            ))}
+          </div>
+          <div class="cover-bottom">
+            <span class="cover-brand">{data.designed.brand}</span>
+            <span class="cover-badge">{data.designed.badge}</span>
+          </div>
+        </div>
+      )
+    }
+
+    {
+      data.coverVariant === 'image' && (
+        <img class="book-img" src={coverImg} alt={data.coverImageAlt ?? ''} />
+      )
+    }
+
+    {
+      data.coverVariant === 'layered' && data.layered && (
+        <>
+          <div class="personality-frame">
+            <img src={layeredPhoto} alt="" />
+          </div>
+          <div class="product-card">
+            <div class="product-cover">
+              {data.layered.logo && <div class="logo">{data.layered.logo}</div>}
+              {data.layered.title && <div class="title">{data.layered.title}</div>}
+              {data.layered.subtitle && <div class="subtitle">{data.layered.subtitle}</div>}
+              {(data.layered.learn ?? []).length > 0 && (
+                <div class="learn">
+                  Inside:<br />
+                  {(data.layered.learn ?? []).map((item) => (
+                    <Fragment>&bull; {item}<br /></Fragment>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div class="product-footer">
+              {data.layered.badge && <span class="badge">{data.layered.badge}</span>}
+              {data.layered.brand && <span class="brand">{data.layered.brand}</span>}
+            </div>
+          </div>
+        </>
+      )
+    }
+  </div>
+
+  <!-- RIGHT: copy + form -->
+  <div class="right">
+    {data.intro && <p class="intro">{data.intro}</p>}
+    <h1 class="headline">{data.headline}</h1>
+    {data.valueProp && <p class="value-prop">{data.valueProp}</p>}
+    {
+      (data.bullets ?? []).length > 0 && (
+        <ul class={bulletClass}>
+          {(data.bullets ?? []).map((b) => (
+            <li>{b}</li>
+          ))}
+        </ul>
+      )
+    }
+    <form class="form-section" id="lead-capture-form" novalidate>
+      <div class="form-label">
+        {data.formLabel} {data.formLabelNote && <span>{data.formLabelNote}</span>}
+      </div>
+      <div class="input-row">
+        <input
+          class="email-input"
+          type="email"
+          name="email"
+          placeholder="you@company.com"
+          autocomplete="email"
+          required
+        />
+        <button class="cta" type="submit">{data.buttonText}</button>
+      </div>
+      <div class="form-status" aria-live="polite" style="display:none; font-size:14px;"></div>
+    </form>
+  </div>
+</div>
+
+<!-- Universal HubSpot + Make + Resend lead-magnet capture (ported verbatim). -->
+<script
+  is:inline
+  src="/hubspot-capture.js"
+  data-portal-id={data.portalId}
+  data-form-guid={data.formGuid}
+  data-guide-slug={data.guideSlug}
+></script>
+
+<!-- Per-page form status, faithful to the source pages. -->
+<script is:inline define:vars={{ successMessage: data.successMessage }}>
+  (function () {
+    var form = document.getElementById('lead-capture-form');
+    var status = form && form.querySelector('.form-status');
+    if (!form || !status) return;
+    var btn = form.querySelector('button[type="submit"]');
+    var originalBtnText = btn && btn.textContent;
+
+    form.addEventListener('submit', function () {
+      if (typeof form.checkValidity === 'function' && !form.checkValidity()) return;
+      if (btn) btn.textContent = 'Sending…';
+    });
+
+    document.addEventListener('hsCapture:error', function () {
+      if (btn && originalBtnText) btn.textContent = originalBtnText;
+      status.textContent = 'Something went wrong. Please try again or email us.';
+      status.style.color = '#c0392b';
+      status.style.display = 'block';
+    });
+
+    document.addEventListener('hsCapture:success', function () {
+      status.textContent = successMessage || '✓ Check your inbox — your download is on its way.';
+      status.style.color = '#1a7f37';
+      status.style.display = 'block';
+      var label = form.querySelector('.form-label');
+      var row = form.querySelector('.input-row');
+      if (label) label.style.display = 'none';
+      if (row) row.style.display = 'none';
+    });
+  })();
+</script>
+
+<style is:global>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400&family=Space+Mono:wght@400;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { overflow-x: hidden; }
+  body {
+    background: #fff;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    padding: 60px 32px;
+    color: #1a1a1a;
+  }
+
+  .page {
+    max-width: 1060px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 72px;
+  }
+
+  /* ---- LEFT column widths per variant ---- */
+  .left--designed { flex: 0 0 400px; }
+  .left--image { flex: 0 0 520px; }
+  .left--layered {
+    flex: 0 0 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* ---- Designed cover (CSS book) ---- */
+  .cover {
+    width: 100%;
+    aspect-ratio: 3/4;
+    background: #1a0a0a;
+    border-radius: 12px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 44px 36px 32px;
+    transform: rotate(-1.5deg);
+    transition: transform 0.3s ease;
+  }
+  .cover:hover { transform: rotate(0deg) scale(1.01); }
+  .cover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,0.012) 3px, rgba(255,255,255,0.012) 6px);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 6px; height: 100%;
+    background: linear-gradient(180deg, var(--bright), var(--cta));
+    z-index: 2;
+  }
+  .cover-top { position: relative; z-index: 3; }
+  .cover-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--bright);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 700;
+  }
+  .cover-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-top: 20px;
+  }
+  .cover-title em { font-style: normal; color: var(--bright); }
+  .cover-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 16px;
+    line-height: 1.7;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    white-space: pre-line;
+  }
+  .cover-stats { position: relative; z-index: 3; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .cover-stat { display: flex; flex-direction: column; gap: 2px; }
+  .cover-stat-num { font-family: 'Space Mono', monospace; font-size: 24px; font-weight: 700; color: var(--bright); }
+  .cover-stat-label { font-family: 'DM Sans', sans-serif; font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.05em; }
+  .cover-bottom { position: relative; z-index: 3; display: flex; justify-content: space-between; align-items: flex-end; }
+  .cover-brand { font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.2); letter-spacing: 0.12em; text-transform: uppercase; }
+  .cover-badge { font-family: 'Space Mono', monospace; font-size: 9px; color: #1a0a0a; background: var(--bright); padding: 5px 12px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; }
+
+  /* ---- Single image cover ---- */
+  .book-img {
+    width: 115%;
+    margin-left: -8%;
+    border-radius: 16px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.18);
+    display: block;
+    transform: rotate(-2deg);
+    transition: transform 0.3s ease;
+  }
+  .book-img:hover { transform: rotate(0deg) scale(1.02); }
+
+  /* ---- Layered photo + product card ---- */
+  .personality-frame {
+    width: 200px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+    background: #222;
+    padding: 6px;
+    position: relative;
+    z-index: 2;
+    margin-bottom: -24px;
+  }
+  .personality-frame img { width: 100%; height: 220px; object-fit: cover; border-radius: 12px; display: block; }
+  .product-card { width: 380px; background: #fff; border-radius: 16px; box-shadow: 0 12px 50px rgba(0,0,0,0.10); overflow: hidden; position: relative; z-index: 1; }
+  .product-cover { background: #061C1E; padding: 40px 36px 36px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .product-cover .logo { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.5); letter-spacing: 0.12em; text-transform: uppercase; }
+  .product-cover .title { font-size: 28px; font-weight: 800; color: #fff; line-height: 1.15; letter-spacing: -0.01em; }
+  .product-cover .subtitle { font-size: 14px; color: #C3E956; font-weight: 400; margin-top: 4px; }
+  .product-cover .learn { margin-top: 12px; text-align: left; width: 100%; font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.8; }
+  .product-footer { padding: 16px 36px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f0ede8; }
+  .product-footer .badge { background: #C3E956; color: #061C1E; font-size: 10px; font-weight: 700; padding: 5px 12px; border-radius: 5px; letter-spacing: 0.04em; }
+  .product-footer .brand { font-size: 12px; color: #aaa; }
+
+  /* ---- RIGHT column (shared) ---- */
+  .right { flex: 1; display: flex; flex-direction: column; gap: 24px; }
+  .intro { font-size: 18px; color: #888; font-weight: 400; }
+  .headline { font-size: clamp(36px, 4.5vw, 52px); font-weight: 800; line-height: 1.08; letter-spacing: -0.03em; color: #1a1a1a; }
+  .value-prop { font-size: 17px; line-height: 1.65; color: #555; max-width: 480px; }
+
+  .bullets { display: flex; flex-direction: column; gap: 14px; margin: 4px 0; }
+  .bullets li { font-size: 17px; color: #333; line-height: 1.5; }
+  .bullets.disc { list-style: disc; padding-left: 24px; }
+  .bullets.squares { list-style: none; padding: 0; }
+  .bullets.squares li { padding-left: 28px; position: relative; }
+  .bullets.squares li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 7px;
+    width: 14px; height: 14px;
+    background: var(--bright);
+    border-radius: 3px;
+    opacity: 0.85;
+  }
+
+  .form-section { margin-top: 12px; display: flex; flex-direction: column; gap: 14px; max-width: 480px; }
+  .form-label { font-size: 16px; font-weight: 700; color: #1a1a1a; }
+  .form-label span { font-weight: 400; color: #999; font-style: italic; }
+  .input-row { display: flex; gap: 12px; align-items: center; }
+  .email-input {
+    flex: 1;
+    padding: 16px 20px;
+    border: 2px solid #e5e5e5;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    color: #1a1a1a;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .email-input:focus { border-color: var(--focus); }
+  .email-input::placeholder { color: #ccc; }
+  .cta {
+    background: var(--cta);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 16px 32px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+    white-space: nowrap;
+  }
+  .cta:hover { background: var(--cta-hover); transform: translateY(-1px); }
+  .cta:active { background: var(--cta-active); transform: translateY(0); }
+  .cta:disabled, .cta[aria-busy="true"] { background: var(--cta); opacity: 0.55; cursor: not-allowed; transform: none; pointer-events: none; }
+
+  /* ---- TABLET ---- */
+  @media (max-width: 840px) {
+    body { padding: 40px 20px; }
+    .page { flex-direction: column; gap: 40px; }
+    .left--designed, .left--image, .left--layered { flex: none; width: 100%; }
+    .left--designed { max-width: 320px; }
+    .left--image { max-width: 420px; }
+    .left--layered { max-width: 360px; align-items: center; }
+    .cover { transform: none; padding: 36px 28px 28px; }
+    .cover-title { font-size: 28px; }
+    .book-img { width: 100%; margin-left: 0; transform: none; }
+    .personality-frame { width: 160px; }
+    .personality-frame img { height: 180px; }
+    .product-card { width: 100%; max-width: 320px; }
+    .product-cover { padding: 32px 24px 28px; }
+    .product-cover .title { font-size: 24px; }
+    .product-footer { padding: 14px 24px; }
+    .right { align-items: flex-start; }
+    .headline { font-size: 36px; }
+  }
+
+  /* ---- MOBILE ---- */
+  @media (max-width: 600px) {
+    body { padding: 28px 16px; }
+    .page { gap: 28px; }
+    .left--designed { max-width: 260px; }
+    .left--image { max-width: 280px; }
+    .left--layered { max-width: 100%; gap: 0; }
+
+    .cover { padding: 28px 22px 22px; border-radius: 10px; }
+    .cover-tag { font-size: 9px; }
+    .cover-title { font-size: 22px; margin-top: 14px; }
+    .cover-sub { font-size: 11px; margin-top: 12px; }
+    .cover-stats { gap: 12px; }
+    .cover-stat-num { font-size: 18px; }
+    .cover-stat-label { font-size: 9px; }
+    .cover-brand { font-size: 12px; }
+    .cover-badge { font-size: 8px; padding: 4px 10px; }
+
+    .personality-frame { width: 128px; padding: 5px; border-radius: 14px; margin-bottom: -20px; }
+    .personality-frame img { height: 144px; border-radius: 10px; }
+    .product-card { max-width: 280px; border-radius: 14px; }
+    .product-cover { padding: 24px 18px 20px; gap: 8px; }
+    .product-cover .logo { font-size: 11px; }
+    .product-cover .title { font-size: 19px; line-height: 1.2; }
+    .product-cover .subtitle { font-size: 12px; }
+    .product-cover .learn { font-size: 11px; line-height: 1.7; margin-top: 8px; }
+    .product-footer { padding: 12px 18px; }
+    .product-footer .badge { font-size: 9px; padding: 4px 10px; }
+    .product-footer .brand { font-size: 11px; }
+
+    .right { gap: 16px; }
+    .intro { font-size: 14px; }
+    .headline { font-size: 26px; line-height: 1.12; }
+    .value-prop { font-size: 14px; line-height: 1.6; }
+    .bullets { gap: 10px; }
+    .bullets li { font-size: 14px; line-height: 1.45; }
+    .bullets.disc { padding-left: 20px; }
+    .bullets.squares li { padding-left: 24px; }
+    .bullets.squares li::before { width: 12px; height: 12px; top: 5px; }
+
+    .form-section { gap: 10px; margin-top: 4px; }
+    .form-label { font-size: 14px; }
+    .input-row { flex-direction: column; align-items: stretch; gap: 10px; }
+    .email-input { padding: 13px 16px; font-size: 14px; border-radius: 10px; }
+    .cta { padding: 13px 24px; font-size: 14px; border-radius: 10px; width: 100%; }
+  }
+</style>

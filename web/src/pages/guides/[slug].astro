@@ -1,0 +1,31 @@
+---
+/* /guides/[slug] — one dynamic route for every lead-magnet guide. Slugs and
+ * content come from the `guide` documents in Sanity; all guides share
+ * GuideTemplate. Uses the bare LandingLayout (no shared Navbar/Footer/global
+ * CSS) so each guide keeps its own self-contained design. */
+import LandingLayout from '../../layouts/LandingLayout.astro';
+import GuideTemplate from '../../components/guides/GuideTemplate.astro';
+import { getAllGuideSlugs, getGuideBySlug } from '../../lib/guides';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const slugs = await getAllGuideSlugs();
+  return Promise.all(
+    slugs.map(async (slug) => ({
+      params: { slug },
+      props: { data: (await getGuideBySlug(slug))! },
+    })),
+  );
+}
+
+const { data } = Astro.props;
+---
+
+<LandingLayout
+  title={data.seoTitle ?? 'Guide — Sagan Passport'}
+  description={data.seoDescription}
+  canonical={data.canonical}
+>
+  <GuideTemplate data={data} />
+</LandingLayout>
