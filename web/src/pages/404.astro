@@ -7,18 +7,20 @@ import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import ButtonFill from '../components/homepage/ButtonFill.astro';
+import { getNotFound } from '../lib/notFound';
+
+const data = await getNotFound();
+const button = data.button ?? {};
 ---
 
-<Layout title="Page Not Found — Sagan Passport">
+<Layout title={data.seoTitle ?? 'Page Not Found — Sagan Passport'}>
   <Navbar />
   <div class="home">
     <section class="section nf">
       <div class="nf__content">
-        <h1 class="t-h2">We couldn&rsquo;t find this page.</h1>
-        <p class="t-body">
-          Sorry, this page doesn&rsquo;t exist. Click the button below to go back to the homepage.
-        </p>
-        <ButtonFill label="Back to home" href="/" />
+        <h1 class="t-h2">{data.heading}</h1>
+        <p class="t-body">{data.body}</p>
+        <ButtonFill label={button.label ?? 'Back to home'} href={button.href ?? '/'} external={button.external} />
       </div>
     </section>
   </div>

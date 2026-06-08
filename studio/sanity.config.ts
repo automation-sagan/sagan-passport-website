@@ -39,6 +39,10 @@ export default defineConfig({
               .id('saganUniversity')
               .child(S.document().schemaType('saganUniversity').documentId('saganUniversity')),
             S.listItem()
+              .title('404 Page')
+              .id('notFound')
+              .child(S.document().schemaType('notFound').documentId('notFound')),
+            S.listItem()
               .title('Navigation')
               .id('navigation')
               .child(S.document().schemaType('navigation').documentId('navigation')),
@@ -50,6 +54,7 @@ export default defineConfig({
                   'howItWorks',
                   'membership',
                   'saganUniversity',
+                  'notFound',
                   'navigation',
                 ].includes(li.getId()!),
             ),
@@ -75,6 +80,7 @@ export default defineConfig({
                 'howItWorks',
                 'membership',
                 'saganUniversity',
+                'notFound',
                 'navigation',
               ].includes(t.templateId),
           )
@@ -86,6 +92,7 @@ export default defineConfig({
         'howItWorks',
         'membership',
         'saganUniversity',
+        'notFound',
         'navigation',
       ].includes(context.schemaType)
         ? input.filter(({action}) =>

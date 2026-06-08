@@ -20,6 +20,7 @@ import {membershipItem} from './membershipItem'
 import {saganUniversity} from './saganUniversity'
 import {course} from './course'
 import {program} from './program'
+import {notFound} from './notFound'
 
 export const schemaTypes = [
   navigation,
@@ -44,4 +45,5 @@ export const schemaTypes = [
   saganUniversity,
   course,
   program,
+  notFound,
 ]
