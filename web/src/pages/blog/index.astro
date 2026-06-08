@@ -4,9 +4,11 @@ import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import Footer from '../../components/Footer.astro';
 import BlogCard from '../../components/blog/BlogCard.astro';
-import { BLOG_POSTS } from '../../data/blog';
+import { getBlogList } from '../../lib/blog';
 import '../../styles/resources.css';
 import '../../styles/blog.css';
+
+const posts = await getBlogList();
 ---
 
 <Layout title="Blog — Sagan Passport">
@@ -28,7 +30,7 @@ import '../../styles/blog.css';
 
     <section class="section blog-feed">
       <div class="res-grid">
-        {BLOG_POSTS.map((p) => <BlogCard post={p} />)}
+        {posts.map((p) => <BlogCard post={p} />)}
       </div>
     </section>
   </div>

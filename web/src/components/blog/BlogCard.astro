@@ -1,21 +1,24 @@
 ---
 /* BlogCard — a single card in the Blog feed. Reuses the global .res-card classes
  * (shared with the Resources grid) from resources.css. */
-import { formatDate, type BlogPost } from '../../data/blog';
+import { formatDate, type BlogSummary } from '../../lib/blog';
+import { imgUrl } from '../../lib/sanityImage';
 interface Props {
-  post: BlogPost;
+  post: BlogSummary;
 }
 const { post: p } = Astro.props;
+const image = imgUrl(p.image);
+const authorImage = imgUrl(p.authorImage);
 ---
 
 <a href={`/blog/${p.slug}`} class="res-card">
-  <div class="res-card__img" style={p.image ? `background-image:url(${p.image})` : undefined}>
+  <div class="res-card__img" style={image ? `background-image:url(${image})` : undefined}>
     <span class="res-card__cat">{p.category}</span>
   </div>
   <div class="res-card__body">
     <h3 class="res-card__title">{p.title}</h3>
     <div class="res-card__meta">
-      {p.authorImage && <span class="res-card__avatar" style={`background-image:url(${p.authorImage})`}></span>}
+      {authorImage && <span class="res-card__avatar" style={`background-image:url(${authorImage})`}></span>}
       <span class="res-card__author">{p.author}</span>
       {p.date && <span class="res-card__date">· {formatDate(p.date)}</span>}
       {p.readTime && <span class="res-card__date">· {p.readTime}</span>}

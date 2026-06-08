@@ -28,6 +28,9 @@ import {roleEntry} from './roleEntry'
 import {resource} from './resource'
 import {resourceSection} from './resourceSection'
 import {resourceTestimonial} from './resourceTestimonial'
+import {blog} from './blog'
+import {blogSection} from './blogSection'
+import {blogCostCard} from './blogCostCard'
 
 export const schemaTypes = [
   navigation,
@@ -60,4 +63,7 @@ export const schemaTypes = [
   resource,
   resourceSection,
   resourceTestimonial,
+  blog,
+  blogSection,
+  blogCostCard,
 ]

@@ -51,6 +51,10 @@ export default defineConfig({
               .id('resource')
               .child(S.documentTypeList('resource').title('Resources')),
             S.listItem()
+              .title('Blog')
+              .id('blog')
+              .child(S.documentTypeList('blog').title('Blog')),
+            S.listItem()
               .title('Navigation')
               .id('navigation')
               .child(S.document().schemaType('navigation').documentId('navigation')),
@@ -65,6 +69,7 @@ export default defineConfig({
                   'notFound',
                   'customer',
                   'resource',
+                  'blog',
                   'navigation',
                 ].includes(li.getId()!),
             ),

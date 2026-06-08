@@ -8,7 +8,8 @@ import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import Footer from '../../components/Footer.astro';
 import BlogCTA from '../../components/blog/BlogCTA.astro';
-import { BLOG_POSTS, formatDate, type BlogPost } from '../../data/blog';
+import { getBlogSlugs, getBlog, getBlogList, formatDate } from '../../lib/blog';
+import { imgUrl } from '../../lib/sanityImage';
 import '../../styles/resources.css';
 import '../../styles/blog.css';
 import '../../styles/blog-article.css';
@@ -18,12 +19,16 @@ import '../../styles/blog-article.css';
 const CALENDLY_URL =
   'https://calendly.com/d/5j7-3xv-p5k/global-talent-hiring-consultation?utm_source=saganpassportdotcom&utm_term=talent';
 
-export function getStaticPaths() {
-  return BLOG_POSTS.map((p) => ({ params: { slug: p.slug }, props: { post: p } }));
+export async function getStaticPaths() {
+  const slugs = await getBlogSlugs();
+  return Promise.all(
+    slugs.map(async (slug) => ({ params: { slug }, props: { post: (await getBlog(slug))! } })),
+  );
 }
 
-const { post } = Astro.props as { post: BlogPost };
-const more = BLOG_POSTS.filter((p) => p.slug !== post.slug).slice(0, 3);
+const { post } = Astro.props;
+const coverImage = imgUrl(post.image);
+const more = (await getBlogList()).filter((p) => p.slug !== post.slug).slice(0, 3);
 const metaBits = [post.date ? formatDate(post.date) : null, post.author, post.readTime].filter(Boolean);
 ---
 
@@ -32,9 +37,9 @@ const metaBits = [post.date ? formatDate(post.date) : null, post.author, post.re
   <div class="home">
     <article class="bp">
       <div class="bp__container">
-        {post.image && (
+        {coverImage && (
           <a class="bp__cover" href={CALENDLY_URL} target="_blank" rel="noreferrer">
-            <img src={post.image} alt={post.title} loading="eager" />
+            <img src={coverImage} alt={post.title} loading="eager" />
           </a>
         )}
 
@@ -61,11 +66,11 @@ const metaBits = [post.date ? formatDate(post.date) : null, post.author, post.re
             {post.costNote && <p class="blog-costnote" style="margin-top:16px">{post.costNote}</p>}
 
             <div class="bp__sections">
-              {post.sections.map((s) => (
+              {(post.sections ?? []).map((s) => (
                 <section class="bp__sec">
                   {s.label && <p class="bp__seclabel">{s.label}</p>}
                   {s.title && <h2 class="bp__sectitle">{s.title}</h2>}
-                  <div class="bp__sec-body article-content" set:html={s.html}></div>
+                  <div class="bp__sec-body article-content" set:html={s.content ?? ''}></div>
                 </section>
               ))}
             </div>
@@ -79,7 +84,7 @@ const metaBits = [post.date ? formatDate(post.date) : null, post.author, post.re
                 <div class="bp__more-line"></div>
                 {more.map((p) => (
                   <a class="bp__pc" href={`/blog/${p.slug}`}>
-                    <span class="bp__pc-thumb" style={p.image ? `background-image:url(${p.image})` : undefined}></span>
+                    <span class="bp__pc-thumb" style={imgUrl(p.image) ? `background-image:url(${imgUrl(p.image)})` : undefined}></span>
                     <span class="bp__pc-body">
                       <span class="bp__pc-cat">{p.category}</span>
                       <span class="bp__pc-title">{p.title}</span>
