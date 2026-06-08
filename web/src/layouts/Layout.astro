@@ -22,6 +22,12 @@ const { title = 'Sagan Passport' } = Astro.props;
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
 
+    <!-- Keep the whole site out of search engines (staging / private). Belt and
+         suspenders: this meta tag + the X-Robots-Tag header in netlify.toml +
+         /robots.txt. Remove all three to allow indexing when going public. -->
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="googlebot" content="noindex, nofollow" />
+
     <!-- The navbar icon images are served from Framer's CDN. -->
     <link rel="preconnect" href="https://framerusercontent.com" crossorigin />
 

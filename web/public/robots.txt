@@ -1,0 +1,4 @@
+# Site is private / not for public search indexing.
+# Block all crawlers from the entire site.
+User-agent: *
+Disallow: /
