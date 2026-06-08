@@ -10,6 +10,12 @@ import {getCliClient} from 'sanity/cli'
 
 const client = getCliClient()
 
+// Every object inside a Sanity array needs a unique `_key`. The Studio adds
+// these automatically in the UI, but an API client must supply them.
+let keySeq = 0
+const k = () => `k${(keySeq++).toString(36)}${Math.random().toString(36).slice(2, 8)}`
+const withKeys = <T extends Record<string, any>>(arr: T[]) => arr.map((item) => ({_key: k(), ...item}))
+
 // ---- image upload (dedup by source URL) -----------------------------------
 const uploadCache = new Map<string, {_type: 'image'; asset: {_type: 'reference'; _ref: string}}>()
 
@@ -158,27 +164,27 @@ async function main() {
     hero: {
       headline: 'Stop settling for less—scale the business you’ve envisioned.',
       body: 'We help you apply leverage by hiring outstanding, remote full-time global talent (and AI Agents), so you can finally build the world-class team you need to win.',
-      buttons: [
+      buttons: withKeys([
         {_type: 'button', label: 'How It Works', href: '/how-it-works', variant: 'outline', external: false},
         {_type: 'button', label: 'Find Your Next Hire', href: '/pricing', variant: 'fill', external: false},
-      ],
+      ]),
     },
-    talent: talent.map((t) => ({_type: 'person', ...t})),
+    talent: withKeys(talent.map((t) => ({_type: 'person', ...t}))),
     logosTagline: 'The unfair advantage behind today’s fastest-growing companies',
-    logos,
-    infoRows: [
+    logos: withKeys(logos),
+    infoRows: withKeys([
       {_type: 'infoRow', heading: 'You’re ready to scale.  Your local talent budget isn’t.', body: SCALE_COPY},
       {_type: 'infoRow', heading: 'We’re not a recruiter.  We’re your force multiplier.', body: SCALE_COPY},
-    ],
+    ]),
     bigCard: {
       heading: 'We don’t stop at hiring.',
       body: 'We provide professional training and development opportunities to your new team members through Sagan University, helping you build your people into the leaders you need. This is how you build a stronger, more capable team for a fraction of the cost.',
       button: {_type: 'button', label: 'About Sagan University', href: '/sagan-university', variant: 'white', external: false},
       image: bigCardImage,
     },
-    features: FEATURES.map((f) => ({_type: 'feature', ...f})),
-    slides: slides.map((s) => ({_type: 'slide', ...s})),
-    testimonials: testimonials.map((t) => ({_type: 'testimonialItem', ...t})),
+    features: withKeys(FEATURES.map((f) => ({_type: 'feature', ...f}))),
+    slides: withKeys(slides.map((s) => ({_type: 'slide', ...s}))),
+    testimonials: withKeys(testimonials.map((t) => ({_type: 'testimonialItem', ...t}))),
     cta: {
       heading: 'Ready to unlock your growth?',
       body: 'Stop compromising and start building. Schedule a call to learn how our global talent network can help you achieve your most ambitious goals.',
