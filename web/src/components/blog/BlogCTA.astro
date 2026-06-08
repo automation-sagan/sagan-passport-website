@@ -1,71 +1,70 @@
 ---
-/* BlogCTA — the blog sidebar CTA card, rebuilt to match the live Framer blog
- * template: a deep-navy card with a small intro line, a large "Hire better. /
- * Not just cheaper." headline, a dandelion "Schedule a Call" button, then a
- * WHITE inner card holding the 4-item checklist and a "Learn how it works"
- * link. Constant across posts. */
+/* BlogCTA — the blog sidebar CTA card. Content is editable per post (the `cta`
+ * field on the blog document); blank fields fall back to the site defaults
+ * below. A simple navy card: title + description + "Schedule a Call" button. */
+import type { BlogCTAData } from '../../lib/blog';
+
 const CALENDLY_URL =
   'https://calendly.com/d/5j7-3xv-p5k/global-talent-hiring-consultation?utm_source=saganpassportdotcom&utm_term=talent';
-const CHECKLIST = [
-  'Pre-vetted, top 1% talent',
-  'Full-time, dedicated team members',
-  'Payroll, compliance & HR support',
-  'Start in as little as 2–3 weeks',
-];
+
+interface Props {
+  cta?: BlogCTAData | null;
+}
+const cta = Astro.props.cta ?? {};
+
+const title = cta.title || 'Ready to build a stronger global team?';
+const description =
+  cta.description ||
+  'Stop guessing and start building. Schedule a call to get a custom plan for your business and see how Sagan Passport can help you hire with confidence.';
+const buttonText = cta.buttonText || 'Schedule a Call';
+const link = cta.buttonLink || CALENDLY_URL;
+const external = /^https?:\/\//.test(link);
 ---
 
 <div class="bcta">
-  <p class="bcta__intro">Ready to build<br />your offshore team?</p>
-  <p class="bcta__accent">Hire better.<br /><span>Not just cheaper.</span></p>
-  <p class="bcta__sub">Get matched with top overseas talent and a dedicated support team.</p>
-  <a class="bcta__btn" href={CALENDLY_URL} target="_blank" rel="noreferrer">Schedule a Call <span aria-hidden="true">→</span></a>
-
-  <div class="bcta__card">
-    <ul class="bcta__list">
-      {CHECKLIST.map((c) => <li>{c}</li>)}
-    </ul>
-    <a class="bcta__learn" href="/how-it-works">Learn how it works <span aria-hidden="true">→</span></a>
-  </div>
+  <h3 class="bcta__title">{title}</h3>
+  <div class="bcta__desc" set:html={description}></div>
+  <a
+    class="bcta__btn"
+    href={link}
+    target={external ? '_blank' : undefined}
+    rel={external ? 'noreferrer' : undefined}>
+    {buttonText} <span aria-hidden="true">→</span>
+  </a>
 </div>
 
 <style>
   .bcta {
     background: rgb(0, 31, 69);
     border-radius: 16px;
-    padding: 24px;
+    padding: 28px;
     display: flex;
     flex-direction: column;
-    align-items: stretch;
+    align-items: flex-start;
+    gap: 16px;
   }
-  .bcta__intro {
+  .bcta__title {
     margin: 0;
     font-family: var(--pp);
-    font-size: 16px;
-    line-height: 1.3;
+    font-size: 24px;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
     color: #fff;
   }
-  .bcta__accent {
-    margin: 20px 0 0;
-    font-family: var(--pp);
-    font-size: clamp(28px, 2.4vw, 34px);
-    line-height: 1.05;
-    letter-spacing: -0.5px;
-    color: #fff;
-  }
-  .bcta__accent span { color: var(--dandelion); }
-  .bcta__sub {
-    margin: 18px 0 0;
+  .bcta__desc {
     font-family: var(--pp);
     font-size: 15px;
-    line-height: 1.45;
+    line-height: 1.5;
     color: rgb(176, 196, 222);
+  }
+  .bcta__desc :global(p) {
+    margin: 0;
   }
   .bcta__btn {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
     gap: 8px;
-    margin-top: 22px;
+    margin-top: 4px;
     padding: 14px 24px;
     background: var(--dandelion);
     color: var(--glacier);
@@ -75,49 +74,7 @@ const CHECKLIST = [
     text-decoration: none;
     transition: background-color 0.25s ease;
   }
-  .bcta__btn:hover { background: rgb(230, 173, 0); }
-
-  /* white inner card: checklist + learn link */
-  .bcta__card {
-    margin-top: 22px;
-    background: #fff;
-    border-radius: 12px;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+  .bcta__btn:hover {
+    background: rgb(230, 173, 0);
   }
-  .bcta__list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .bcta__list li {
-    position: relative;
-    padding-left: 22px;
-    font-family: var(--pp);
-    font-size: 14px;
-    line-height: 1.4;
-    color: rgb(0, 43, 92);
-  }
-  .bcta__list li::before {
-    content: '◇';
-    position: absolute;
-    left: 0;
-    color: var(--dandelion);
-  }
-  .bcta__learn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--pp-semibold);
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--glacier);
-    text-decoration: none;
-  }
-  .bcta__learn:hover { color: rgb(0, 31, 69); }
 </style>

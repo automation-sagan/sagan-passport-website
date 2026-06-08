@@ -84,6 +84,23 @@ export const blog = defineType({
       group: 'content',
       of: [defineArrayMember({type: 'blogSection'})],
     }),
+    defineField({
+      name: 'cta',
+      title: 'Sidebar CTA',
+      type: 'object',
+      group: 'content',
+      description: 'Editable per post. Blank fields fall back to the site default.',
+      fields: [
+        defineField({name: 'title', type: 'string'}),
+        defineField({name: 'description', type: 'text', rows: 3}),
+        defineField({name: 'buttonText', type: 'string'}),
+        defineField({
+          name: 'buttonLink',
+          type: 'string',
+          description: 'Optional. Defaults to the consultation booking link.',
+        }),
+      ],
+    }),
   ],
   preview: {
     select: {title: 'title', subtitle: 'category', media: 'image'},

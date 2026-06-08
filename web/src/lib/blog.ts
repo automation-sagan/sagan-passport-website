@@ -25,12 +25,20 @@ export interface BlogSummary {
   image?: SanityImageSource;
 }
 
+export interface BlogCTAData {
+  title?: string;
+  description?: string;
+  buttonText?: string;
+  buttonLink?: string;
+}
+
 /** Full article shape for /blog/[slug]. */
 export interface BlogFull extends BlogSummary {
   introHtml?: string;
   costCards?: BlogCostCard[];
   costNote?: string;
   sections?: BlogSection[];
+  cta?: BlogCTAData;
 }
 
 const LIST_QUERY = `*[_type == "blog" && defined(slug.current)] | order(coalesce(date, "") desc){
@@ -43,7 +51,8 @@ const FULL_FIELDS = `
   title, category, date, readTime, author, authorImage, image,
   introHtml, costNote,
   costCards[]{ title, price, unit },
-  sections[]{ label, title, content }
+  sections[]{ label, title, content },
+  cta{ title, description, buttonText, buttonLink }
 `;
 
 /** All blog posts as card summaries (newest first). */
