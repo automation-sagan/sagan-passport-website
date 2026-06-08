@@ -4,14 +4,15 @@
  * "Our Unique Approach" grid. */
 interface Props {
   text: string;
+  icon?: string;
 }
-const CHECK_ICON =
+const DEFAULT_ICON =
   'https://framerusercontent.com/images/1i53LccbVs7fHThj7a2TfwA.png?width=40&height=40';
-const { text } = Astro.props;
+const { text, icon = DEFAULT_ICON } = Astro.props;
 ---
 
 <div class="su-check">
-  <img class="su-check__icon" src={CHECK_ICON} alt="" loading="lazy" />
+  <img class="su-check__icon" src={icon} alt="" loading="lazy" />
   <p class="su-check__text">{text}</p>
 </div>
 

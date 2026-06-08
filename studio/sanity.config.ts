@@ -35,14 +35,23 @@ export default defineConfig({
               .id('membership')
               .child(S.document().schemaType('membership').documentId('membership')),
             S.listItem()
+              .title('Sagan University')
+              .id('saganUniversity')
+              .child(S.document().schemaType('saganUniversity').documentId('saganUniversity')),
+            S.listItem()
               .title('Navigation')
               .id('navigation')
               .child(S.document().schemaType('navigation').documentId('navigation')),
             ...S.documentTypeListItems().filter(
               (li) =>
-                !['homepage', 'pricing', 'howItWorks', 'membership', 'navigation'].includes(
-                  li.getId()!,
-                ),
+                ![
+                  'homepage',
+                  'pricing',
+                  'howItWorks',
+                  'membership',
+                  'saganUniversity',
+                  'navigation',
+                ].includes(li.getId()!),
             ),
           ]),
     }),
@@ -60,13 +69,25 @@ export default defineConfig({
       creationContext.type === 'global'
         ? prev.filter(
             (t) =>
-              !['homepage', 'pricing', 'howItWorks', 'membership', 'navigation'].includes(
-                t.templateId,
-              ),
+              ![
+                'homepage',
+                'pricing',
+                'howItWorks',
+                'membership',
+                'saganUniversity',
+                'navigation',
+              ].includes(t.templateId),
           )
         : prev,
     actions: (input, context) =>
-      ['homepage', 'pricing', 'howItWorks', 'membership', 'navigation'].includes(context.schemaType)
+      [
+        'homepage',
+        'pricing',
+        'howItWorks',
+        'membership',
+        'saganUniversity',
+        'navigation',
+      ].includes(context.schemaType)
         ? input.filter(({action}) =>
             ['publish', 'discardChanges', 'restore'].includes(action!),
           )

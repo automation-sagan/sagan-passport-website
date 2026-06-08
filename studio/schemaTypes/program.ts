@@ -1,9 +1,9 @@
 import {defineField, defineType} from 'sanity'
 
-/** A feature card in the homepage 3-up grid: title + short description. */
-export const feature = defineType({
-  name: 'feature',
-  title: 'Feature',
+/** A Sagan University program card: icon disc + title + tagline + body. */
+export const program = defineType({
+  name: 'program',
+  title: 'Program',
   type: 'object',
   fields: [
     defineField({
@@ -12,18 +12,22 @@ export const feature = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'description',
+      name: 'tag',
+      title: 'Tagline',
+      type: 'string',
+    }),
+    defineField({
+      name: 'body',
       type: 'text',
-      rows: 3,
+      rows: 5,
     }),
     defineField({
       name: 'icon',
       type: 'image',
       options: {hotspot: true},
-      description: 'Optional. Used by the Sagan University "Why" cards.',
     }),
   ],
   preview: {
-    select: {title: 'title', subtitle: 'description', media: 'icon'},
+    select: {title: 'title', subtitle: 'tag', media: 'icon'},
   },
 })
