@@ -26,66 +26,80 @@ interface FooterLink {
   href: string;
   external?: boolean;
 }
-interface FooterCol {
+interface FooterSection {
   heading: string;
   links: FooterLink[];
 }
+// A column stacks one or more headed sections, so every link fits inside 3
+// columns (the original footer's 3-column layout) without spilling into a 4th.
+type FooterCol = FooterSection[];
 
 const COLUMNS: FooterCol[] = [
-  {
-    heading: 'Sagan',
-    links: [
-      { label: 'How it Works', href: '/how-it-works' },
-      { label: 'Pricing', href: '/pricing' },
-      { label: 'Sagan University', href: '/sagan-university' },
-      { label: 'Resources', href: '/resources' },
-      { label: 'Blog', href: '/blog' },
-      { label: 'Hire Talent', href: '/hire-talent' },
-      { label: 'Hire Global Talent', href: '/hire-global-talent' },
-      { label: 'Free Consultation', href: '/free-consultation' },
-    ],
-  },
-  {
-    heading: 'Services',
-    links: [
-      { label: 'Home Services', href: '/customers/home-services' },
-      { label: 'Private Equity & Holding', href: '/customers/private-equity' },
-      { label: 'Small Businesses', href: '/customers/small-businesses' },
-      { label: 'Franchises', href: '/customers/franchises' },
-      { label: 'Professional Services', href: '/customers/professional-services' },
-      { label: 'Real Estate', href: '/customers/real-estate' },
-      { label: 'Health & Wellness', href: '/customers/health-wellness' },
-    ],
-  },
-  {
-    heading: 'AI Agents',
-    links: [
-      { label: 'AI Answering', href: '/agent/ai-answering' },
-      { label: 'Freight Quoting', href: '/agent/freight' },
-      { label: 'Lead Intake', href: '/agent/lead-intake' },
-      { label: 'Order Monitoring', href: '/agent/order-monitor' },
-      { label: 'Pool QC Second Brain', href: '/agent/pool-qc-second-brain' },
-      { label: 'Quality of Earnings', href: '/agent/qoe' },
-      { label: 'RoofQuote AI', href: '/agent/roofquote-ai' },
-      { label: 'Deal Signal', href: '/agent/signal' },
-    ],
-  },
-  {
-    heading: 'Compare',
-    links: [
-      { label: 'Athena vs Sagan', href: '/vs/athena-vs-sagan' },
-      { label: 'GrowthAssistant vs Sagan', href: '/vs/growth-assistant-vs-sagan' },
-      { label: 'Scalesource vs Sagan', href: '/vs/scalesource-vs-sagan' },
-      { label: 'Somewhere vs Sagan', href: '/vs/somewhere-vs-sagan' },
-    ],
-  },
-  {
-    heading: 'Contact',
-    links: [
-      { label: 'Schedule a Call', href: CALENDLY_URL, external: true },
-      { label: 'Member Portal', href: PORTAL_URL, external: true },
-    ],
-  },
+  [
+    {
+      heading: 'Sagan',
+      links: [
+        { label: 'How it Works', href: '/how-it-works' },
+        { label: 'Pricing', href: '/pricing' },
+        { label: 'Sagan University', href: '/sagan-university' },
+        { label: 'Resources', href: '/resources' },
+        { label: 'Blog', href: '/blog' },
+      ],
+    },
+    {
+      heading: 'Hire',
+      links: [
+        { label: 'Hire Talent', href: '/hire-talent' },
+        { label: 'Hire Global Talent', href: '/hire-global-talent' },
+        { label: 'Free Consultation', href: '/free-consultation' },
+      ],
+    },
+  ],
+  [
+    {
+      heading: 'Services',
+      links: [
+        { label: 'Home Services', href: '/customers/home-services' },
+        { label: 'Private Equity & Holding', href: '/customers/private-equity' },
+        { label: 'Small Businesses', href: '/customers/small-businesses' },
+        { label: 'Franchises', href: '/customers/franchises' },
+        { label: 'Professional Services', href: '/customers/professional-services' },
+        { label: 'Real Estate', href: '/customers/real-estate' },
+        { label: 'Health & Wellness', href: '/customers/health-wellness' },
+      ],
+    },
+    {
+      heading: 'Compare',
+      links: [
+        { label: 'Athena vs Sagan', href: '/vs/athena-vs-sagan' },
+        { label: 'GrowthAssistant vs Sagan', href: '/vs/growth-assistant-vs-sagan' },
+        { label: 'Scalesource vs Sagan', href: '/vs/scalesource-vs-sagan' },
+        { label: 'Somewhere vs Sagan', href: '/vs/somewhere-vs-sagan' },
+      ],
+    },
+  ],
+  [
+    {
+      heading: 'AI Agents',
+      links: [
+        { label: 'AI Answering', href: '/agent/ai-answering' },
+        { label: 'Freight Quoting', href: '/agent/freight' },
+        { label: 'Lead Intake', href: '/agent/lead-intake' },
+        { label: 'Order Monitoring', href: '/agent/order-monitor' },
+        { label: 'Pool QC Second Brain', href: '/agent/pool-qc-second-brain' },
+        { label: 'Quality of Earnings', href: '/agent/qoe' },
+        { label: 'RoofQuote AI', href: '/agent/roofquote-ai' },
+        { label: 'Deal Signal', href: '/agent/signal' },
+      ],
+    },
+    {
+      heading: 'Contact',
+      links: [
+        { label: 'Schedule a Call', href: CALENDLY_URL, external: true },
+        { label: 'Member Portal', href: PORTAL_URL, external: true },
+      ],
+    },
+  ],
 ];
 ---
 
@@ -98,18 +112,22 @@ const COLUMNS: FooterCol[] = [
     <div class="footerx__cols">
       {COLUMNS.map((col) => (
         <div class="footerx__col">
-          <h4 class="footerx__heading">{col.heading}</h4>
-          <div class="footerx__links">
-            {col.links.map((link) => (
-              <a
-                class="footerx__link"
-                href={link.href}
-                {...(link.external ? { target: '_blank', rel: 'noreferrer' } : {})}
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
+          {col.map((section) => (
+            <div class="footerx__group">
+              <h4 class="footerx__heading">{section.heading}</h4>
+              <div class="footerx__links">
+                {section.links.map((link) => (
+                  <a
+                    class="footerx__link"
+                    href={link.href}
+                    {...(link.external ? { target: '_blank', rel: 'noreferrer' } : {})}
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       ))}
     </div>
@@ -164,21 +182,26 @@ const COLUMNS: FooterCol[] = [
   }
 
   /* ---- Link columns ---- */
-  /* Columns laid out as a wrapping grid so the link set can grow past the
-     original 3 columns (now 5: Sagan, Services, AI Agents, Compare, Contact)
-     without overflowing — auto-fit packs as many ~150px tracks as fit, then
-     wraps to a new row (row-gap below keeps the rows apart). */
   .footerx__cols {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    display: flex;
+    flex-direction: row;
     flex: 1 0 0;
     max-width: 810px;
-    gap: 40px 24px;
+    justify-content: space-between;
+    gap: 24px;
   }
+  /* Each column stacks its headed sections vertically; this gap separates one
+     section (e.g. "Sagan") from the next ("Hire") within the same column. */
   .footerx__col {
     display: flex;
     flex-direction: column;
+    flex: 1 0 0;
     max-width: 233px;
+    gap: 32px;
+  }
+  .footerx__group {
+    display: flex;
+    flex-direction: column;
     gap: 15px;
   }
   .footerx__heading {
@@ -236,7 +259,8 @@ const COLUMNS: FooterCol[] = [
       max-width: 320px;
     }
     .footerx__cols {
-      gap: 32px 12px;
+      justify-content: center;
+      gap: 12px;
     }
     .footerx__wordmark {
       margin: auto -32px -48px -32px; /* sides match the 32px padding */
