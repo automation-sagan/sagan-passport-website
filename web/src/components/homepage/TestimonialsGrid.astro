@@ -154,8 +154,8 @@ const TESTIMONIALS = (testimonials ?? []).map((t) => ({
     color: var(--glacier);
   }
 
-  /* Show more / less — white outline pill. When collapsed it floats over the
-     blurred fade; when expanded it sits below the grid. */
+  /* "See More Love For Sagan" — white outline pill that floats over the blurred
+     fade while collapsed. Clicking expands the wall and removes the button. */
   .tgrid__more {
     padding: 14px 28px;
     font-family: var(--pp);
@@ -204,9 +204,11 @@ const TESTIMONIALS = (testimonials ?? []).map((t) => ({
   document.querySelectorAll<HTMLElement>('[data-tgrid]').forEach((root) => {
     const btn = root.querySelector<HTMLButtonElement>('[data-more]');
     if (!btn) return;
+    // One-way expand: reveal the full wall and remove the button — there's no
+    // "Show Less" (per design, once expanded it stays expanded).
     btn.addEventListener('click', () => {
-      const collapsed = root.classList.toggle('is-collapsed');
-      btn.textContent = collapsed ? 'See More Love For Sagan' : 'Show Less';
+      root.classList.remove('is-collapsed');
+      btn.remove();
     });
   });
 </script>
