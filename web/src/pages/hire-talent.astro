@@ -8,7 +8,8 @@ import HireTalentPage from '../components/landing/HireTalentPage.astro';
 import { getLandingPageBySlug } from '../lib/landingPages';
 
 export const prerender = true;
-const data = (await getLandingPageBySlug('hire-talent'))!;
+const data = await getLandingPageBySlug('hire-talent');
+if (!data) return new Response(null, { status: 404 });
 ---
 
 <LandingLayout

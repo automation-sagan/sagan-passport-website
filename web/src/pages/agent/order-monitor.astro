@@ -5,7 +5,8 @@ import OrderMonitorAgent from '../../components/agent/OrderMonitorAgent.astro';
 import { getAgentDemoBySlug } from '../../lib/agentDemos';
 
 export const prerender = true;
-const data = (await getAgentDemoBySlug('order-monitor'))!;
+const data = await getAgentDemoBySlug('order-monitor');
+if (!data) return new Response(null, { status: 404 });
 ---
 
 <LandingLayout

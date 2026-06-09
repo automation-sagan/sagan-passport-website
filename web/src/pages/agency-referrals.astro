@@ -9,7 +9,8 @@ import AgencyReferralsPage from '../components/landing/AgencyReferralsPage.astro
 import { getLandingPageBySlug } from '../lib/landingPages';
 
 export const prerender = true;
-const data = (await getLandingPageBySlug('agency-referrals'))!;
+const data = await getLandingPageBySlug('agency-referrals');
+if (!data) return new Response(null, { status: 404 });
 ---
 
 <LandingLayout

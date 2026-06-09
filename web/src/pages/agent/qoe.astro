@@ -5,7 +5,8 @@ import QoeAgent from '../../components/agent/QoeAgent.astro';
 import { getAgentDemoBySlug } from '../../lib/agentDemos';
 
 export const prerender = true;
-const data = (await getAgentDemoBySlug('qoe'))!;
+const data = await getAgentDemoBySlug('qoe');
+if (!data) return new Response(null, { status: 404 });
 ---
 
 <LandingLayout

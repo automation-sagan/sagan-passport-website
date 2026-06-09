@@ -5,7 +5,8 @@ import SomewhereVs from '../../components/vs/SomewhereVs.astro';
 import { getComparisonBySlug } from '../../lib/comparisons';
 
 export const prerender = true;
-const data = (await getComparisonBySlug('somewhere-vs-sagan'))!;
+const data = await getComparisonBySlug('somewhere-vs-sagan');
+if (!data) return new Response(null, { status: 404 });
 ---
 
 <LandingLayout

@@ -5,7 +5,8 @@ import GrowthAssistantVs from '../../components/vs/GrowthAssistantVs.astro';
 import { getComparisonBySlug } from '../../lib/comparisons';
 
 export const prerender = true;
-const data = (await getComparisonBySlug('growth-assistant-vs-sagan'))!;
+const data = await getComparisonBySlug('growth-assistant-vs-sagan');
+if (!data) return new Response(null, { status: 404 });
 ---
 
 <LandingLayout

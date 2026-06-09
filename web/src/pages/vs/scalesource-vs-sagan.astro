@@ -5,7 +5,8 @@ import ScaleSourceVs from '../../components/vs/ScaleSourceVs.astro';
 import { getComparisonBySlug } from '../../lib/comparisons';
 
 export const prerender = true;
-const data = (await getComparisonBySlug('scalesource-vs-sagan'))!;
+const data = await getComparisonBySlug('scalesource-vs-sagan');
+if (!data) return new Response(null, { status: 404 });
 ---
 
 <LandingLayout

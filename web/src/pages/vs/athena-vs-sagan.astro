@@ -8,7 +8,8 @@ import AthenaVs from '../../components/vs/AthenaVs.astro';
 import { getComparisonBySlug } from '../../lib/comparisons';
 
 export const prerender = true;
-const data = (await getComparisonBySlug('athena-vs-sagan'))!;
+const data = await getComparisonBySlug('athena-vs-sagan');
+if (!data) return new Response(null, { status: 404 });
 ---
 
 <LandingLayout

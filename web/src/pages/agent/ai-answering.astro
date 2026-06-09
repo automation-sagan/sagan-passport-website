@@ -5,7 +5,8 @@ import AiAnsweringAgent from '../../components/agent/AiAnsweringAgent.astro';
 import { getAgentDemoBySlug } from '../../lib/agentDemos';
 
 export const prerender = true;
-const data = (await getAgentDemoBySlug('ai-answering'))!;
+const data = await getAgentDemoBySlug('ai-answering');
+if (!data) return new Response(null, { status: 404 });
 ---
 
 <LandingLayout

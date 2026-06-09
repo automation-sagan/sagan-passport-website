@@ -5,7 +5,8 @@ import RoofquoteAiAgent from '../../components/agent/RoofquoteAiAgent.astro';
 import { getAgentDemoBySlug } from '../../lib/agentDemos';
 
 export const prerender = true;
-const data = (await getAgentDemoBySlug('roofquote-ai'))!;
+const data = await getAgentDemoBySlug('roofquote-ai');
+if (!data) return new Response(null, { status: 404 });
 ---
 
 <LandingLayout

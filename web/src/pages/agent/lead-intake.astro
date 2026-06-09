@@ -5,7 +5,8 @@ import LeadIntakeAgent from '../../components/agent/LeadIntakeAgent.astro';
 import { getAgentDemoBySlug } from '../../lib/agentDemos';
 
 export const prerender = true;
-const data = (await getAgentDemoBySlug('lead-intake'))!;
+const data = await getAgentDemoBySlug('lead-intake');
+if (!data) return new Response(null, { status: 404 });
 ---
 
 <LandingLayout

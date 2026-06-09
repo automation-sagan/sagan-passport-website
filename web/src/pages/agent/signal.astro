@@ -5,7 +5,8 @@ import SignalAgent from '../../components/agent/SignalAgent.astro';
 import { getAgentDemoBySlug } from '../../lib/agentDemos';
 
 export const prerender = true;
-const data = (await getAgentDemoBySlug('signal'))!;
+const data = await getAgentDemoBySlug('signal');
+if (!data) return new Response(null, { status: 404 });
 ---
 
 <LandingLayout

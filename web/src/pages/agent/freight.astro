@@ -5,7 +5,8 @@ import FreightAgent from '../../components/agent/FreightAgent.astro';
 import { getAgentDemoBySlug } from '../../lib/agentDemos';
 
 export const prerender = true;
-const data = (await getAgentDemoBySlug('freight'))!;
+const data = await getAgentDemoBySlug('freight');
+if (!data) return new Response(null, { status: 404 });
 ---
 
 <LandingLayout

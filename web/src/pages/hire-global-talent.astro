@@ -8,7 +8,8 @@ import HireGlobalTalentPage from '../components/landing/HireGlobalTalentPage.ast
 import { getLandingPageBySlug } from '../lib/landingPages';
 
 export const prerender = true;
-const data = (await getLandingPageBySlug('hire-global-talent'))!;
+const data = await getLandingPageBySlug('hire-global-talent');
+if (!data) return new Response(null, { status: 404 });
 ---
 
 <LandingLayout
