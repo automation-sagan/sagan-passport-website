@@ -142,7 +142,11 @@
 }
 .info__scene {
   width: 50%;
-  height: 592px;
+  /* Match the square Spline scene so it fills edge-to-edge instead of
+     letterboxing (the uncovered band rendered black). aspect-ratio drives the
+     height from the fluid 50% width; the phone breakpoints below set an explicit
+     height, which overrides this. */
+  aspect-ratio: 1 / 1;
   border-radius: 72px;
   background: var(--space-200);
   overflow: hidden;
