@@ -45,7 +45,7 @@ const TICKER = [...courses, ...courses];
   <div class="home">
     <!-- Hero -->
     <section class="section su-hero">
-      <Appear class="su-centered">
+      <Appear rise class="su-centered">
         <h2 class="t-h2" style="text-align:center">{hero.heading}</h2>
         <h4 class="t-h4" style="text-align:center">{hero.subheading}</h4>
         <p class="t-body" style="text-align:center">{hero.body}</p>
@@ -80,11 +80,11 @@ const TICKER = [...courses, ...courses];
 
     <!-- Why Sagan University -->
     <section class="section su-why" id="why">
-      <Appear class="su-centered">
+      <Appear rise class="su-centered">
         <h2 class="t-h2" style="text-align:center">{why.heading}</h2>
         <p class="t-body-sm" style="text-align:center">{why.body}</p>
       </Appear>
-      <Appear class="su-feature-grid" delay={0.1}>
+      <Appear rise class="su-feature-grid" delay={0.1}>
         {
           (why.features ?? []).map((f) => (
             <FeatureCard title={f.title ?? ''} description={f.description ?? ''} icon={imgUrl(f.icon)} />
@@ -95,7 +95,7 @@ const TICKER = [...courses, ...courses];
 
     <!-- Programs -->
     <section class="section su-programs">
-      <Appear class="su-program-grid">
+      <Appear rise class="su-program-grid">
         {
           programs.map((p) => (
             <ProgramCard title={p.title ?? ''} tag={p.tag ?? ''} body={p.body ?? ''} icon={imgUrl(p.icon)} />
@@ -106,14 +106,15 @@ const TICKER = [...courses, ...courses];
 
     <!-- Approach -->
     <section class="section su-approach">
-      <Appear class="su-centered">
+      <Appear rise class="su-centered">
         <p class="t-eyebrow">{approach.eyebrow}</p>
         <h2 class="t-h2" style="text-align:center">{approach.heading}</h2>
       </Appear>
-      <Appear class="su-check-grid" delay={0.1}>
+      <Appear rise class="su-check-grid" delay={0.1}>
         {checks.map((c) => <CheckmarkCard text={c} icon={checkIconUrl} />)}
       </Appear>
       <Appear
+        rise
         class="su-largecard"
         blur={false}
         style={`background-image:url(${imgUrl(approach.cardImage)})`}>
@@ -134,7 +135,7 @@ const TICKER = [...courses, ...courses];
 
     <!-- Case study / video -->
     <section class="section su-case">
-      <Appear class="su-case__content">
+      <Appear rise class="su-case__content">
         <h2 class="t-h2" style="max-width:580px">{caseStudy.heading}</h2>
         <p class="t-body" style="max-width:900px">{caseStudy.body}</p>
       </Appear>

@@ -19,10 +19,10 @@ const faqs: QA[] = items.map((it) => ({
 
 <section class="section hiw-faq">
   <div class="hiw-faq__inner">
-    <div class="hiw-faq__head">
+    <div class="hiw-faq__head appear-el appear-el--rise" data-appear>
       <h3 class="t-h3" style="max-width:291px;margin:0">{heading}</h3>
     </div>
-    <div class="hiw-faq__list">
+    <div class="hiw-faq__list appear-el appear-el--rise" data-appear style="transition-delay:0.1s">
       <FaqAccordion items={faqs} />
     </div>
   </div>

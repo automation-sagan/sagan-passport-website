@@ -13,7 +13,7 @@ const { heading, body } = Astro.props;
 <section class="section hiw-hero">
   <div class="hiw-hero__content">
     <div class="hiw-hero__title">
-      <h2 class="t-h2" style="text-align:center">{heading}</h2>
+      <h2 class="t-h2 appear-el appear-el--rise" style="text-align:center" data-appear>{heading}</h2>
       <div class="hiw-hero__anim">
         <SplineEmbed
           scene="https://prod.spline.design/hnKgxipHE7hU2hJC-JWR/scene.hanacode"
@@ -21,6 +21,6 @@ const { heading, body } = Astro.props;
         />
       </div>
     </div>
-    <p class="t-body" style="text-align:center">{body}</p>
+    <p class="t-body appear-el appear-el--rise" style="text-align:center;transition-delay:0.12s" data-appear>{body}</p>
   </div>
 </section>
