@@ -12,12 +12,12 @@ const { data = {} } = Astro.props;
 ---
 
 <section class="section hiw-membership">
-  <div class="hiw-centered">
+  <div class="hiw-centered appear-el appear-el--rise" data-appear>
     <p class="t-eyebrow">{data.eyebrow}</p>
     <h2 class="t-h2" style="text-align:center">{data.heading}</h2>
     <p class="t-body" style="text-align:center">{data.subcopy}</p>
   </div>
-  <div class="hiw-toggle">
+  <div class="hiw-toggle appear-el appear-el--rise" data-appear style="transition-delay:0.12s">
     <MembershipToggle tabs={data.tabs} />
   </div>
 </section>

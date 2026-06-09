@@ -250,6 +250,17 @@ html.lenis body {
   transform: none;
   filter: none;
 }
+/* "Rise" variant — faithful port of the Framer "appear" effect on the marketing
+ * pages (pricing / how-it-works / sagan-university): a larger 48px rise, no blur,
+ * and a slower, smooth ease-out that approximates Framer's overdamped spring
+ * (stiffness 500 / damping 100 / mass 3). Use alongside [data-appear]; .is-in
+ * (above) supplies the revealed end state. */
+.appear-el--rise {
+  transform: translateY(48px);
+  filter: none;
+  transition-duration: 0.8s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
 .appear-text .appear-word {
   display: inline-block;
   opacity: 0;

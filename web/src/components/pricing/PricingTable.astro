@@ -37,14 +37,14 @@ const cards: Plan[] = (plans ?? []).map((p) => ({
 ---
 
 <div class="ptable" data-billing="monthly">
-  <div class="ptable__head">
+  <div class="ptable__head appear-el appear-el--rise" data-appear>
     <h2 class="t-h2" style="text-align:center">{heading}</h2>
     <p class="t-body" style="text-align:center">{subcopy}</p>
   </div>
 
   <BillingToggle />
 
-  <div class="ptable__cards">
+  <div class="ptable__cards appear-el appear-el--rise" data-appear style="transition-delay:0.2s">
     {cards.map((plan) => <PricingCard plan={plan} />)}
   </div>
 </div>
