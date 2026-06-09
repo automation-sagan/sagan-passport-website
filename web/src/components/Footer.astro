@@ -40,6 +40,9 @@ const COLUMNS: FooterCol[] = [
       { label: 'Sagan University', href: '/sagan-university' },
       { label: 'Resources', href: '/resources' },
       { label: 'Blog', href: '/blog' },
+      { label: 'Hire Talent', href: '/hire-talent' },
+      { label: 'Hire Global Talent', href: '/hire-global-talent' },
+      { label: 'Free Consultation', href: '/free-consultation' },
     ],
   },
   {
@@ -52,6 +55,28 @@ const COLUMNS: FooterCol[] = [
       { label: 'Professional Services', href: '/customers/professional-services' },
       { label: 'Real Estate', href: '/customers/real-estate' },
       { label: 'Health & Wellness', href: '/customers/health-wellness' },
+    ],
+  },
+  {
+    heading: 'AI Agents',
+    links: [
+      { label: 'AI Answering', href: '/agent/ai-answering' },
+      { label: 'Freight Quoting', href: '/agent/freight' },
+      { label: 'Lead Intake', href: '/agent/lead-intake' },
+      { label: 'Order Monitoring', href: '/agent/order-monitor' },
+      { label: 'Pool QC Second Brain', href: '/agent/pool-qc-second-brain' },
+      { label: 'Quality of Earnings', href: '/agent/qoe' },
+      { label: 'RoofQuote AI', href: '/agent/roofquote-ai' },
+      { label: 'Deal Signal', href: '/agent/signal' },
+    ],
+  },
+  {
+    heading: 'Compare',
+    links: [
+      { label: 'Athena vs Sagan', href: '/vs/athena-vs-sagan' },
+      { label: 'GrowthAssistant vs Sagan', href: '/vs/growth-assistant-vs-sagan' },
+      { label: 'Scalesource vs Sagan', href: '/vs/scalesource-vs-sagan' },
+      { label: 'Somewhere vs Sagan', href: '/vs/somewhere-vs-sagan' },
     ],
   },
   {
@@ -139,18 +164,20 @@ const COLUMNS: FooterCol[] = [
   }
 
   /* ---- Link columns ---- */
+  /* Columns laid out as a wrapping grid so the link set can grow past the
+     original 3 columns (now 5: Sagan, Services, AI Agents, Compare, Contact)
+     without overflowing — auto-fit packs as many ~150px tracks as fit, then
+     wraps to a new row (row-gap below keeps the rows apart). */
   .footerx__cols {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     flex: 1 0 0;
     max-width: 810px;
-    justify-content: space-between;
-    gap: 24px;
+    gap: 40px 24px;
   }
   .footerx__col {
     display: flex;
     flex-direction: column;
-    flex: 1 0 0;
     max-width: 233px;
     gap: 15px;
   }
@@ -209,8 +236,7 @@ const COLUMNS: FooterCol[] = [
       max-width: 320px;
     }
     .footerx__cols {
-      justify-content: center;
-      gap: 12px;
+      gap: 32px 12px;
     }
     .footerx__wordmark {
       margin: auto -32px -48px -32px; /* sides match the 32px padding */
