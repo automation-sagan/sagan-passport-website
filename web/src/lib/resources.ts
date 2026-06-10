@@ -28,7 +28,10 @@ export interface ResourceSummary {
 
 /** Full article shape for the /resources/[slug] detail page. */
 export interface ResourceFull extends ResourceSummary {
+  shareLink?: string;
   youtubeId?: string;
+  mainImageAlt?: string;
+  authorImageAlt?: string;
   sections?: ResourceSection[];
   testimonials?: ResourceTestimonial[];
 }
@@ -40,7 +43,8 @@ const LIST_QUERY = `*[_type == "resource" && defined(slug.current)] | order(coal
 
 const FULL_FIELDS = `
   "slug": slug.current,
-  title, category, authorName, authorImage, date, mainImage, youtubeId,
+  title, category, authorName, authorImage, date, mainImage, shareLink, youtubeId,
+  "mainImageAlt": mainImage.alt, "authorImageAlt": authorImage.alt,
   sections[]{ tag, title, content },
   testimonials[]{ content, personName }
 `;

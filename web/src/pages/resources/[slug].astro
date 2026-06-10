@@ -21,7 +21,7 @@ export async function getStaticPaths() {
 const { resource } = Astro.props;
 const mainImage = imgUrl(resource.mainImage);
 const authorImage = imgUrl(resource.authorImage);
-const shareUrl = `https://saganpassport.com/resources/${resource.slug}`;
+const shareUrl = resource.shareLink || `https://saganpassport.com/resources/${resource.slug}`;
 const SCHEDULE_URL =
   'https://calendly.com/d/5j7-3xv-p5k/global-talent-hiring-consultation?utm_source=saganpassportdotcom&utm_term=talent';
 ---
@@ -31,7 +31,12 @@ const SCHEDULE_URL =
   <div class="home">
     <!-- Hero -->
     <section class="section res-hero">
-      <div class="res-hero__image" style={`background-image:url(${mainImage})`}></div>
+      <div
+        class="res-hero__image"
+        style={`background-image:url(${mainImage})`}
+        role={resource.mainImageAlt ? 'img' : undefined}
+        aria-label={resource.mainImageAlt || undefined}>
+      </div>
       <div class="res-hero__content">
         <h1 class="t-h1" style="margin:0">{resource.title}</h1>
         <div class="res-hero__bottom">

@@ -47,11 +47,20 @@ export const resource = defineType({
       type: 'image',
       options: {hotspot: true},
       group: 'meta',
+      fields: [defineField({name: 'alt', type: 'string', title: 'Alt text'})],
     }),
     defineField({
       name: 'mainImage',
       type: 'image',
       options: {hotspot: true},
+      group: 'meta',
+      fields: [defineField({name: 'alt', type: 'string', title: 'Alt text'})],
+    }),
+    defineField({
+      name: 'shareLink',
+      title: 'Share link',
+      type: 'url',
+      description: 'The copy-link button URL. Blank = https://saganpassport.com/resources/<slug>.',
       group: 'meta',
     }),
     defineField({
