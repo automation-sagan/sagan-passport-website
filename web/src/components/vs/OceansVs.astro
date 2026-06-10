@@ -1,0 +1,530 @@
+---
+/* Faithful port of /vs/oceans-vs-sagan (Sri Lanka staffing-markup page). The
+ * bespoke layout + persuasive copy (ledger, receipts, flow chart, wins) are
+ * preserved verbatim; the hero, comparison table, and calculator numbers are
+ * driven by the `comparison` Sanity document (key editable fields). CSS is the
+ * page's exact original, extracted to styles/vs/oceans.css. */
+import type { ComparisonData, ComparisonRow } from '../../lib/comparisons';
+import '../../styles/vs/oceans.css';
+
+interface Props {
+  data: ComparisonData;
+}
+const { data } = Astro.props;
+
+const slug = data.slug ?? 'oceans-vs-sagan';
+const cal = (term: string) =>
+  `${data.calendlyUrl ?? 'https://calendly.com/d/5j7-3xv-p5k/global-talent-hiring-consultation'}?utm_source=${slug}&utm_term=${term}`;
+
+const rows = data.comparisonRows ?? [];
+
+/* The source table colours the lead text per cell (.bad / .good spans) and the
+ * sub-text rides in a <small>. State drives the wrapper, matching the original
+ * markup exactly; 'plain' rows render bare text. */
+const wrapState = (text?: string, cls?: string) =>
+  cls ? '<span class="' + cls + '">' + (text ?? '') + '</span>' : (text ?? '');
+const withSmall = (text: string, small?: string) =>
+  text + (small ? '<small>' + small + '</small>' : '');
+const competitorCell = (r: ComparisonRow) =>
+  withSmall(wrapState(r.competitorText, r.competitorState === 'cross' ? 'bad' : undefined), r.competitorSmall);
+const saganCell = (r: ComparisonRow) =>
+  withSmall(wrapState(r.saganText, r.saganState === 'check' ? 'good' : undefined), r.saganSmall);
+
+const calc = data.calc ?? {};
+/* Oceans quote = assumed talent pay + middleman gap ($1,000 + $2,250 = $3,250). */
+const oceansMonthly = (calc.talentMonthly ?? 1000) + (calc.middlemanMonthly ?? 2250);
+---
+
+<nav class="nav" aria-label="Primary">
+  <div class="nav-inner">
+    <a class="brand" href="#" aria-label="Oceans vs Sagan">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>Oceans vs Sagan</span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="#receipts">Receipts</a>
+      <a class="nav-link" href="#calculator">Calculator</a>
+      <a class="nav-link" href="#compare">Compare</a>
+      <a class="nav-cta" href={cal('nav')} target="_blank" rel="noopener">Book a Call</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-inner">
+    <div class="hero-kicker">Sri Lanka staffing markup math</div>
+    <h1>{data.heroHeadlineLead} <span>{data.heroHeadlineEm}</span></h1>
+    <p class="hero-copy">{data.heroBody}</p>
+    <div class="hero-actions">
+      <a class="button" href={cal('hero')} target="_blank" rel="noopener">Book a Free Consultation</a>
+      <a class="button secondary" href="#calculator">Run the Numbers</a>
+    </div>
+    <div class="hero-sub">{data.heroSub}</div>
+
+    <div class="ledger" aria-label="Pricing breakdown">
+      <div class="ledger-top">
+        <div class="ledger-stat">
+          <div class="ledger-label">Oceans quote</div>
+          <div class="ledger-value bad">$3,250/mo</div>
+        </div>
+        <div class="ledger-stat">
+          <div class="ledger-label">One-time fee</div>
+          <div class="ledger-value bad">$1,500</div>
+        </div>
+        <div class="ledger-stat">
+          <div class="ledger-label">Annual increase</div>
+          <div class="ledger-value bad">7%</div>
+        </div>
+      </div>
+      <div class="ledger-bar-wrap">
+        <div class="ledger-row">
+          <div class="ledger-row-name">Oceans model</div>
+          <div>
+            <div class="bar" aria-hidden="true">
+              <div class="bar-piece talent">$1,000 to talent</div>
+              <div class="bar-piece markup">$2,250 gap</div>
+            </div>
+            <div class="ledger-note">Default scenario uses the Glassdoor pay-gap datapoint: roughly $1,000/month employee pay against $3,000+ client pricing.</div>
+          </div>
+        </div>
+        <div class="ledger-row">
+          <div class="ledger-row-name">Sagan model</div>
+          <div>
+            <div class="bar" aria-hidden="true">
+              <div class="bar-piece direct">Salary goes directly to your team member</div>
+            </div>
+            <div class="ledger-note">Sagan charges a membership plus a one-time finder&apos;s fee. You own the employment relationship.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="wrap">
+    <div class="stats-grid reveal">
+      <div class="stat">
+        <div class="stat-num mono">$40.5K</div>
+        <div class="stat-label">Year-one Oceans cash cost for one Diver, including equipment fee</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num mono">$90.9K</div>
+        <div class="stat-label">Estimated three-year non-salary spend at $1,000/month talent pay</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num mono">$20.1K</div>
+        <div class="stat-label">Sagan fees over three years using the same salary assumption</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num mono">$70.8K</div>
+        <div class="stat-label">Estimated savings over three years for one hire</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="receipts" class="light-section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">The receipts</span>
+      <h2>Oceans tells you the service story. The invoice tells you the model.</h2>
+      <p class="section-copy">The point is not that Oceans provides no support. The point is that support is priced as a permanent staffing layer attached to every person you hire.</p>
+    </div>
+
+    <div class="evidence-grid">
+      <article class="evidence-card blue reveal">
+        <div class="badge blue">Glassdoor pay gap</div>
+        <p class="evidence-text">&ldquo;Pricing starts at $3,000 USD&rdquo; while employees get &ldquo;around $1,000 USD.&rdquo;</p>
+        <p class="evidence-detail">Former Colombo employee review, 2.0 stars, Dec 15, 2025. The same review calls out lack of client-pay transparency, night work, and no raises until after one year.</p>
+        <a class="evidence-link" href="https://www.glassdoor.sg/Reviews/Employee-Review-Oceans-XYZ-E9018287-RVW101824609.htm" target="_blank" rel="noopener">See Glassdoor review</a>
+      </article>
+      <article class="evidence-card red reveal">
+        <div class="badge red">Glassdoor quote</div>
+        <p class="evidence-text">&ldquo;Shouldn&apos;t be allowed to take this much off its employees.&rdquo;</p>
+        <p class="evidence-detail">SEO/Content Specialist, former employee, Colombo. That is the staffing spread problem in one sentence.</p>
+        <a class="evidence-link" href="https://www.glassdoor.sg/Reviews/Employee-Review-Oceans-XYZ-E9018287-RVW101824609.htm" target="_blank" rel="noopener">See Glassdoor review</a>
+      </article>
+      <article class="evidence-card gold reveal">
+        <div class="badge gold">Reddit first person</div>
+        <p class="evidence-text">&ldquo;USD $800/month&rdquo; salary. Client would pay Oceans &ldquo;USD $1,800/month.&rdquo;</p>
+        <p class="evidence-detail">u/mildlyangrygrape in r/srilanka. Lower client price than the current quote, same basic markup pattern.</p>
+        <a class="evidence-link" href="https://www.reddit.com/r/srilanka/comments/1i9jvq4/transparency_into_oceans_salary_in_sri_lanka/" target="_blank" rel="noopener">See Reddit thread</a>
+      </article>
+      <article class="evidence-card reveal">
+        <div class="badge">Reddit counterpoint</div>
+        <p class="evidence-text">&ldquo;$800 net income is nothing to scoff at.&rdquo;</p>
+        <p class="evidence-detail">u/Curious_Junket_4598 argues the pay can still be fair by local-company standards. That does not erase the client-side markup question.</p>
+        <a class="evidence-link" href="https://www.reddit.com/r/srilanka/comments/1i9jvq4/transparency_into_oceans_salary_in_sri_lanka/" target="_blank" rel="noopener">See Reddit thread</a>
+      </article>
+      <article class="evidence-card red reveal">
+        <div class="badge red">Reddit worker risk</div>
+        <p class="evidence-text">One commenter describes a two-year bond and USD-denominated exit costs.</p>
+        <p class="evidence-detail">u/nutzstastic also warns that contractor status can reduce local employment protections if the company is not registered in Sri Lanka.</p>
+        <a class="evidence-link" href="https://www.reddit.com/r/srilanka/comments/1d1n63y/working_for_oceans_salary_and_experience/" target="_blank" rel="noopener">See Reddit thread</a>
+      </article>
+      <article class="evidence-card blue reveal">
+        <div class="badge blue">Reddit client side</div>
+        <p class="evidence-text">A client-side commenter cites a &ldquo;3 month $12k contract.&rdquo;</p>
+        <p class="evidence-detail">u/akatz50 says their experience with talent quality and contract enforcement was negative.</p>
+        <a class="evidence-link" href="https://www.reddit.com/r/srilanka/comments/186sv76/is_oceans_independent_consulting_legit/" target="_blank" rel="noopener">See Reddit thread</a>
+      </article>
+    </div>
+
+    <div class="callout reveal">
+      The balanced version is simple: $800-$1,000/month can still be meaningful pay locally. But if clients are paying $3,000-$3,250/month, the recurring gap is the product. Add the $1,500 equipment fee and 7% annual increase, and the spread compounds.
+    </div>
+  </div>
+</section>
+
+<section class="tinted-section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Talent quality</span>
+      <h2>The best people do not want to be hidden behind a markup forever.</h2>
+      <p class="section-copy">Sri Lanka has serious operators. Treat them like operators. Give them a direct relationship, a clear compensation path, and a company they actually belong to.</p>
+    </div>
+    <div class="talent-grid">
+      <article class="talent-card agency reveal">
+        <h3>Through a staffing agency</h3>
+        <div class="item-list">
+          <div class="item"><span class="icon no">&times;</span><span>The client relationship belongs to the agency.</span></div>
+          <div class="item"><span class="icon no">&times;</span><span>Compensation is abstracted behind one monthly service price.</span></div>
+          <div class="item"><span class="icon no">&times;</span><span>Raises, title changes, and long-term growth move through a middle layer.</span></div>
+          <div class="item"><span class="icon no">&times;</span><span>Every new hire restarts the per-person recurring margin.</span></div>
+          <div class="item"><span class="icon no">&times;</span><span>The person can feel like capacity you rent, not a team member you build with.</span></div>
+        </div>
+      </article>
+      <article class="talent-card direct reveal">
+        <h3>As a direct hire</h3>
+        <div class="item-list">
+          <div class="item"><span class="icon yes">&#10003;</span><span>The person works for you from day one.</span></div>
+          <div class="item"><span class="icon yes">&#10003;</span><span>You set the salary, bonus path, title, and growth plan.</span></div>
+          <div class="item"><span class="icon yes">&#10003;</span><span>Every salary dollar goes to the team member, not to a staffing spread.</span></div>
+          <div class="item"><span class="icon yes">&#10003;</span><span>You can promote, retain, and invest in the person directly.</span></div>
+          <div class="item"><span class="icon yes">&#10003;</span><span>The strongest candidates get a real job, not an assignment.</span></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="light-section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Business model</span>
+      <h2>Outsourced staffing versus direct hiring.</h2>
+      <p class="section-copy">Oceans is selling managed staffing. Sagan helps you hire directly, then gets out of the way of the employment relationship.</p>
+    </div>
+    <div class="model-grid">
+      <article class="model-card oceans reveal">
+        <span class="badge red">Oceans</span>
+        <h3>Managed staffing</h3>
+        <div class="model-price red">$3,250/mo</div>
+        <p class="model-note">Plus $1,500 equipment fee, 7% annual service increase, upfront term invoicing, and payment penalties in the quote terms.</p>
+        <div class="item-list">
+          <div class="item"><span class="icon no">&times;</span><span>Your Diver works through Oceans, not as your direct employee.</span></div>
+          <div class="item"><span class="icon no">&times;</span><span>The monthly price stays attached to every person for as long as the engagement runs.</span></div>
+          <div class="item"><span class="icon no">&times;</span><span>At the Glassdoor $1,000 pay datapoint, the default gap is $2,250/month.</span></div>
+          <div class="item"><span class="icon no">&times;</span><span>Costs increase every year by contract, not by the person&apos;s promotion path.</span></div>
+        </div>
+      </article>
+      <article class="model-card sagan reveal">
+        <span class="badge blue">Sagan</span>
+        <h3>Direct-hire membership</h3>
+        <div class="model-price">$499/mo + fee</div>
+        <p class="model-note">$499/month membership plus a one-time finder&apos;s fee per hire. You pay salary directly and own the relationship.</p>
+        <div class="item-list">
+          <div class="item"><span class="icon yes">&#10003;</span><span>Your hire becomes your team member, not Sagan&apos;s rented capacity.</span></div>
+          <div class="item"><span class="icon yes">&#10003;</span><span>No permanent per-person markup once the person is hired.</span></div>
+          <div class="item"><span class="icon yes">&#10003;</span><span>Membership is flat, so the economics improve as your team grows.</span></div>
+          <div class="item"><span class="icon yes">&#10003;</span><span>Cancel the membership and keep your team. They work for you.</span></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="compare" class="tinted-section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Side by side</span>
+      <h2>How the economics actually compare.</h2>
+      <p class="section-copy">Same underlying idea: global talent. Very different ownership structure.</p>
+    </div>
+    <div class="table-wrap reveal">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Oceans</th>
+            <th>Sagan</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rows.map((r) => (
+              <tr>
+                <td>{r.label}{r.labelSmall && <small>{r.labelSmall}</small>}</td>
+                <td set:html={competitorCell(r)} />
+                <td set:html={saganCell(r)} />
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="calculator" class="dark-section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Cost calculator</span>
+      <h2>Run the markup math yourself.</h2>
+      <p class="section-copy">Adjust the team size, timeframe, and assumed monthly salary. The calculator includes the $1,500 equipment fee per hire and 7% annual Oceans service fee increase.</p>
+    </div>
+
+    <div class="calculator reveal">
+      <div class="calc-inputs">
+        <div class="field">
+          <label for="hires">Number of people</label>
+          <select id="hires">
+            <option value="1" selected>1 Diver</option>
+            <option value="2">2 Divers</option>
+            <option value="3">3 Divers</option>
+            <option value="5">5 Divers</option>
+            <option value="10">10 Divers</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="years">Timeframe</label>
+          <select id="years">
+            <option value="1">1 year</option>
+            <option value="2">2 years</option>
+            <option value="3" selected>3 years</option>
+            <option value="5">5 years</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="salary">Assumed monthly salary</label>
+          <select id="salary">
+            <option value="800">$800/month</option>
+            <option value="1000" selected>$1,000/month</option>
+            <option value="1200">$1,200/month</option>
+            <option value="1500">$1,500/month</option>
+            <option value="2000">$2,000/month</option>
+          </select>
+        </div>
+      </div>
+      <div class="calc-results">
+        <div class="result">
+          <div class="result-label">Oceans non-salary spend</div>
+          <div class="result-amount red" id="oceans-spend">$90,881</div>
+          <div class="result-detail" id="oceans-detail">$3,250/mo, equipment fee, and annual increases minus salary reaching talent.</div>
+        </div>
+        <div class="result">
+          <div class="result-label">Sagan fees</div>
+          <div class="result-amount blue" id="sagan-spend">$20,124</div>
+          <div class="result-detail" id="sagan-detail">$499/mo membership + one-time finder&apos;s fee per hire.</div>
+        </div>
+        <div class="result">
+          <div class="result-label">Estimated savings</div>
+          <div class="result-amount" id="savings">$70,757</div>
+          <div class="result-detail" id="savings-detail">The salary assumption is held constant in both models.</div>
+        </div>
+      </div>
+      <div class="calc-summary" id="calc-summary">
+        <strong>Default:</strong> one hire over three years. Oceans bills about $126,881 total. If $36,000 reaches talent, about $90,881 is non-salary spend.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="light-section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Follow the money</span>
+      <h2>Where does the client dollar go?</h2>
+      <p class="section-copy">The entire argument fits inside one bar chart.</p>
+    </div>
+    <div class="flow reveal">
+      <div class="flow-row">
+        <div class="flow-name">Oceans<small>$3,250/month quote</small></div>
+        <div class="flow-bar">
+          <div class="flow-part salary">$1,000 salary</div>
+          <div class="flow-part markup">$2,250 gap</div>
+        </div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-name">Sagan<small>You set salary directly</small></div>
+        <div class="flow-bar">
+          <div class="flow-part full">100% of salary goes to your team member</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout reveal">
+      If the salary assumption is too low, change it in the calculator. The page still asks the same question: how much recurring margin are you willing to pay to avoid hiring directly?
+    </div>
+  </div>
+</section>
+
+<section class="tinted-section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">After the hire</span>
+      <h2>The cost difference is obvious. The ownership difference is bigger.</h2>
+    </div>
+    <div class="posthire-grid">
+      <article class="posthire-card agency reveal">
+        <h3>With Oceans</h3>
+        <div class="item-list">
+          <div class="item"><span class="icon no">&times;</span><span>You have a staffed Diver, but the engagement still runs through Oceans.</span></div>
+          <div class="item"><span class="icon no">&times;</span><span>Your invoice rises by 7% annually under the quote terms.</span></div>
+          <div class="item"><span class="icon no">&times;</span><span>Your payment obligations begin once the contract is signed.</span></div>
+          <div class="item"><span class="icon no">&times;</span><span>Credit cards add 2.5%; late payments add $50/day after 14 days overdue.</span></div>
+        </div>
+      </article>
+      <article class="posthire-card direct reveal">
+        <h3>With Sagan</h3>
+        <div class="item-list">
+          <div class="item"><span class="icon yes">&#10003;</span><span>You hire the person directly and build the relationship yourself.</span></div>
+          <div class="item"><span class="icon yes">&#10003;</span><span>You decide when raises happen and who receives the upside.</span></div>
+          <div class="item"><span class="icon yes">&#10003;</span><span>The finder&apos;s fee is one-time. The monthly membership is not per hire.</span></div>
+          <div class="item"><span class="icon yes">&#10003;</span><span>Your team stays your team.</span></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="dark-section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Who wins?</span>
+      <h2>Everyone wins except the permanent markup.</h2>
+      <p class="section-copy">You save money. The hire has a direct career path. The only thing you lose is the recurring staffing tax.</p>
+    </div>
+    <div class="wins-grid">
+      <article class="win-card reveal">
+        <div class="win-number">01</div>
+        <div class="win-label">Winner</div>
+        <h3>You save money</h3>
+        <p>Same talent market, fewer dollars routed through a middle layer every month.</p>
+      </article>
+      <article class="win-card reveal">
+        <div class="win-number">02</div>
+        <div class="win-label">Winner</div>
+        <h3>Your hire earns trust</h3>
+        <p>A direct relationship makes career growth concrete, not theoretical.</p>
+      </article>
+      <article class="win-card reveal">
+        <div class="win-number">03</div>
+        <div class="win-label">Winner</div>
+        <h3>Your company owns the team</h3>
+        <p>People, process, comp, title, and loyalty live inside your company.</p>
+      </article>
+      <article class="win-card loser reveal">
+        <div class="win-number">&times;</div>
+        <div class="win-label">Loser</div>
+        <h3>The markup</h3>
+        <p>The recurring spread has nowhere to hide once you run the math.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap reveal">
+    <span class="eyebrow">Next step</span>
+    <h2>Stop renting the team you could own.</h2>
+    <p>Bring the Oceans quote. We will benchmark the role, salary, and market, then show you what it costs to hire the same profile directly.</p>
+    <a class="button" href={cal('bottom-cta')} target="_blank" rel="noopener">Book a Free Consultation</a>
+    <div class="hero-sub">No commitment. No pressure. Just the math.</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>&copy; 2026 Sagan. Oceans pricing terms are based on the quote details provided for this build, plus publicly available Oceans pages and linked public discussion. Verify current terms before publishing broadly. <a href="https://saganpassport.com" target="_blank" rel="noopener">saganpassport.com</a></p>
+  </div>
+</footer>
+
+<!-- Scroll reveal + calculator (numbers injected from Sanity) -->
+<script
+  is:inline
+  define:vars={{
+    oceansMonthly,
+    membershipMonthly: calc.membershipMonthly ?? 499,
+    finderFeePct: calc.finderFeePct ?? 18,
+  }}
+>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) entry.target.classList.add("visible");
+    });
+  }, { threshold: 0.1, rootMargin: "0px 0px -24px 0px" });
+
+  document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+
+  const hiresEl = document.getElementById("hires");
+  const yearsEl = document.getElementById("years");
+  const salaryEl = document.getElementById("salary");
+
+  const OCEANS_MONTHLY = oceansMonthly;            // from data.calc (1000 + 2250)
+  const SAGAN_MONTHLY = membershipMonthly;         // from data.calc.membershipMonthly (499)
+  const SAGAN_FINDER_RATE = finderFeePct / 100;    // from data.calc.finderFeePct (18 → 0.18)
+  // NOTE: the $1,500 equipment fee and 7% annual increase come from the Oceans
+  // quote terms — no Sanity field maps to them, kept inline like the source page.
+  const EQUIPMENT_FEE = 1500;
+  const ANNUAL_INCREASE = 0.07;
+
+  function fmt(value) {
+    return "$" + Math.round(value).toLocaleString("en-US");
+  }
+
+  function plural(count, singular, pluralWord) {
+    return count === 1 ? singular : pluralWord;
+  }
+
+  function calculate() {
+    const hires = Number(hiresEl.value);
+    const years = Number(yearsEl.value);
+    const salaryMonthly = Number(salaryEl.value);
+    const months = years * 12;
+
+    let oceansBill = EQUIPMENT_FEE * hires;
+    for (let year = 0; year < years; year += 1) {
+      oceansBill += OCEANS_MONTHLY * Math.pow(1 + ANNUAL_INCREASE, year) * 12 * hires;
+    }
+
+    const salaryTotal = salaryMonthly * months * hires;
+    const oceansNonSalary = oceansBill - salaryTotal;
+
+    const finderFee = salaryMonthly * 12 * SAGAN_FINDER_RATE * hires;
+    const membership = SAGAN_MONTHLY * months;
+    const saganFees = finderFee + membership;
+    const savings = oceansNonSalary - saganFees;
+
+    document.getElementById("oceans-spend").textContent = fmt(oceansNonSalary);
+    document.getElementById("oceans-detail").textContent =
+      fmt(oceansBill) + " total Oceans bill minus " + fmt(salaryTotal) + " assumed talent salary.";
+
+    document.getElementById("sagan-spend").textContent = fmt(saganFees);
+    document.getElementById("sagan-detail").textContent =
+      fmt(membership) + " membership + " + fmt(finderFee) + " finder" + (hires === 1 ? "'s" : "s'") + " fee.";
+
+    document.getElementById("savings").textContent = fmt(savings);
+    document.getElementById("savings-detail").textContent =
+      "Across " + hires + " " + plural(hires, "hire", "hires") + " over " + years + " " + plural(years, "year", "years") + ".";
+
+    document.getElementById("calc-summary").innerHTML =
+      "<strong>Scenario:</strong> " + hires + " " + plural(hires, "hire", "hires") + " over " + years + " " + plural(years, "year", "years") + ". Oceans bills about " + fmt(oceansBill) + " total. If " + fmt(salaryTotal) + " reaches talent, about " + fmt(oceansNonSalary) + " is non-salary spend.";
+  }
+
+  [hiresEl, yearsEl, salaryEl].forEach((el) => el.addEventListener("change", calculate));
+  calculate();
+</script>
+
+<!-- Universal HubSpot capture (no guide slug — just lead capture) -->
+<script is:inline src="/hubspot-capture.js" data-portal-id="50517161" data-form-guid="daac2804-e5c3-48e7-8ab7-a5b41c9e7c38"></script>

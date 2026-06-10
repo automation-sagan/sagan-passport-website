@@ -1,0 +1,18 @@
+---
+/* /vs/oceans-vs-sagan — own route so only this page's CSS bundles. */
+import LandingLayout from '../../layouts/LandingLayout.astro';
+import OceansVs from '../../components/vs/OceansVs.astro';
+import { getComparisonBySlug } from '../../lib/comparisons';
+
+export const prerender = true;
+const data = await getComparisonBySlug('oceans-vs-sagan');
+if (!data) return new Response(null, { status: 404 });
+---
+
+<LandingLayout
+  title={data.seoTitle ?? 'Oceans vs Sagan'}
+  description={data.seoDescription}
+  canonical={data.canonical}
+>
+  <OceansVs data={data} />
+</LandingLayout>
