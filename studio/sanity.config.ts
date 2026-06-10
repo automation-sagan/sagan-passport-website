@@ -59,6 +59,10 @@ export default defineConfig({
               .id('blog')
               .child(S.documentTypeList('blog').title('Blog')),
             S.listItem()
+              .title('Blog page (SEO)')
+              .id('blogIndex')
+              .child(S.document().schemaType('blogIndex').documentId('blogIndex')),
+            S.listItem()
               .title('Guides')
               .id('guide')
               .child(S.documentTypeList('guide').title('Guides')),
@@ -87,6 +91,7 @@ export default defineConfig({
                 ![
                   'siteSettings',
                   'resourcesIndex',
+                  'blogIndex',
                   'homepage',
                   'pricing',
                   'howItWorks',
@@ -122,6 +127,7 @@ export default defineConfig({
               ![
                 'siteSettings',
                 'resourcesIndex',
+                'blogIndex',
                 'homepage',
                 'pricing',
                 'howItWorks',
@@ -136,6 +142,7 @@ export default defineConfig({
       [
         'siteSettings',
         'resourcesIndex',
+        'blogIndex',
         'homepage',
         'pricing',
         'howItWorks',

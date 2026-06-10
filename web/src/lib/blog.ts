@@ -52,7 +52,15 @@ export interface BlogFull extends BlogSummary {
   showSidebar?: boolean;
   seoTitle?: string;
   seoDescription?: string;
+  ogImage?: SanityImageSource;
   schemaMarkup?: string;
+}
+
+/** SEO meta for the /blog listing page (blogIndex singleton). */
+export interface BlogIndexData {
+  seoTitle?: string;
+  seoDescription?: string;
+  ogImage?: SanityImageSource;
 }
 
 const LIST_QUERY = `*[_type == "blog" && defined(slug.current)] | order(coalesce(date, "") desc){
@@ -71,12 +79,21 @@ const FULL_FIELDS = `
   sections[]{ label, title, intro, content, quote, content2 },
   cta{ title, description, buttonText, buttonLink },
   useH2Headings, showSidebar,
-  seoTitle, seoDescription, schemaMarkup
+  seoTitle, seoDescription, ogImage, schemaMarkup
 `;
 
 /** All blog posts as card summaries (newest first). */
 export async function getBlogList(): Promise<BlogSummary[]> {
   return (await sanityClient.fetch<BlogSummary[]>(LIST_QUERY)) ?? [];
+}
+
+/** SEO meta for the /blog listing page (queried at build time). */
+export async function getBlogIndex(): Promise<BlogIndexData> {
+  return (
+    (await sanityClient.fetch<BlogIndexData | null>(
+      `*[_type == "blogIndex"][0]{ seoTitle, seoDescription, ogImage }`,
+    )) ?? {}
+  );
 }
 
 /** All blog slugs (for getStaticPaths). */

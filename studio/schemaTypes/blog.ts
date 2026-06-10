@@ -142,6 +142,13 @@ export const blog = defineType({
       description: 'Meta description shown in search results.',
     }),
     defineField({
+      name: 'ogImage',
+      title: 'Social share image',
+      type: 'image',
+      group: 'seo',
+      description: 'Overrides the sitewide default from Site settings. 1200×630 recommended.',
+    }),
+    defineField({
       name: 'schemaMarkup',
       title: 'Schema Markup (JSON-LD)',
       type: 'text',

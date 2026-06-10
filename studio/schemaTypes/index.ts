@@ -42,10 +42,12 @@ import {agentDemo} from './agentDemo'
 import {landingPage} from './landingPage'
 import {siteSettings} from './siteSettings'
 import {resourcesIndex} from './resourcesIndex'
+import {blogIndex} from './blogIndex'
 
 export const schemaTypes = [
   siteSettings,
   resourcesIndex,
+  blogIndex,
   navigation,
   navItem,
   navCard,

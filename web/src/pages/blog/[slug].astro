@@ -52,7 +52,11 @@ if (post.schemaMarkup) {
 }
 ---
 
-<Layout title={post.seoTitle || `${post.title} — Sagan Passport`} description={post.seoDescription}>
+<Layout
+  title={post.seoTitle || `${post.title} — Sagan Passport`}
+  description={post.seoDescription}
+  ogImage={post.ogImage}
+>
   {jsonLd && <script is:inline type="application/ld+json" set:html={jsonLd} slot="head" />}
   <Navbar />
   <div class="home">
