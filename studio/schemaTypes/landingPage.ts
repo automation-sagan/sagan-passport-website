@@ -35,17 +35,15 @@ export const landingPage = defineType({
 
     defineField({name: 'heroEyebrow', title: 'Hero eyebrow', type: 'string', group: 'hero'}),
     defineField({
-      name: 'heroHeadlineHtml',
-      title: 'Hero headline (HTML allowed)',
-      type: 'text',
-      rows: 3,
+      name: 'heroHeadline',
+      title: 'Hero headline',
+      type: 'inlineBody',
       group: 'hero',
     }),
     defineField({
-      name: 'heroLeadHtml',
-      title: 'Hero lead (HTML allowed)',
-      type: 'text',
-      rows: 4,
+      name: 'heroLead',
+      title: 'Hero lead',
+      type: 'inlineBody',
       group: 'hero',
     }),
 

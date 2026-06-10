@@ -25,7 +25,7 @@ export const blogSection = defineType({
     defineField({
       name: 'content',
       title: 'Content',
-      type: 'blogBody',
+      type: 'richBody',
     }),
     defineField({
       name: 'quote',
@@ -37,7 +37,7 @@ export const blogSection = defineType({
     defineField({
       name: 'content2',
       title: 'Content 2',
-      type: 'blogBody',
+      type: 'richBody',
       description: 'Optional second content block, shown after the pull-quote.',
     }),
   ],

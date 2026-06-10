@@ -1,5 +1,8 @@
 import { sanityClient } from 'sanity:client';
+import { inlineBodyHtml, type RichTextBody } from './richTextHtml';
 
+/** Hero copy is inline rich text in Sanity; getAgentDemoBySlug() serializes it
+ * to HTML strings, so components keep rendering heroHeadlineHtml/heroLeadHtml. */
 export interface AgentDemoData {
   slug: string;
   seoTitle?: string;
@@ -17,8 +20,8 @@ const AGENT_FIELDS = `
   seoDescription,
   canonical,
   heroEyebrow,
-  heroHeadlineHtml,
-  heroLeadHtml,
+  "heroHeadlineHtml": coalesce(heroHeadline, heroHeadlineHtml),
+  "heroLeadHtml": coalesce(heroLead, heroLeadHtml),
   ctaUrl
 `;
 
@@ -32,10 +35,12 @@ export async function getAllAgentDemoSlugs(): Promise<string[]> {
 
 /** Fetch one agent demo by slug (queried at build time). */
 export async function getAgentDemoBySlug(slug: string): Promise<AgentDemoData | null> {
-  return (
-    (await sanityClient.fetch<AgentDemoData | null>(
-      `*[_type == "agentDemo" && slug.current == $slug][0]{${AGENT_FIELDS}}`,
-      { slug },
-    )) ?? null
+  const doc = await sanityClient.fetch<AgentDemoData | null>(
+    `*[_type == "agentDemo" && slug.current == $slug][0]{${AGENT_FIELDS}}`,
+    { slug },
   );
+  if (!doc) return null;
+  doc.heroHeadlineHtml = inlineBodyHtml(doc.heroHeadlineHtml as RichTextBody | string | undefined);
+  doc.heroLeadHtml = inlineBodyHtml(doc.heroLeadHtml as RichTextBody | string | undefined);
+  return doc;
 }

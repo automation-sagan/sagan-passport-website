@@ -1,5 +1,8 @@
 import { sanityClient } from 'sanity:client';
+import { inlineBodyHtml, type RichTextBody } from './richTextHtml';
 
+/** Cell text is inline rich text in Sanity; getComparisonBySlug() serializes
+ * it to HTML strings before the vs components see it. */
 export interface ComparisonRow {
   label?: string;
   labelSmall?: string;
@@ -64,10 +67,15 @@ export async function getAllComparisonSlugs(): Promise<string[]> {
 
 /** Fetch one comparison by slug (queried at build time). */
 export async function getComparisonBySlug(slug: string): Promise<ComparisonData | null> {
-  return (
-    (await sanityClient.fetch<ComparisonData | null>(
-      `*[_type == "comparison" && slug.current == $slug][0]{${COMPARISON_FIELDS}}`,
-      { slug },
-    )) ?? null
+  const doc = await sanityClient.fetch<ComparisonData | null>(
+    `*[_type == "comparison" && slug.current == $slug][0]{${COMPARISON_FIELDS}}`,
+    { slug },
   );
+  if (!doc) return null;
+  doc.comparisonRows = doc.comparisonRows?.map((r) => ({
+    ...r,
+    competitorText: inlineBodyHtml(r.competitorText as RichTextBody | string | undefined),
+    saganText: inlineBodyHtml(r.saganText as RichTextBody | string | undefined),
+  }));
+  return doc;
 }

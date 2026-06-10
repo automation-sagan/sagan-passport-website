@@ -1,6 +1,9 @@
 import { sanityClient } from 'sanity:client';
 import type { SanityImageSource } from '@sanity/image-url';
+import { richBodyHtml, type RichTextBody } from './richTextHtml';
 
+/** Section content is rich text in Sanity; getResource() serializes it to an
+ * HTML string before the component sees it. */
 export interface ResourceSection {
   tag?: string;
   title?: string;
@@ -57,12 +60,16 @@ export async function getResourceSlugs(): Promise<string[]> {
 
 /** One resource article by slug (queried at build time). */
 export async function getResource(slug: string): Promise<ResourceFull | null> {
-  return (
-    (await sanityClient.fetch<ResourceFull | null>(
-      `*[_type == "resource" && slug.current == $slug][0]{${FULL_FIELDS}}`,
-      { slug },
-    )) ?? null
+  const doc = await sanityClient.fetch<ResourceFull | null>(
+    `*[_type == "resource" && slug.current == $slug][0]{${FULL_FIELDS}}`,
+    { slug },
   );
+  if (!doc) return null;
+  doc.sections = doc.sections?.map((s) => ({
+    ...s,
+    content: richBodyHtml(s.content as RichTextBody | string | undefined),
+  }));
+  return doc;
 }
 
 /** Format an ISO date as "Mon D, YYYY" (empty string if unset). */

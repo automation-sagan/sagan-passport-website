@@ -1,6 +1,6 @@
 import { sanityClient } from 'sanity:client';
 import type { SanityImageSource } from '@sanity/image-url';
-import type { BlogBody } from './blogBodyHtml';
+import { richBodyHtml, type RichTextBody } from './richTextHtml';
 
 export interface BlogCostCard {
   title?: string;
@@ -9,14 +9,14 @@ export interface BlogCostCard {
 }
 
 /* content/content2 are Portable Text; legacy documents (pre-backfill) still
- * hold raw HTML strings — blogBodyHtml() accepts both. */
+ * hold raw HTML strings — richBodyHtml() accepts both. */
 export interface BlogSection {
   label?: string;
   title?: string;
   intro?: string;
-  content?: BlogBody | string;
+  content?: RichTextBody | string;
   quote?: string;
-  content2?: BlogBody | string;
+  content2?: RichTextBody | string;
 }
 
 /** Card/summary shape for the /blog grid and the "More from the blog" sidebar. */
@@ -42,7 +42,7 @@ export interface BlogCTAData {
 
 /** Full article shape for /blog/[slug]. */
 export interface BlogFull extends BlogSummary {
-  intro?: BlogBody | string;
+  intro?: RichTextBody | string;
   costCards?: BlogCostCard[];
   costNote?: string;
   sections?: BlogSection[];
@@ -89,12 +89,16 @@ export async function getBlogSlugs(): Promise<string[]> {
 
 /** One blog post by slug (queried at build time). */
 export async function getBlog(slug: string): Promise<BlogFull | null> {
-  return (
-    (await sanityClient.fetch<BlogFull | null>(
-      `*[_type == "blog" && slug.current == $slug][0]{${FULL_FIELDS}}`,
-      { slug },
-    )) ?? null
+  const post = await sanityClient.fetch<BlogFull | null>(
+    `*[_type == "blog" && slug.current == $slug][0]{${FULL_FIELDS}}`,
+    { slug },
   );
+  if (!post) return null;
+  // cta.description is rich text in Sanity; BlogCTA renders an HTML string.
+  if (post.cta?.description) {
+    post.cta = { ...post.cta, description: richBodyHtml(post.cta.description as RichTextBody | string) };
+  }
+  return post;
 }
 
 /** Format an ISO date as "Mon D, YYYY" (empty string if unset). */

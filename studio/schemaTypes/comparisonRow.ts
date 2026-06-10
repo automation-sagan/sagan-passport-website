@@ -1,9 +1,9 @@
 import {defineField, defineType} from 'sanity'
 
-/** One row of a "vs" comparison table. Cell text may contain light inline HTML
- * (e.g. <strong>, check/cross glyphs) so it renders faithfully; the *State
- * fields drive the cell colour class (cross = red, check = green, neutral =
- * grey, plain = default). */
+/** One row of a "vs" comparison table. Cell text is inline rich text (bold and
+ * check/green/red emphasis via the inlineBody decorators); the *State fields
+ * drive the cell colour class (cross = red, check = green, neutral = grey,
+ * plain = default). */
 export const comparisonRow = defineType({
   name: 'comparisonRow',
   title: 'Comparison row',
@@ -18,7 +18,7 @@ export const comparisonRow = defineType({
       options: {list: ['cross', 'neutral', 'plain'], layout: 'radio'},
       initialValue: 'cross',
     }),
-    defineField({name: 'competitorText', title: 'Competitor cell', type: 'text', rows: 2}),
+    defineField({name: 'competitorText', title: 'Competitor cell', type: 'inlineBody'}),
     defineField({name: 'competitorSmall', title: 'Competitor cell sub-text', type: 'string'}),
     defineField({
       name: 'saganState',
@@ -27,7 +27,7 @@ export const comparisonRow = defineType({
       options: {list: ['check', 'neutral', 'plain'], layout: 'radio'},
       initialValue: 'check',
     }),
-    defineField({name: 'saganText', title: 'Sagan cell', type: 'text', rows: 2}),
+    defineField({name: 'saganText', title: 'Sagan cell', type: 'inlineBody'}),
     defineField({name: 'saganSmall', title: 'Sagan cell sub-text', type: 'string'}),
   ],
   preview: {

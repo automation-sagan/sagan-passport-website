@@ -3,9 +3,8 @@ import {defineField, defineType} from 'sanity'
 /** An AI-agent demo landing page (/agent/<slug>). Multi-entry, one doc per
  * vertical. These pages are bespoke (each has its own demo UI + persuasive copy
  * in its Astro component); this document holds the key editable fields: meta,
- * the hero copy, and the primary CTA/waitlist URL. The hero head/lead are stored
- * as HTML (rendered with set:html) so the original inline emphasis is preserved
- * while staying editable. */
+ * the hero copy, and the primary CTA/waitlist URL. The hero head/lead are inline
+ * rich text (inlineBody) serialized back to the page's markup at build time. */
 export const agentDemo = defineType({
   name: 'agentDemo',
   title: 'AI Agent demo',
@@ -38,18 +37,15 @@ export const agentDemo = defineType({
 
     defineField({name: 'heroEyebrow', title: 'Hero eyebrow', type: 'string', group: 'hero'}),
     defineField({
-      name: 'heroHeadlineHtml',
-      title: 'Hero headline (HTML allowed)',
-      type: 'text',
-      rows: 3,
-      description: 'Inline HTML (<span>, <br>, <em>) is preserved.',
+      name: 'heroHeadline',
+      title: 'Hero headline',
+      type: 'inlineBody',
       group: 'hero',
     }),
     defineField({
-      name: 'heroLeadHtml',
-      title: 'Hero lead paragraph (HTML allowed)',
-      type: 'text',
-      rows: 4,
+      name: 'heroLead',
+      title: 'Hero lead paragraph',
+      type: 'inlineBody',
       group: 'hero',
     }),
 

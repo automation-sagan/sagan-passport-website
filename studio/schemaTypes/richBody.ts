@@ -1,9 +1,10 @@
 import {defineArrayMember, defineType} from 'sanity'
 
-/** Rich-text body for blog content (intro + section content). Replaces the raw
- * Framer HTML textareas — the web build converts these blocks back to HTML. */
-export const blogBody = defineType({
-  name: 'blogBody',
+/** Rich-text body for long-form content (blog intro/sections, resource
+ * sections, CTAs). Replaces the raw Framer HTML textareas — the web build
+ * converts these blocks back to HTML (web/src/lib/richTextHtml.ts). */
+export const richBody = defineType({
+  name: 'richBody',
   title: 'Body',
   type: 'array',
   of: [

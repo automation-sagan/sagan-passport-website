@@ -72,7 +72,7 @@ export const blog = defineType({
     defineField({
       name: 'intro',
       title: 'Intro',
-      type: 'blogBody',
+      type: 'richBody',
       group: 'content',
       description: 'Lead paragraph(s) shown under the title.',
     }),
@@ -117,7 +117,7 @@ export const blog = defineType({
       description: 'Editable per post. Blank fields fall back to the site default.',
       fields: [
         defineField({name: 'title', type: 'string'}),
-        defineField({name: 'description', type: 'text', rows: 3}),
+        defineField({name: 'description', type: 'richBody'}),
         defineField({name: 'buttonText', type: 'string'}),
         defineField({
           name: 'buttonLink',

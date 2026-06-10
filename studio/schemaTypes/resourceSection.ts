@@ -1,7 +1,7 @@
 import {defineField, defineType} from 'sanity'
 
-/** One section of a resource article: optional eyebrow tag + title, plus the
- * body content as HTML (kept as-is from the Framer CMS, rendered with set:html). */
+/** One section of a resource article: optional eyebrow tag + title + rich-text
+ * body content (serialized back to HTML at build time). */
 export const resourceSection = defineType({
   name: 'resourceSection',
   title: 'Section',
@@ -18,10 +18,8 @@ export const resourceSection = defineType({
     }),
     defineField({
       name: 'content',
-      title: 'Content (HTML)',
-      type: 'text',
-      rows: 10,
-      description: 'Rich HTML from the Framer CMS — rendered as-is on the page.',
+      title: 'Content',
+      type: 'richBody',
     }),
   ],
   preview: {
