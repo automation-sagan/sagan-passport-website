@@ -29,6 +29,7 @@ import {resource} from './resource'
 import {resourceSection} from './resourceSection'
 import {resourceTestimonial} from './resourceTestimonial'
 import {blog} from './blog'
+import {blogBody} from './blogBody'
 import {blogSection} from './blogSection'
 import {blogCostCard} from './blogCostCard'
 import {guide} from './guide'
@@ -71,6 +72,7 @@ export const schemaTypes = [
   resourceSection,
   resourceTestimonial,
   blog,
+  blogBody,
   blogSection,
   blogCostCard,
   guide,

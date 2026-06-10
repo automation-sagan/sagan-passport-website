@@ -9,8 +9,9 @@ import '../styles/global.css';
 
 interface Props {
   title?: string;
+  description?: string;
 }
-const { title = 'Sagan Passport' } = Astro.props;
+const { title = 'Sagan Passport', description } = Astro.props;
 ---
 
 <!doctype html>
@@ -42,6 +43,8 @@ const { title = 'Sagan Passport' } = Astro.props;
     />
 
     <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <slot name="head" />
   </head>
   <body>
     <slot />

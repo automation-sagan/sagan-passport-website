@@ -9,6 +9,7 @@ export const blog = defineType({
   groups: [
     {name: 'meta', title: 'Meta'},
     {name: 'content', title: 'Content'},
+    {name: 'seo', title: 'SEO'},
   ],
   fields: [
     defineField({
@@ -52,6 +53,7 @@ export const blog = defineType({
       type: 'image',
       options: {hotspot: true},
       group: 'meta',
+      fields: [defineField({name: 'alt', type: 'string', title: 'Alt text'})],
     }),
     defineField({
       name: 'image',
@@ -59,13 +61,20 @@ export const blog = defineType({
       type: 'image',
       options: {hotspot: true},
       group: 'meta',
+      fields: [defineField({name: 'alt', type: 'string', title: 'Alt text'})],
     }),
     defineField({
-      name: 'introHtml',
-      title: 'Intro (HTML)',
-      type: 'text',
-      rows: 5,
+      name: 'featured',
+      type: 'boolean',
+      group: 'meta',
+      description: 'Featured post — listed first on /blog.',
+    }),
+    defineField({
+      name: 'intro',
+      title: 'Intro',
+      type: 'blogBody',
       group: 'content',
+      description: 'Lead paragraph(s) shown under the title.',
     }),
     defineField({
       name: 'costCards',
@@ -85,6 +94,22 @@ export const blog = defineType({
       of: [defineArrayMember({type: 'blogSection'})],
     }),
     defineField({
+      name: 'useH2Headings',
+      title: 'Use H2 headings',
+      type: 'boolean',
+      group: 'content',
+      initialValue: true,
+      description: 'On: section titles render as H2 (recommended for SEO). Off: H3. Mirrors the Framer "Use H2 Headings" flag.',
+    }),
+    defineField({
+      name: 'showSidebar',
+      title: 'Show sidebar',
+      type: 'boolean',
+      group: 'content',
+      initialValue: true,
+      description: 'Off: full-width article with no sidebar (no "More from the blog" or CTA).',
+    }),
+    defineField({
       name: 'cta',
       title: 'Sidebar CTA',
       type: 'object',
@@ -100,6 +125,39 @@ export const blog = defineType({
           description: 'Optional. Defaults to the consultation booking link.',
         }),
       ],
+    }),
+    defineField({
+      name: 'seoTitle',
+      title: 'SEO title',
+      type: 'string',
+      group: 'seo',
+      description: 'Overrides the page <title>. Blank = "<Title> — Sagan Passport".',
+    }),
+    defineField({
+      name: 'seoDescription',
+      title: 'SEO description',
+      type: 'text',
+      rows: 3,
+      group: 'seo',
+      description: 'Meta description shown in search results.',
+    }),
+    defineField({
+      name: 'schemaMarkup',
+      title: 'Schema Markup (JSON-LD)',
+      type: 'text',
+      rows: 10,
+      group: 'seo',
+      description: 'Optional raw JSON-LD (e.g. an Article schema) injected into the page <head>.',
+      validation: (rule) =>
+        rule.custom((value) => {
+          if (!value) return true
+          try {
+            JSON.parse(value)
+            return true
+          } catch {
+            return 'Must be valid JSON'
+          }
+        }),
     }),
   ],
   preview: {

@@ -1,7 +1,8 @@
 import {defineField, defineType} from 'sanity'
 
-/** One section of a blog post: optional label + title, plus HTML body content
- * (kept as-is from the Framer CMS, rendered with set:html). */
+/** One section of a blog post. Mirrors the Framer CMS section slots: optional
+ * label + title + intro line, rich-text content (+ optional pull-quote and a
+ * second content block, rendered after the quote). */
 export const blogSection = defineType({
   name: 'blogSection',
   title: 'Section',
@@ -17,11 +18,27 @@ export const blogSection = defineType({
       type: 'string',
     }),
     defineField({
+      name: 'intro',
+      type: 'string',
+      description: 'Optional short intro line under the title.',
+    }),
+    defineField({
       name: 'content',
-      title: 'Content (HTML)',
+      title: 'Content',
+      type: 'blogBody',
+    }),
+    defineField({
+      name: 'quote',
+      title: 'Pull-quote',
       type: 'text',
-      rows: 10,
-      description: 'Rich HTML from the Framer CMS — rendered as-is on the page.',
+      rows: 3,
+      description: 'Optional highlighted quote, shown after the content.',
+    }),
+    defineField({
+      name: 'content2',
+      title: 'Content 2',
+      type: 'blogBody',
+      description: 'Optional second content block, shown after the pull-quote.',
     }),
   ],
   preview: {

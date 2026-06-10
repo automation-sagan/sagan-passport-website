@@ -9,6 +9,7 @@ import Navbar from '../../components/Navbar.astro';
 import Footer from '../../components/Footer.astro';
 import BlogCTA from '../../components/blog/BlogCTA.astro';
 import { getBlogSlugs, getBlog, getBlogList, formatDate } from '../../lib/blog';
+import { blogBodyHtml } from '../../lib/blogBodyHtml';
 import { imgUrl } from '../../lib/sanityImage';
 import '../../styles/resources.css';
 import '../../styles/blog.css';
@@ -28,29 +29,49 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const coverImage = imgUrl(post.image);
-const more = (await getBlogList()).filter((p) => p.slug !== post.slug).slice(0, 3);
+const showSidebar = post.showSidebar !== false;
+const more = showSidebar
+  ? (await getBlogList()).filter((p) => p.slug !== post.slug).slice(0, 3)
+  : [];
 const metaBits = [post.date ? formatDate(post.date) : null, post.author, post.readTime].filter(Boolean);
+const introHtml = blogBodyHtml(post.intro);
+
+/* Section titles render as H2 by default; the Framer "Use H2 Headings" flag
+ * turns them into H3 (visually identical — .bp__sectitle carries the style). */
+const HeadingTag = post.useH2Headings === false ? 'h3' : 'h2';
+
+/* JSON-LD from the Studio "Schema Markup" field. The parse/stringify round-trip
+ * rejects invalid JSON and neutralizes any </script> breakout before set:html. */
+let jsonLd: string | undefined;
+if (post.schemaMarkup) {
+  try {
+    jsonLd = JSON.stringify(JSON.parse(post.schemaMarkup));
+  } catch {
+    /* invalid JSON in Studio — skip rather than break the page */
+  }
+}
 ---
 
-<Layout title={`${post.title} — Sagan Passport`}>
+<Layout title={post.seoTitle || `${post.title} — Sagan Passport`} description={post.seoDescription}>
+  {jsonLd && <script is:inline type="application/ld+json" set:html={jsonLd} slot="head" />}
   <Navbar />
   <div class="home">
     <article class="bp">
       <div class="bp__container">
         {coverImage && (
           <a class="bp__cover" href={CALENDLY_URL} target="_blank" rel="noreferrer">
-            <img src={coverImage} alt={post.title} loading="eager" />
+            <img src={coverImage} alt={post.imageAlt || post.title} loading="eager" />
           </a>
         )}
 
-        <div class="bp__wrap">
+        <div class={showSidebar ? 'bp__wrap' : 'bp__wrap bp__wrap--full'}>
           <!-- main content -->
           <div class="bp__main">
             <p class="bp__crumb"><a href="/blog">BLOG POST</a> <span>› {post.title}</span></p>
             <h1 class="bp__title">{post.title}</h1>
             <p class="bp__meta">{metaBits.join('  •  ')}</p>
 
-            {post.introHtml && <div class="bp__lead article-content" set:html={post.introHtml}></div>}
+            {introHtml && <div class="bp__lead article-content" set:html={introHtml}></div>}
 
             {post.costCards && post.costCards.length > 0 && (
               <div class="blog-costcards" style="margin-top:32px">
@@ -69,33 +90,44 @@ const metaBits = [post.date ? formatDate(post.date) : null, post.author, post.re
               {(post.sections ?? []).map((s) => (
                 <section class="bp__sec">
                   {s.label && <p class="bp__seclabel">{s.label}</p>}
-                  {s.title && <h2 class="bp__sectitle">{s.title}</h2>}
-                  <div class="bp__sec-body article-content" set:html={s.content ?? ''}></div>
+                  {s.title && <HeadingTag class="bp__sectitle">{s.title}</HeadingTag>}
+                  {s.intro && <p class="bp__sec-intro">{s.intro}</p>}
+                  <div class="bp__sec-body article-content" set:html={blogBodyHtml(s.content)}></div>
+                  {s.quote && (
+                    <div class="article-content">
+                      <blockquote><p>{s.quote}</p></blockquote>
+                    </div>
+                  )}
+                  {s.content2 && s.content2.length > 0 && (
+                    <div class="bp__sec-body article-content" set:html={blogBodyHtml(s.content2)}></div>
+                  )}
                 </section>
               ))}
             </div>
           </div>
 
-          <!-- sticky sidebar -->
-          <aside class="bp__aside">
-            {more.length > 0 && (
-              <div class="bp__more">
-                <h3 class="bp__more-title">More from the blog</h3>
-                <div class="bp__more-line"></div>
-                {more.map((p) => (
-                  <a class="bp__pc" href={`/blog/${p.slug}`}>
-                    <span class="bp__pc-thumb" style={imgUrl(p.image) ? `background-image:url(${imgUrl(p.image)})` : undefined}></span>
-                    <span class="bp__pc-body">
-                      <span class="bp__pc-cat">{p.category}</span>
-                      <span class="bp__pc-title">{p.title}</span>
-                      {p.readTime && <span class="bp__pc-read">{p.readTime}</span>}
-                    </span>
-                  </a>
-                ))}
-              </div>
-            )}
-            <BlogCTA cta={post.cta} />
-          </aside>
+          {/* sticky sidebar */}
+          {showSidebar && (
+            <aside class="bp__aside">
+              {more.length > 0 && (
+                <div class="bp__more">
+                  <h3 class="bp__more-title">More from the blog</h3>
+                  <div class="bp__more-line"></div>
+                  {more.map((p) => (
+                    <a class="bp__pc" href={`/blog/${p.slug}`}>
+                      <span class="bp__pc-thumb" style={imgUrl(p.image) ? `background-image:url(${imgUrl(p.image)})` : undefined}></span>
+                      <span class="bp__pc-body">
+                        <span class="bp__pc-cat">{p.category}</span>
+                        <span class="bp__pc-title">{p.title}</span>
+                        {p.readTime && <span class="bp__pc-read">{p.readTime}</span>}
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              )}
+              <BlogCTA cta={post.cta} />
+            </aside>
+          )}
         </div>
       </div>
     </article>

@@ -43,6 +43,9 @@
 }
 .bp__main { min-width: 0; }
 
+/* full-width variant — used when the post's "Show sidebar" toggle is off */
+.bp__wrap--full { grid-template-columns: minmax(0, 1fr); }
+
 /* header */
 .bp__crumb {
   margin: 0 0 18px;
@@ -98,6 +101,16 @@
   font-weight: 400;
   line-height: 1.2;
   letter-spacing: -0.5px;
+  color: var(--glacier);
+}
+/* bold lead-in line under a section title — mirrors Framer's "Section 1 Title"
+ * rich-text preset (19px bold) */
+.bp__sec-intro {
+  margin: 0 0 16px;
+  font-family: var(--pp);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.5;
   color: var(--glacier);
 }
 .bp__sec-body { min-width: 0; }
