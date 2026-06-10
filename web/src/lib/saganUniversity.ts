@@ -35,6 +35,8 @@ export interface SuSlide {
 
 export interface SaganUniversityData {
   seoTitle?: string;
+  seoDescription?: string;
+  ogImage?: SanityImageSource;
   hero?: {
     heading?: string;
     subheading?: string;
@@ -69,6 +71,8 @@ export interface SaganUniversityData {
 
 const SAGAN_UNIVERSITY_QUERY = `*[_type == "saganUniversity"][0]{
   seoTitle,
+  seoDescription,
+  ogImage,
   hero{ heading, subheading, body, buttons[]{ label, href, external, variant } },
   coursesLabel,
   courses[]{ title, image },

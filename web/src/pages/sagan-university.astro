@@ -40,7 +40,11 @@ const testimonials = (data.testimonials ?? []).map((t) => ({
 const TICKER = [...courses, ...courses];
 ---
 
-<Layout title={data.seoTitle ?? 'Sagan University — Sagan Passport'}>
+<Layout
+  title={data.seoTitle ?? 'Sagan University — Training for Leaders and Global Teams'}
+  description={data.seoDescription}
+  ogImage={data.ogImage}
+>
   <Navbar />
   <div class="home">
     <!-- Hero -->

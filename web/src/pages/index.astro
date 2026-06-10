@@ -15,7 +15,11 @@ import '../styles/homepage.css';
 const home = await getHomepage();
 ---
 
-<Layout title={home.seoTitle ?? 'Sagan Passport'}>
+<Layout
+  title={home.seoTitle ?? 'Sagan Passport — Hire World-Class International Talent'}
+  description={home.seoDescription}
+  ogImage={home.ogImage}
+>
   <Navbar />
   <div class="home">
     <Hero data={home.hero} />

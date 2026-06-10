@@ -14,7 +14,11 @@ const pricing = await getPricing();
 const membership = await getMembership();
 ---
 
-<Layout title={pricing.seoTitle ?? 'Pricing — Sagan Passport'}>
+<Layout
+  title={pricing.seoTitle ?? 'Sagan Passport Pricing — International Hiring from $499/Mo'}
+  description={pricing.seoDescription}
+  ogImage={pricing.ogImage}
+>
   <Navbar />
   <div class="home">
     <section class="section pricing-hero">

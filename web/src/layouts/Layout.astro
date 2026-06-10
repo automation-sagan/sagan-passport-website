@@ -6,12 +6,43 @@
 // lives in src/styles/global.css, imported once below. Components reference
 // those tokens (var(--glacier), var(--pp), …) and must not redefine them.
 import '../styles/global.css';
+import { getSiteSettings } from '../lib/siteSettings';
+import { imgUrl } from '../lib/sanityImage';
+import type { SanityImageSource } from '@sanity/image-url';
 
 interface Props {
   title?: string;
   description?: string;
+  /** Page-specific social share image; falls back to the sitewide default from Site settings. */
+  ogImage?: SanityImageSource | string;
 }
-const { title = 'Sagan Passport', description } = Astro.props;
+const { title = 'Sagan Passport', description, ogImage } = Astro.props;
+
+// Sitewide SEO defaults (site name/URL, default share image, org logo) are
+// edited in Sanity → Site settings; fetched once per build.
+const site = await getSiteSettings();
+const siteName = site.siteName ?? 'Sagan Passport';
+const siteUrl = (site.siteUrl ?? 'https://saganpassport.com').replace(/\/+$/, '');
+
+// Canonical URL: with build.format 'file' the page path can surface as
+// "/pricing.html" (or "/index.html" for the root), but Netlify serves the
+// clean slash-less URL — normalize to that.
+const path = Astro.url.pathname
+  .replace(/\/index\.html$/, '/')
+  .replace(/\.html$/, '')
+  .replace(/(.)\/$/, '$1');
+const canonical = `${siteUrl}${path}`;
+
+const ogImageUrl =
+  typeof ogImage === 'string' ? ogImage : imgUrl(ogImage ?? site.ogImage) || undefined;
+
+const orgJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: siteName,
+  url: siteUrl,
+  ...(imgUrl(site.logo) ? { logo: imgUrl(site.logo) } : {}),
+});
 ---
 
 <!doctype html>
@@ -44,6 +75,23 @@ const { title = 'Sagan Passport', description } = Astro.props;
 
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={canonical} />
+
+    <!-- Social share cards (Open Graph + Twitter). Values come from each
+         page's SEO group in Sanity, falling back to Site settings. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    {description && <meta name="twitter:description" content={description} />}
+    {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
+
+    <!-- Organization structured data for search engines (edited in Sanity → Site settings). -->
+    <script is:inline type="application/ld+json" set:html={orgJsonLd}></script>
     <slot name="head" />
   </head>
   <body>

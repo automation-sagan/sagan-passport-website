@@ -25,6 +25,8 @@ export interface HiwFaqItem {
 
 export interface HowItWorksData {
   seoTitle?: string;
+  seoDescription?: string;
+  ogImage?: SanityImageSource;
   hero?: {
     heading?: string;
     body?: string;
@@ -51,6 +53,8 @@ export interface HowItWorksData {
 
 const HOW_IT_WORKS_QUERY = `*[_type == "howItWorks"][0]{
   seoTitle,
+  seoDescription,
+  ogImage,
   hero{ heading, body },
   process{
     heading,

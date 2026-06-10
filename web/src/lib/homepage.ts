@@ -10,6 +10,8 @@ export interface SanityButton {
 
 export interface HomepageData {
   seoTitle?: string;
+  seoDescription?: string;
+  ogImage?: SanityImageSource;
   hero?: {
     headline?: string;
     body?: string;
@@ -39,6 +41,8 @@ export interface HomepageData {
 
 const HOMEPAGE_QUERY = `*[_type == "homepage"][0]{
   seoTitle,
+  seoDescription,
+  ogImage,
   hero{ headline, body, buttons[]{ label, href, external, variant } },
   talent[]{ name, role, rate, image },
   logosTagline,

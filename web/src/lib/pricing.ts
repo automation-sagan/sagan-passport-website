@@ -1,4 +1,5 @@
 import { sanityClient } from 'sanity:client';
+import type { SanityImageSource } from '@sanity/image-url';
 
 export interface SanityPlan {
   title: string;
@@ -17,6 +18,8 @@ export interface SanityPlan {
 
 export interface PricingData {
   seoTitle?: string;
+  seoDescription?: string;
+  ogImage?: SanityImageSource;
   heading?: string;
   subcopy?: string;
   plans?: SanityPlan[];
@@ -24,6 +27,8 @@ export interface PricingData {
 
 const PRICING_QUERY = `*[_type == "pricing"][0]{
   seoTitle,
+  seoDescription,
+  ogImage,
   heading,
   subcopy,
   plans[]{

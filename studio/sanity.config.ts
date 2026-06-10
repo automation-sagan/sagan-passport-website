@@ -74,9 +74,14 @@ export default defineConfig({
               .title('Navigation')
               .id('navigation')
               .child(S.document().schemaType('navigation').documentId('navigation')),
+            S.listItem()
+              .title('Site settings')
+              .id('siteSettings')
+              .child(S.document().schemaType('siteSettings').documentId('siteSettings')),
             ...S.documentTypeListItems().filter(
               (li) =>
                 ![
+                  'siteSettings',
                   'homepage',
                   'pricing',
                   'howItWorks',
@@ -110,6 +115,7 @@ export default defineConfig({
         ? prev.filter(
             (t) =>
               ![
+                'siteSettings',
                 'homepage',
                 'pricing',
                 'howItWorks',
@@ -122,6 +128,7 @@ export default defineConfig({
         : prev,
     actions: (input, context) =>
       [
+        'siteSettings',
         'homepage',
         'pricing',
         'howItWorks',

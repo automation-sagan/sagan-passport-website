@@ -40,8 +40,10 @@ import {comparisonRow} from './comparisonRow'
 import {comparisonTestimonial} from './comparisonTestimonial'
 import {agentDemo} from './agentDemo'
 import {landingPage} from './landingPage'
+import {siteSettings} from './siteSettings'
 
 export const schemaTypes = [
+  siteSettings,
   navigation,
   navItem,
   navCard,

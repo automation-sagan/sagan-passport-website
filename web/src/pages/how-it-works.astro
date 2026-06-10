@@ -15,7 +15,11 @@ const data = await getHowItWorks();
 const membership = await getMembership();
 ---
 
-<Layout title={data.seoTitle ?? 'How It Works — Sagan Passport'}>
+<Layout
+  title={data.seoTitle ?? 'How Sagan Passport Works — Global Hiring Made Simple'}
+  description={data.seoDescription}
+  ogImage={data.ogImage}
+>
   <Navbar />
   <div class="home">
     <HiwHero heading={data.hero?.heading} body={data.hero?.body} />
