@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>saganpassport.com — Interactive Site Tree</title>
+<style>
+  :root {
+    --framer: #2563eb;
+    --framer-bg: #dbeafe;
+    --static: #16a34a;
+    --static-bg: #dcfce7;
+    --external: #9333ea;
+    --external-bg: #f3e8ff;
+    --cta: #ea580c;
+    --cta-bg: #ffedd5;
+    --root: #0f172a;
+    --root-bg: #e2e8f0;
+    --action: #4f46e5;
+    --action-bg: #e0e7ff;
+    --note: #64748b;
+    --note-bg: #f1f5f9;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f8fafc; }
+  #canvas { display: block; width: 100vw; height: 100vh; cursor: grab; }
+  #canvas.grabbing { cursor: grabbing; }
+
+  .panel {
+    position: fixed;
+    background: rgba(255,255,255,0.96);
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    padding: 12px 14px;
+    backdrop-filter: blur(4px);
+  }
+  code { background: #f1f5f9; padding: 1px 5px; border-radius: 4px; font-size: 11px; }
+
+  #controls { top: 16px; right: 16px; display: flex; gap: 8px; align-items: center; }
+  #controls button {
+    border: 1px solid #cbd5e1; background: #fff; color: #0f172a;
+    height: 34px; min-width: 34px; border-radius: 8px; font-size: 18px; cursor: pointer;
+    line-height: 1; display: flex; align-items: center; justify-content: center; padding: 0 10px;
+  }
+  #controls button:hover { background: #f1f5f9; }
+  #controls button.active { background: #fff7ed; border-color: var(--cta); color: var(--cta); }
+  #controls #reset { font-size: 13px; }
+
+  #hint { bottom: 16px; right: 16px; font-size: 11px; color: #94a3b8; }
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+
+<div id="controls" class="panel">
+  <button id="zoomout" title="Zoom out">−</button>
+  <button id="zoomin" title="Zoom in">+</button>
+  <button id="reset" title="Reset view">Reset</button>
+</div>
+
+<div id="hint" class="panel">Drag to pan • Scroll to zoom • Double-click to reset</div>
+
+<script>
+// ---------------------------------------------------------------------------
+// Tree data. type: root | framer | static | external | cta | action | note
+// Page-by-page flow: a page node -> its in-content buttons (type "action") ->
+// what each button does (a destination page, Calendly, or an in-page action).
+// Nav + footer are global to every page, so they are intentionally omitted.
+// ---------------------------------------------------------------------------
+const TREE = {
+  label: "🌐 saganpassport.com", type: "root", children: [
+    { label: "/ — Home", type: "framer", children: [
+      { label: 'Hero — "How It Works" (outline)', type: "action", children: [
+        { label: "→ /how-it-works", type: "framer" },
+      ]},
+      { label: 'Hero — "Find Your Next Hire" (fill)', type: "action", children: [
+        { label: "→ /pricing", type: "framer" },
+      ]},
+      { label: 'Big card — "About Sagan University"', type: "action", children: [
+        { label: "→ /sagan-university", type: "framer" },
+      ]},
+      { label: 'Closing CTA — "Schedule a Call" ↗', type: "action", children: [
+        { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+      ]},
+    ]},
+    { label: "/how-it-works", type: "framer", children: [
+      { label: 'Proof — "Read G2 Reviews"', type: "action", children: [
+        { label: "↗ g2.com — Sagan reviews", type: "external" },
+      ]},
+      { label: 'Proof — "Read Clutch Reviews"', type: "action", children: [
+        { label: "↗ clutch.co — Sagan profile", type: "external" },
+      ]},
+    ]},
+    { label: "/pricing", type: "framer", children: [
+      { label: 'One-time Placement — "Get Started"', type: "action", children: [
+        { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+      ]},
+      { label: 'Sagan Membership — "Get Started"', type: "action", children: [
+        { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+      ]},
+      { label: 'Institutional Platform — "Get Started"', type: "action", children: [
+        { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+      ]},
+    ]},
+    { label: "Customers — Verticals", type: "framer", children: [
+      { label: "/customers/home-services", type: "framer", children: [
+        { label: "Case study — ▶ play video", type: "action", children: [
+          { label: "↗ YouTube — Plumbing $6M→$25M", type: "external" },
+        ]},
+      ]},
+      { label: "/customers/private-equity", type: "framer", children: [
+        { label: "Case study — ▶ play video", type: "action", children: [
+          { label: "↗ YouTube — Galleon remote team", type: "external" },
+        ]},
+      ]},
+      { label: "/customers/small-businesses", type: "framer", children: [
+        { label: "Case study — ▶ play video", type: "action", children: [
+          { label: "↗ YouTube — Architect bought back biz", type: "external" },
+        ]},
+      ]},
+      { label: "/customers/health-wellness", type: "framer", children: [
+        { label: "Case study — ▶ play video", type: "action", children: [
+          { label: "↗ YouTube — $70M dental DSO", type: "external" },
+        ]},
+      ]},
+      { label: "/customers/franchises", type: "framer", children: [
+        { label: "Case study — ▶ play video", type: "action", children: [
+          { label: "↗ YouTube — Koala Insulation (Beachy)", type: "external" },
+        ]},
+      ]},
+      { label: "/customers/professional-services", type: "framer", children: [
+        { label: "Case study — ▶ play video", type: "action", children: [
+          { label: "↗ YouTube — Franchise Wolf / FranDogs", type: "external" },
+        ]},
+      ]},
+      { label: "/customers/real-estate", type: "framer", children: [
+        { label: "Case study — ▶ play video", type: "action", children: [
+          { label: "↗ YouTube — Incline Homes (Klein)", type: "external" },
+        ]},
+      ]},
+    ]},
+    { label: "/sagan-university", type: "framer", children: [
+      { label: 'Hero — "Learn More" (outline)', type: "action", children: [
+        { label: "↓ #why — same-page section", type: "framer" },
+      ]},
+      { label: 'Hero — "Start Now" (fill)', type: "action", children: [
+        { label: "→ /pricing", type: "framer" },
+      ]},
+      { label: "Case study — ▶ play video", type: "action", children: [
+        { label: "↗ YouTube — case-study video", type: "external" },
+      ]},
+    ]},
+    { label: "/resources — 13 case studies", type: "framer", children: [
+      { label: 'Header — "Join" newsletter', type: "action", children: [
+        { label: "✉ submit email — no-op placeholder (not wired)", type: "note" },
+      ]},
+      { label: "soccer-shots-buffalo", type: "framer", children: [
+        { label: 'Closing CTA — "Schedule a Call" ↗', type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+      ]},
+      { label: "galleon-remote-team", type: "framer", children: [
+        { label: 'Closing CTA — "Schedule a Call" ↗', type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+      ]},
+      { label: "remixalot-20-hours-revenue-30", type: "framer", children: [
+        { label: 'Closing CTA — "Schedule a Call" ↗', type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+      ]},
+      { label: "70m-dental-dso-recruiting", type: "framer", children: [
+        { label: 'Closing CTA — "Schedule a Call" ↗', type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+      ]},
+      { label: "zen-windows-installation-mgr", type: "framer", children: [
+        { label: 'Closing CTA — "Schedule a Call" ↗', type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+      ]},
+      { label: "entrepreneur-out-of-inbox", type: "framer", children: [
+        { label: 'Closing CTA — "Schedule a Call" ↗', type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+      ]},
+      { label: "anonymous-twitter-franchise", type: "framer", children: [
+        { label: 'Closing CTA — "Schedule a Call" ↗', type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+      ]},
+      { label: "plumbing-6m-to-25m", type: "framer", children: [
+        { label: 'Closing CTA — "Schedule a Call" ↗', type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+      ]},
+      { label: "architect-bought-back-business", type: "framer", children: [
+        { label: 'Closing CTA — "Schedule a Call" ↗', type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+      ]},
+      { label: "brandon-beachy-koala-insulation", type: "framer", children: [
+        { label: 'Closing CTA — "Schedule a Call" ↗', type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+      ]},
+      { label: "incline-homes-jacob-klein", type: "framer", children: [
+        { label: 'Closing CTA — "Schedule a Call" ↗', type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+      ]},
+      { label: "lazy-leverage-franchisee-0-to-17", type: "framer", children: [
+        { label: 'Closing CTA — "Schedule a Call" ↗', type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+      ]},
+      { label: "lazy-leverage-rolling-suds", type: "framer", children: [
+        { label: 'Closing CTA — "Schedule a Call" ↗', type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+      ]},
+    ]},
+    { label: "/blog", type: "framer", children: [
+      { label: "overseas-staffing-home-service-businesses", type: "framer", children: [
+        { label: 'Sidebar CTA — "Schedule a Call" ↗', type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+        { label: 'Breadcrumb — "BLOG POST"', type: "action", children: [
+          { label: "→ /blog (index)", type: "framer" },
+        ]},
+        { label: '"More from the blog" — related', type: "action", children: [
+          { label: "→ other /blog posts (×3)", type: "framer" },
+        ]},
+      ]},
+      { label: "cost-of-hiring-international-remote-employees", type: "framer", children: [
+        { label: 'Sidebar CTA — "Schedule a Call" ↗', type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+        { label: 'Breadcrumb — "BLOG POST"', type: "action", children: [
+          { label: "→ /blog (index)", type: "framer" },
+        ]},
+        { label: '"More from the blog" — related', type: "action", children: [
+          { label: "→ other /blog posts (×3)", type: "framer" },
+        ]},
+      ]},
+      { label: "blog-what-is-offshore-staffing-2", type: "framer", children: [
+        { label: 'Sidebar CTA — "Schedule a Call" ↗', type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+        { label: 'Breadcrumb — "BLOG POST"', type: "action", children: [
+          { label: "→ /blog (index)", type: "framer" },
+        ]},
+        { label: '"More from the blog" — related', type: "action", children: [
+          { label: "→ other /blog posts (×3)", type: "framer" },
+        ]},
+      ]},
+    ]},
+    { label: "Agent — AI agent demos", type: "static", children: [
+      { label: "/agent/ai-answering", type: "static", children: [
+        { label: 'CTA — beta / waitlist', type: "action", children: [
+          { label: "↗ shipyourweekendproject.com", type: "external" },
+        ]},
+        { label: 'Brand — "Sagan"', type: "action", children: [
+          { label: "↗ saganpassport.com", type: "external" },
+        ]},
+      ]},
+      { label: "/agent/freight", type: "static", children: [
+        { label: 'CTA — beta / waitlist', type: "action", children: [
+          { label: "↗ shipyourweekendproject.com", type: "external" },
+        ]},
+        { label: 'Brand — "Sagan"', type: "action", children: [
+          { label: "↗ saganpassport.com", type: "external" },
+        ]},
+      ]},
+      { label: "/agent/lead-intake", type: "static", children: [
+        { label: 'CTA — beta / waitlist', type: "action", children: [
+          { label: "↗ shipyourweekendproject.com", type: "external" },
+        ]},
+        { label: 'Brand — "Sagan"', type: "action", children: [
+          { label: "↗ saganpassport.com", type: "external" },
+        ]},
+      ]},
+      { label: "/agent/order-monitor", type: "static", children: [
+        { label: 'CTA — beta / waitlist', type: "action", children: [
+          { label: "↗ shipyourweekendproject.com", type: "external" },
+        ]},
+        { label: 'Brand — "Sagan"', type: "action", children: [
+          { label: "↗ saganpassport.com", type: "external" },
+        ]},
+      ]},
+      { label: "/agent/pool-qc-second-brain", type: "static", children: [
+        { label: 'CTA — beta / waitlist', type: "action", children: [
+          { label: "↗ shipyourweekendproject.com", type: "external" },
+        ]},
+        { label: 'Brand — "Sagan"', type: "action", children: [
+          { label: "↗ saganpassport.com", type: "external" },
+        ]},
+      ]},
+      { label: "/agent/qoe", type: "static", children: [
+        { label: 'CTA — beta / waitlist', type: "action", children: [
+          { label: "↗ shipyourweekendproject.com", type: "external" },
+        ]},
+        { label: 'Brand — "Sagan"', type: "action", children: [
+          { label: "↗ saganpassport.com", type: "external" },
+        ]},
+      ]},
+      { label: "/agent/roofquote-ai", type: "static", children: [
+        { label: 'CTA — beta / waitlist', type: "action", children: [
+          { label: "↗ shipyourweekendproject.com", type: "external" },
+        ]},
+        { label: 'Brand — "Sagan"', type: "action", children: [
+          { label: "↗ saganpassport.com", type: "external" },
+        ]},
+      ]},
+      { label: "/agent/signal", type: "static", children: [
+        { label: 'CTA — beta / waitlist', type: "action", children: [
+          { label: "↗ shipyourweekendproject.com", type: "external" },
+        ]},
+        { label: 'Brand — "Sagan"', type: "action", children: [
+          { label: "↗ saganpassport.com", type: "external" },
+        ]},
+      ]},
+    ]},
+    { label: "Guides — Lead magnets", type: "static", children: [
+      { label: "/guides/hiring-guide", type: "static" },
+      { label: "/guides/compensation-guide", type: "static" },
+      { label: "/guides/delegation-guide", type: "static" },
+    ]},
+    { label: "vs — Comparisons", type: "static", children: [
+      { label: "/vs/athena-vs-sagan", type: "static", children: [
+        { label: "CTA — Schedule a Call (×3)", type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+        { label: 'Brand — "Sagan"', type: "action", children: [
+          { label: "→ saganpassport.com (home)", type: "framer" },
+        ]},
+        { label: "Proof links — reviews & citations", type: "action", children: [
+          { label: "↗ Clutch · X/Twitter · Reddit · Athena pricing / Indeed", type: "external" },
+        ]},
+      ]},
+      { label: "/vs/growth-assistant-vs-sagan", type: "static", children: [
+        { label: "CTA — Schedule a Call (×7)", type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+        { label: 'Brand — "Sagan"', type: "action", children: [
+          { label: "→ saganpassport.com (home)", type: "framer" },
+        ]},
+        { label: "Proof links — reviews & citations", type: "action", children: [
+          { label: "↗ Clutch · X/Twitter · Reddit · GrowthAssistant pricing / Indeed", type: "external" },
+        ]},
+      ]},
+      { label: "/vs/scalesource-vs-sagan", type: "static", children: [
+        { label: "CTA — Schedule a Call (×4)", type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+        { label: 'Brand — "Sagan"', type: "action", children: [
+          { label: "→ saganpassport.com (home)", type: "framer" },
+        ]},
+        { label: "Proof links — reviews", type: "action", children: [
+          { label: "↗ Clutch reviews", type: "external" },
+        ]},
+      ]},
+      { label: "/vs/somewhere-vs-sagan", type: "static", children: [
+        { label: "CTA — Schedule a Call (×3)", type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+        { label: 'Brand — "Sagan"', type: "action", children: [
+          { label: "→ saganpassport.com (home)", type: "framer" },
+        ]},
+        { label: "Proof links — reviews & citations", type: "action", children: [
+          { label: "↗ Clutch · X/Twitter", type: "external" },
+        ]},
+      ]},
+    ]},
+    { label: "Hire Talent", type: "static", children: [
+      { label: "/hire-global-talent", type: "static", children: [
+        { label: "Booking — Calendly (René's event)", type: "action", children: [
+          { label: "🗓 Calendly — René's consultation (new tab)", type: "cta" },
+        ]},
+        { label: "Lead form", type: "action", children: [
+          { label: "↗ HubSpot — lead form submit", type: "external" },
+        ]},
+        { label: "Proof links — X/Twitter", type: "action", children: [
+          { label: "↗ X/Twitter testimonials (×20+)", type: "external" },
+        ]},
+      ]},
+      { label: "/hire-talent", type: "static", children: [
+        { label: "Booking — Calendly (embed)", type: "action", children: [
+          { label: "🗓 Calendly — book consultation (new tab)", type: "cta" },
+        ]},
+        { label: "Lead form", type: "action", children: [
+          { label: "↗ HubSpot — lead form submit", type: "external" },
+        ]},
+      ]},
+    ]},
+    { label: "/agency-referrals", type: "static", children: [
+      { label: "Full-page iframe → agency-referrals.lovable.app", type: "external", children: [
+        { label: 'CTA — "Book a Call" (×3)', type: "action", children: [
+          { label: "🗓 Calendly — Leke's 30-min global hiring", type: "cta" },
+        ]},
+        { label: 'CTA — "Learn More"', type: "action", children: [
+          { label: "↗ webinar replay (webinargeek.com)", type: "external" },
+        ]},
+        { label: 'CTA — "Refer a Client. Get Paid."', type: "action", children: [
+          { label: "↗ linkedin.com/in/osmanileke", type: "external" },
+        ]},
+        { label: "⚠ Lovable editor badge (public)", type: "action", children: [
+          { label: "↗ lovable.dev project editor", type: "note" },
+        ]},
+      ]},
+    ]},
+    { label: "Landing pages (separate Vercel apps)", type: "external", children: [
+      { label: "/ai-savings → ai-savings-scan.vercel.app", type: "external", children: [
+        { label: "Scanner — AI team builder", type: "action", children: [
+          { label: "→ /api/generate-team (app backend, AI)", type: "note" },
+        ]},
+        { label: "Email gate — capture", type: "action", children: [
+          { label: "↗ HubSpot (via /api/email)", type: "external" },
+        ]},
+        { label: "CTA — Book a call", type: "action", children: [
+          { label: "↗ saganpassport.com/book", type: "external" },
+        ]},
+        { label: "CTA — partner site", type: "action", children: [
+          { label: "↗ shipyourweekendproject.com", type: "external" },
+        ]},
+      ]},
+      { label: "/free-consultation → free-consultation.vercel.app", type: "external", children: [
+        { label: "Inline Calendly widget (iframe)", type: "action", children: [
+          { label: "🗓 Calendly — embedded inline (linkedin utm)", type: "cta" },
+        ]},
+        { label: "Proof — Clutch", type: "action", children: [
+          { label: "↗ clutch.co reviews", type: "external" },
+        ]},
+      ]},
+      { label: "/backstop → sagan-squeeze-back.vercel.app", type: "external", children: [
+        { label: "Claim form — submit", type: "action", children: [
+          { label: "→ /api/send-email (app backend)", type: "note" },
+        ]},
+        { label: "Polymarket event", type: "action", children: [
+          { label: "↗ polymarket.com (CL hit · Jun 2026)", type: "external" },
+        ]},
+        { label: "Email Jon", type: "action", children: [
+          { label: "✉ mailto:jon@getsagan.com", type: "external" },
+        ]},
+      ]},
+    ]},
+    { label: "Header nav — external links", type: "external", children: [
+      { label: "⚠ AI Agents → /ai-agent (301 → shipyourweekendproject.com)", type: "external" },
+      { label: "Sign In → portal.saganpassport.com", type: "external" },
+    ]},
+  ]
+};
+
+// Each TOP-LEVEL section gets its own high-contrast hue; the whole flow beneath
+// it (page → buttons → destinations) inherits that color, so every page reads as
+// a distinct color zone. Order matches the root's children, top to bottom.
+const ROOT_COLOR = { stroke: "#0f172a", fill: "#0f172a", text: "#ffffff" };
+const PALETTE = [
+  { stroke: "#2563eb", fill: "#dbeafe", text: "#1e3a8a" }, // 1  Home — blue
+  { stroke: "#0d9488", fill: "#ccfbf1", text: "#134e4a" }, // 2  How It Works — teal
+  { stroke: "#ea580c", fill: "#ffedd5", text: "#7c2d12" }, // 3  Pricing — orange
+  { stroke: "#7c3aed", fill: "#ede9fe", text: "#4c1d95" }, // 4  Customers — violet
+  { stroke: "#db2777", fill: "#fce7f3", text: "#831843" }, // 5  Sagan University — pink
+  { stroke: "#16a34a", fill: "#dcfce7", text: "#14532d" }, // 6  Resources — green
+  { stroke: "#d97706", fill: "#fef3c7", text: "#78350f" }, // 7  Blog — amber
+  { stroke: "#4f46e5", fill: "#e0e7ff", text: "#312e81" }, // 8  Agent — indigo
+  { stroke: "#0891b2", fill: "#cffafe", text: "#155e63" }, // 9  Guides — cyan
+  { stroke: "#e11d48", fill: "#ffe4e6", text: "#881337" }, // 10 vs — rose
+  { stroke: "#c026d3", fill: "#fae8ff", text: "#701a75" }, // 11 Hire Talent — fuchsia
+  { stroke: "#65a30d", fill: "#ecfccb", text: "#365314" }, // 12 Agency referrals — lime
+  { stroke: "#0284c7", fill: "#e0f2fe", text: "#075985" }, // 13 Landing apps — sky
+  { stroke: "#475569", fill: "#e2e8f0", text: "#1e293b" }, // 14 Header nav — slate
+];
+
+// ---------------------------------------------------------------------------
+// Layout: left-to-right tidy tree.
+// ---------------------------------------------------------------------------
+const NODE_H = 34, V_GAP = 14, COL_W = 290, PAD_X = 60, PAD_Y = 60;
+const ROW = NODE_H + V_GAP;
+
+let leafCursor = 0;
+function layout(node, depth) {
+  node.depth = depth;
+  node.x = PAD_X + depth * COL_W;
+  if (node.children && node.children.length) {
+    node.children.forEach(c => layout(c, depth + 1));
+    const first = node.children[0], last = node.children[node.children.length - 1];
+    node.y = (first.y + last.y) / 2;
+  } else {
+    node.y = PAD_Y + leafCursor * ROW;
+    leafCursor++;
+  }
+}
+layout(TREE, 0);
+
+// Flatten nodes + edges; assign each node its section color (top-level child's
+// palette entry, inherited by the whole subtree).
+const nodes = [], edges = [];
+TREE.color = ROOT_COLOR;
+(function walk(n, color) {
+  n.color = color;
+  nodes.push(n);
+  if (n.children) n.children.forEach((c, i) => {
+    const childColor = (n === TREE) ? PALETTE[i % PALETTE.length] : color;
+    edges.push([n, c]);
+    walk(c, childColor);
+  });
+})(TREE, ROOT_COLOR);
+
+const maxX = Math.max(...nodes.map(n => n.x)) + COL_W;
+const maxY = Math.max(...nodes.map(n => n.y)) + NODE_H + PAD_Y;
+
+// ---------------------------------------------------------------------------
+// Canvas + view transform.
+// ---------------------------------------------------------------------------
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+let view = { x: 0, y: 0, scale: 1 };
+let dpr = window.devicePixelRatio || 1;
+
+function resize() {
+  dpr = window.devicePixelRatio || 1;
+  canvas.width = canvas.clientWidth * dpr;
+  canvas.height = canvas.clientHeight * dpr;
+  draw();
+}
+window.addEventListener("resize", resize);
+
+function fitView() {
+  const vw = canvas.clientWidth, vh = canvas.clientHeight;
+  const scale = Math.min(vw / maxX, vh / maxY, 1) * 0.92;
+  view.scale = scale;
+  view.x = (vw - maxX * scale) / 2 + 20;
+  view.y = (vh - maxY * scale) / 2;
+  draw();
+}
+
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function nodeWidth(node) {
+  ctx.font = (node.type === "root" ? "600 " : "500 ") + "13px -apple-system, system-ui, sans-serif";
+  const w = ctx.measureText(node.label).width + 28;
+  return Math.min(Math.max(w, 90), COL_W - 40);
+}
+
+function curve(x1, y1, x2, y2) {
+  const midX = x1 + (x2 - x1) / 2;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.bezierCurveTo(midX, y1, midX, y2, x2, y2);
+  ctx.stroke();
+}
+
+function draw() {
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+  ctx.save();
+  ctx.translate(view.x, view.y);
+  ctx.scale(view.scale, view.scale);
+
+  // Tree edges.
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([]);
+  edges.forEach(([p, c]) => {
+    const pw = nodeWidth(p);
+    ctx.strokeStyle = c.color.stroke + "66";
+    curve(p.x + pw, p.y + NODE_H / 2, c.x, c.y + NODE_H / 2);
+  });
+
+  // Nodes.
+  nodes.forEach(n => {
+    const w = nodeWidth(n);
+    const col = n.color;
+    ctx.fillStyle = col.fill;
+    ctx.strokeStyle = col.stroke;
+    ctx.lineWidth = (n.type === "root") ? 2.5 : 1.5;
+    roundRect(n.x, n.y, w, NODE_H, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = col.text;
+    ctx.font = (n.type === "root" ? "600 " : "500 ") + "13px -apple-system, system-ui, sans-serif";
+    ctx.textBaseline = "middle";
+    ctx.save();
+    roundRect(n.x, n.y, w, NODE_H, 8);
+    ctx.clip();
+    ctx.fillText(n.label, n.x + 14, n.y + NODE_H / 2 + 0.5);
+    ctx.restore();
+  });
+
+  ctx.restore();
+}
+
+// ---------------------------------------------------------------------------
+// Interaction.
+// ---------------------------------------------------------------------------
+let dragging = false, last = { x: 0, y: 0 };
+canvas.addEventListener("mousedown", e => { dragging = true; last = { x: e.clientX, y: e.clientY }; canvas.classList.add("grabbing"); });
+window.addEventListener("mousemove", e => {
+  if (!dragging) return;
+  view.x += e.clientX - last.x; view.y += e.clientY - last.y;
+  last = { x: e.clientX, y: e.clientY }; draw();
+});
+window.addEventListener("mouseup", () => { dragging = false; canvas.classList.remove("grabbing"); });
+
+canvas.addEventListener("wheel", e => {
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+  const newScale = Math.min(Math.max(view.scale * factor, 0.15), 3);
+  view.x = mx - (mx - view.x) * (newScale / view.scale);
+  view.y = my - (my - view.y) * (newScale / view.scale);
+  view.scale = newScale; draw();
+}, { passive: false });
+
+canvas.addEventListener("dblclick", fitView);
+
+function zoomBy(factor) {
+  const cx = canvas.clientWidth / 2, cy = canvas.clientHeight / 2;
+  const newScale = Math.min(Math.max(view.scale * factor, 0.15), 3);
+  view.x = cx - (cx - view.x) * (newScale / view.scale);
+  view.y = cy - (cy - view.y) * (newScale / view.scale);
+  view.scale = newScale; draw();
+}
+document.getElementById("zoomin").onclick = () => zoomBy(1.2);
+document.getElementById("zoomout").onclick = () => zoomBy(1 / 1.2);
+document.getElementById("reset").onclick = fitView;
+
+// Touch (single-finger pan).
+canvas.addEventListener("touchstart", e => { if (e.touches.length === 1) { dragging = true; last = { x: e.touches[0].clientX, y: e.touches[0].clientY }; } }, { passive: true });
+canvas.addEventListener("touchmove", e => {
+  if (dragging && e.touches.length === 1) {
+    view.x += e.touches[0].clientX - last.x; view.y += e.touches[0].clientY - last.y;
+    last = { x: e.touches[0].clientX, y: e.touches[0].clientY }; draw();
+  }
+}, { passive: true });
+canvas.addEventListener("touchend", () => { dragging = false; });
+
+resize();
+fitView();
+</script>
+</body>
+</html>
