@@ -28,12 +28,22 @@ export interface ResourceSummary {
 
 /** Full article shape for the /resources/[slug] detail page. */
 export interface ResourceFull extends ResourceSummary {
+  seoTitle?: string;
+  seoDescription?: string;
+  ogImage?: SanityImageSource;
   shareLink?: string;
   youtubeId?: string;
   mainImageAlt?: string;
   authorImageAlt?: string;
   sections?: ResourceSection[];
   testimonials?: ResourceTestimonial[];
+}
+
+/** SEO meta for the /resources listing page (resourcesIndex singleton). */
+export interface ResourcesIndexData {
+  seoTitle?: string;
+  seoDescription?: string;
+  ogImage?: SanityImageSource;
 }
 
 const LIST_QUERY = `*[_type == "resource" && defined(slug.current)] | order(coalesce(date, "") desc){
@@ -43,7 +53,8 @@ const LIST_QUERY = `*[_type == "resource" && defined(slug.current)] | order(coal
 
 const FULL_FIELDS = `
   "slug": slug.current,
-  title, category, authorName, authorImage, date, mainImage, shareLink, youtubeId,
+  title, seoTitle, seoDescription, ogImage,
+  category, authorName, authorImage, date, mainImage, shareLink, youtubeId,
   "mainImageAlt": mainImage.alt, "authorImageAlt": authorImage.alt,
   sections[]{ tag, title, content },
   testimonials[]{ content, personName }
@@ -52,6 +63,15 @@ const FULL_FIELDS = `
 /** All published resources as card summaries (newest first), for the listing. */
 export async function getResourceList(): Promise<ResourceSummary[]> {
   return (await sanityClient.fetch<ResourceSummary[]>(LIST_QUERY)) ?? [];
+}
+
+/** SEO meta for the /resources listing page (queried at build time). */
+export async function getResourcesIndex(): Promise<ResourcesIndexData> {
+  return (
+    (await sanityClient.fetch<ResourcesIndexData | null>(
+      `*[_type == "resourcesIndex"][0]{ seoTitle, seoDescription, ogImage }`,
+    )) ?? {}
+  );
 }
 
 /** All published resource slugs (for getStaticPaths). */

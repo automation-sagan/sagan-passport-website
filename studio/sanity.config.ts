@@ -51,6 +51,10 @@ export default defineConfig({
               .id('resource')
               .child(S.documentTypeList('resource').title('Resources')),
             S.listItem()
+              .title('Resources page (SEO)')
+              .id('resourcesIndex')
+              .child(S.document().schemaType('resourcesIndex').documentId('resourcesIndex')),
+            S.listItem()
               .title('Blog')
               .id('blog')
               .child(S.documentTypeList('blog').title('Blog')),
@@ -82,6 +86,7 @@ export default defineConfig({
               (li) =>
                 ![
                   'siteSettings',
+                  'resourcesIndex',
                   'homepage',
                   'pricing',
                   'howItWorks',
@@ -116,6 +121,7 @@ export default defineConfig({
             (t) =>
               ![
                 'siteSettings',
+                'resourcesIndex',
                 'homepage',
                 'pricing',
                 'howItWorks',
@@ -129,6 +135,7 @@ export default defineConfig({
     actions: (input, context) =>
       [
         'siteSettings',
+        'resourcesIndex',
         'homepage',
         'pricing',
         'howItWorks',

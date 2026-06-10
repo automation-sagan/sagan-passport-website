@@ -26,7 +26,11 @@ const SCHEDULE_URL =
   'https://calendly.com/d/5j7-3xv-p5k/global-talent-hiring-consultation?utm_source=saganpassportdotcom&utm_term=talent';
 ---
 
-<Layout title={`${resource.title} — Sagan Passport`}>
+<Layout
+  title={resource.seoTitle ?? `${resource.title} - Sagan Passport`}
+  description={resource.seoDescription}
+  ogImage={resource.ogImage}
+>
   <Navbar />
   <div class="home">
     <!-- Hero -->

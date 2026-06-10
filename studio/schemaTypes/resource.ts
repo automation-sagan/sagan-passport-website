@@ -27,6 +27,28 @@ export const resource = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'seoTitle',
+      title: 'Page title (SEO)',
+      type: 'string',
+      description: 'Shown in the browser tab and search results. Blank = "<Title> - Sagan Passport".',
+      group: 'meta',
+    }),
+    defineField({
+      name: 'seoDescription',
+      title: 'Meta description (SEO)',
+      type: 'text',
+      rows: 3,
+      description: 'Shown under the title in search results and social shares. Aim for 150–160 characters.',
+      group: 'meta',
+    }),
+    defineField({
+      name: 'ogImage',
+      title: 'Social share image',
+      type: 'image',
+      description: 'Overrides the sitewide default from Site settings. 1200×630 recommended.',
+      group: 'meta',
+    }),
+    defineField({
       name: 'category',
       type: 'string',
       description: 'e.g. Case Studies, Podcasts, Testimonials',

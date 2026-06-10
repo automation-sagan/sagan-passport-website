@@ -41,9 +41,11 @@ import {comparisonTestimonial} from './comparisonTestimonial'
 import {agentDemo} from './agentDemo'
 import {landingPage} from './landingPage'
 import {siteSettings} from './siteSettings'
+import {resourcesIndex} from './resourcesIndex'
 
 export const schemaTypes = [
   siteSettings,
+  resourcesIndex,
   navigation,
   navItem,
   navCard,

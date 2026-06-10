@@ -6,10 +6,11 @@ import Navbar from '../../components/Navbar.astro';
 import Footer from '../../components/Footer.astro';
 import ResourceCard from '../../components/resources/ResourceCard.astro';
 import NewsletterForm from '../../components/resources/NewsletterForm.astro';
-import { getResourceList } from '../../lib/resources';
+import { getResourceList, getResourcesIndex } from '../../lib/resources';
 import '../../styles/resources.css';
 
 const resources = await getResourceList();
+const seo = await getResourcesIndex();
 
 // Filter tabs: "All" + the categories actually present, in a stable order.
 const ORDER = ['Case Studies', 'Podcasts', 'Testimonials'];
@@ -21,7 +22,11 @@ const categories = [
 const tabs = ['All', ...categories];
 ---
 
-<Layout title="Resources — Sagan Passport">
+<Layout
+  title={seo.seoTitle ?? 'Resources — Sagan Passport'}
+  description={seo.seoDescription}
+  ogImage={seo.ogImage}
+>
   <Navbar />
   <div class="home">
     <section class="section res-list">
