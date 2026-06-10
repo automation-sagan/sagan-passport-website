@@ -22,8 +22,14 @@ export const talentPerson = defineType({
       type: 'string',
       description: 'e.g. Full Time - $1,800/month',
     }),
+    defineField({
+      name: 'photo',
+      type: 'image',
+      options: {hotspot: true},
+      description: 'Card background photo of the person.',
+    }),
   ],
   preview: {
-    select: {title: 'role', subtitle: 'from'},
+    select: {title: 'role', subtitle: 'from', media: 'photo'},
   },
 })

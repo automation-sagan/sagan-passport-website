@@ -10,6 +10,7 @@ export interface CustomerTalentPerson {
   role?: string;
   from?: string;
   rate?: string;
+  photo?: SanityImageSource;
 }
 
 export interface CustomerRoleEntry {
@@ -27,6 +28,8 @@ export interface CustomerSlide {
 
 export interface CustomerData {
   seoTitle?: string;
+  seoDescription?: string;
+  ogImage?: SanityImageSource;
   eyebrow?: string;
   hero?: {
     title?: string;
@@ -59,12 +62,14 @@ export interface CustomerData {
 
 const CUSTOMER_FIELDS = `
   seoTitle,
+  seoDescription,
+  ogImage,
   eyebrow,
   hero{ title, body, image },
   logosHeading,
   logos,
   serviceCards[]{ title, body },
-  talent{ heading, subheading, people[]{ role, from, rate }, ticker1, ticker2 },
+  talent{ heading, subheading, people[]{ role, from, rate, photo }, ticker1, ticker2 },
   caseStudy{ title, body, image, youtubeId },
   roles{ heading, body, entries[]{ title, country, rate } },
   testimonials[]{ image, quote, name, title }

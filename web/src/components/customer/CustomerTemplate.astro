@@ -85,7 +85,14 @@ const testimonials = (data.testimonials ?? []).map((t) => ({
       <p class="t-body" style="text-align:center">{talent.subheading}</p>
     </div>
     <div class="hs-talent__people">
-      {people.map((p) => <TalentPersonCard role={p.role ?? ''} from={p.from ?? ''} rate={p.rate ?? ''} />)}
+      {people.map((p) => (
+        <TalentPersonCard
+          role={p.role ?? ''}
+          from={p.from ?? ''}
+          rate={p.rate ?? ''}
+          photo={p.photo ? imgUrl(p.photo) : undefined}
+        />
+      ))}
     </div>
     <div class="hs-talent__tickers">
       <div class="marquee">

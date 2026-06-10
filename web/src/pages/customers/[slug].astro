@@ -22,7 +22,11 @@ export async function getStaticPaths() {
 const { data } = Astro.props;
 ---
 
-<Layout title={data.seoTitle ?? 'Customers — Sagan Passport'}>
+<Layout
+  title={data.seoTitle ?? 'Customers — Sagan Passport'}
+  description={data.seoDescription}
+  ogImage={data.ogImage}
+>
   <Navbar />
   <CustomerTemplate data={data} />
   <Footer />
