@@ -1,7 +1,8 @@
 ---
 /* ButtonFill — primary button (Astro port): dark glacier text pill + a touching
- * glacier arrow circle, white label/arrow. Hover darkens to deep-glacier and
- * the arrow turns mint. */
+ * glacier arrow circle, white label/arrow. Hover darkens to deep-glacier while
+ * the arrow slides out right and its white twin slides in from the left (the
+ * same swap as the pricing Get Started button / live saganpassport.com). */
 interface Props {
   label: string;
   href: string;
@@ -17,7 +18,10 @@ const { label, href, external = false } = Astro.props;
   rel={external ? 'noreferrer' : undefined}>
   <span class="btn-fill__label">{label}</span>
   <span class="btn-fill__circle">
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
+    <svg class="btn-fill__arrow btn-fill__arrow--a" viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
+      <path d="M5 12h13M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+    <svg class="btn-fill__arrow btn-fill__arrow--b" viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
       <path d="M5 12h13M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
     </svg>
   </span>
@@ -51,6 +55,8 @@ const { label, href, external = false } = Astro.props;
     transition: background-color 0.3s cubic-bezier(0.44, 0, 0.56, 1);
   }
   .btn-fill__circle {
+    position: relative;
+    overflow: hidden;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -60,24 +66,47 @@ const { label, href, external = false } = Astro.props;
     border-radius: 50%;
     color: var(--white);
     background: var(--glacier);
+    transition: background-color 0.3s cubic-bezier(0.44, 0, 0.56, 1);
+  }
+  /* Two stacked arrows; both centered, offset via translateX. Same 0.7s
+     ease-out swap as the pricing Get Started button. */
+  .btn-fill__arrow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
     transition:
-      background-color 0.3s cubic-bezier(0.44, 0, 0.56, 1),
-      color 0.3s cubic-bezier(0.44, 0, 0.56, 1);
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .btn-fill__circle svg {
-    transition: transform 0.25s ease;
+  /* Resting arrow: centered. Hover: slides out to the right. */
+  .btn-fill__arrow--a {
+    transform: translate(-50%, -50%) translateX(0);
+    opacity: 1;
   }
-  .btn-fill:hover .btn-fill__label {
-    background: var(--deep-glacier);
+  /* Incoming arrow (same color): waits off to the left. Hover: slides in. */
+  .btn-fill__arrow--b {
+    transform: translate(-50%, -50%) translateX(-200%);
+    opacity: 0;
   }
+  .btn-fill:hover .btn-fill__arrow--a {
+    transform: translate(-50%, -50%) translateX(200%);
+    opacity: 0;
+  }
+  .btn-fill:hover .btn-fill__arrow--b {
+    transform: translate(-50%, -50%) translateX(0);
+    opacity: 1;
+  }
+  .btn-fill:hover .btn-fill__label,
   .btn-fill:hover .btn-fill__circle {
     background: var(--deep-glacier);
-    color: var(--mint);
-  }
-  .btn-fill:hover .btn-fill__circle svg {
-    transform: translateX(2px);
   }
   .btn-fill:active {
     transform: translateY(1px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn-fill__arrow {
+      transition: none;
+    }
   }
 </style>

@@ -200,16 +200,28 @@
       transition: background-color .3s cubic-bezier(.44,0,.56,1);
     }
     .btn-fill__circle {
+      position: relative; overflow: hidden;
       display: inline-flex; align-items: center; justify-content: center;
       flex: none; width: 60px; height: 60px; border-radius: 50%;
       color: var(--white); background: var(--glacier);
-      transition: background-color .3s cubic-bezier(.44,0,.56,1), color .3s cubic-bezier(.44,0,.56,1);
+      transition: background-color .3s cubic-bezier(.44,0,.56,1);
     }
-    .btn-fill__circle svg { transition: transform .25s ease; }
+    /* Two stacked arrows; the resting one slides out right on hover while its
+       same-color twin slides in from the left (matches the sitewide swap). */
+    .btn-fill__arrow {
+      position: absolute; top: 50%; left: 50%;
+      transition: transform .7s cubic-bezier(.16,1,.3,1), opacity .7s cubic-bezier(.16,1,.3,1);
+    }
+    .btn-fill__arrow--a { transform: translate(-50%, -50%) translateX(0); opacity: 1; }
+    .btn-fill__arrow--b { transform: translate(-50%, -50%) translateX(-200%); opacity: 0; }
+    .btn-fill:hover .btn-fill__arrow--a { transform: translate(-50%, -50%) translateX(200%); opacity: 0; }
+    .btn-fill:hover .btn-fill__arrow--b { transform: translate(-50%, -50%) translateX(0); opacity: 1; }
     .btn-fill:hover .btn-fill__label { background: var(--deep-glacier); }
-    .btn-fill:hover .btn-fill__circle { background: var(--deep-glacier); color: var(--white); }
-    .btn-fill:hover .btn-fill__circle svg { transform: translateX(2px); }
+    .btn-fill:hover .btn-fill__circle { background: var(--deep-glacier); }
     .btn-fill:active { transform: translateY(1px); }
+    @media (prefers-reduced-motion: reduce) {
+      .btn-fill__arrow { transition: none; }
+    }
 
     /* Risk reversal UNDER the CTA */
     .risk { display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap; }
