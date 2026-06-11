@@ -1,9 +1,9 @@
 ---
 /* GetStartedButton — pricing-card CTA (Astro port). Dark glacier text pill + a
- * glacier arrow circle. The circle holds TWO arrows for the hover swap (the
- * Framer "Primary - Hover - White" variant): at rest the accent arrow sits
- * centered; on hover it slides out to the right while a white arrow slides in
- * from the left to take its place. Leaving the button reverses it. */
+ * glacier arrow circle. The circle holds TWO arrows for the hover swap: at rest
+ * one sits centered; on hover it slides out to the right while its twin slides
+ * in from the left to take its place (both in the plan's accent color, matching
+ * the live saganpassport.com/pricing button). Leaving the button reverses it. */
 interface Props {
   label?: string;
   href: string;
@@ -27,7 +27,7 @@ const ARROW = 'M5 12h13M12 5l7 7-7 7';
     <svg class="pgsb__arrow pgsb__arrow--a" viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true" style={`color:${accent}`}>
       <path d={ARROW} stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
     </svg>
-    <svg class="pgsb__arrow pgsb__arrow--b" viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
+    <svg class="pgsb__arrow pgsb__arrow--b" viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true" style={`color:${accent}`}>
       <path d={ARROW} stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
     </svg>
   </span>
@@ -73,23 +73,24 @@ const ARROW = 'M5 12h13M12 5l7 7-7 7';
     background: var(--glacier);
     transition: background-color 0.3s cubic-bezier(0.44, 0, 0.56, 1);
   }
-  /* Two stacked arrows; both centered, offset via translateX. */
+  /* Two stacked arrows; both centered, offset via translateX. The 0.7s ease-out
+     matches the unhurried swap on the live saganpassport.com/pricing button. */
   .pgsb__arrow {
     position: absolute;
     top: 50%;
     left: 50%;
     transition:
-      transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-      opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1);
   }
   /* Resting accent arrow: centered. Hover: slides out to the right. */
   .pgsb__arrow--a {
     transform: translate(-50%, -50%) translateX(0);
     opacity: 1;
   }
-  /* Incoming white arrow: waits off to the left. Hover: slides into center. */
+  /* Incoming arrow (same accent color): waits off to the left. Hover: slides
+     into center. */
   .pgsb__arrow--b {
-    color: var(--white);
     transform: translate(-50%, -50%) translateX(-200%);
     opacity: 0;
   }
