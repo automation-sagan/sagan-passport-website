@@ -3,6 +3,7 @@ import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './schemaTypes'
 import {PreviewPane} from './components/PreviewPane'
+import {openPreviewAction} from './components/openPreviewAction'
 
 export default defineConfig({
   name: 'default',
@@ -159,8 +160,10 @@ export default defineConfig({
               ].includes(t.templateId),
           )
         : prev,
-    actions: (input, context) =>
-      [
+    actions: (input, context) => {
+      // Blog posts get the "Open preview" action next to Publish.
+      if (context.schemaType === 'blog') return [...input, openPreviewAction]
+      return [
         'siteSettings',
         'resourcesIndex',
         'blogIndex',
@@ -176,6 +179,7 @@ export default defineConfig({
         ? input.filter(({action}) =>
             ['publish', 'discardChanges', 'restore'].includes(action!),
           )
-        : input,
+        : input
+    },
   },
 })
