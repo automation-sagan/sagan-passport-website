@@ -2,6 +2,7 @@ import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './schemaTypes'
+import {PreviewPane} from './components/PreviewPane'
 
 export default defineConfig({
   name: 'default',
@@ -12,6 +13,15 @@ export default defineConfig({
 
   plugins: [
     structureTool({
+      // Blog posts get a second "Preview" tab rendering the draft on the site
+      // (see components/PreviewPane.tsx).
+      defaultDocumentNode: (S, {schemaType}) =>
+        schemaType === 'blog'
+          ? S.document().views([
+              S.view.form(),
+              S.view.component(PreviewPane).title('Preview'),
+            ])
+          : undefined,
       // "Homepage" and "Navigation" are singletons — surface each as one fixed
       // document, not a create-your-own list.
       structure: (S) =>

@@ -104,9 +104,8 @@ export async function getBlogSlugs(): Promise<string[]> {
   return (rows ?? []).map((r) => r.slug);
 }
 
-/** One blog post by slug (queried at build time). */
-export async function getBlog(slug: string): Promise<BlogFull | null> {
-  const post = await sanityClient.fetch<BlogFull | null>(
+async function fetchBlog(client: typeof sanityClient, slug: string): Promise<BlogFull | null> {
+  const post = await client.fetch<BlogFull | null>(
     `*[_type == "blog" && slug.current == $slug][0]{${FULL_FIELDS}}`,
     { slug },
   );
@@ -116,6 +115,25 @@ export async function getBlog(slug: string): Promise<BlogFull | null> {
     post.cta = { ...post.cta, description: richBodyHtml(post.cta.description as RichTextBody | string) };
   }
   return post;
+}
+
+/** One blog post by slug (queried at build time). */
+export async function getBlog(slug: string): Promise<BlogFull | null> {
+  return fetchBlog(sanityClient, slug);
+}
+
+/** One blog post by slug with DRAFT content (the editor's unpublished state
+ * layered over the published doc). Used only by the SSR preview route — needs
+ * the server-side SANITY_API_READ_TOKEN since drafts are private. */
+export async function getBlogDraft(slug: string): Promise<BlogFull | null> {
+  const token = import.meta.env.SANITY_API_READ_TOKEN;
+  if (!token) return null;
+  const draftsClient = sanityClient.withConfig({
+    token,
+    useCdn: false,
+    perspective: 'drafts',
+  });
+  return fetchBlog(draftsClient, slug);
 }
 
 /** Format an ISO date as "Mon D, YYYY" (empty string if unset). */

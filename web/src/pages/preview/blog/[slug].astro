@@ -1,0 +1,68 @@
+---
+/* /preview/blog/[slug] — DRAFT preview for editors (the Studio's "Preview"
+ * tab points here). Server-rendered on every request so it always shows the
+ * current draft state from Sanity, gated by ?secret= (PREVIEW_SECRET env).
+ *
+ * Never indexed: requires the secret, sends X-Robots-Tag + no-store, and the
+ * staging site is noindex anyway. */
+import Layout from '../../../layouts/Layout.astro';
+import Navbar from '../../../components/Navbar.astro';
+import Footer from '../../../components/Footer.astro';
+import BlogArticle from '../../../components/blog/BlogArticle.astro';
+import { getBlogDraft, getBlogList } from '../../../lib/blog';
+import '../../../styles/resources.css';
+import '../../../styles/blog.css';
+import '../../../styles/blog-article.css';
+
+export const prerender = false;
+
+const configuredSecret = import.meta.env.PREVIEW_SECRET;
+const secret = Astro.url.searchParams.get('secret');
+if (!configuredSecret || secret !== configuredSecret) {
+  return new Response('Not found', { status: 404 });
+}
+
+const { slug } = Astro.params;
+const post = slug ? await getBlogDraft(slug) : null;
+if (!post) {
+  return new Response(
+    'Draft not found — check the post has a slug, and that SANITY_API_READ_TOKEN is set.',
+    { status: 404 },
+  );
+}
+
+const showSidebar = post.showSidebar !== false;
+const more = showSidebar
+  ? (await getBlogList()).filter((p) => p.slug !== post.slug).slice(0, 3)
+  : [];
+
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+Astro.response.headers.set('Cache-Control', 'no-store');
+---
+
+<Layout title={`[DRAFT] ${post.title ?? 'Untitled'} — Preview`}>
+  <div class="preview-banner">
+    DRAFT PREVIEW — this is the unpublished state. Publish in the Studio to make it live.
+  </div>
+  <Navbar />
+  <div class="home">
+    <BlogArticle post={post} more={more} />
+  </div>
+  <Footer />
+</Layout>
+
+<style>
+  .preview-banner {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 8px 16px;
+    text-align: center;
+    font-family: var(--grotesk);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #fff;
+    background: #c2410c;
+  }
+</style>

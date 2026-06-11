@@ -1,24 +1,16 @@
 ---
 /* /blog/[slug] — blog article, rebuilt to match the live Framer saganpassport
- * blog post template: a content-width rounded cover image (linked to the
- * consult call), then a two-column grid — main content (breadcrumb → title →
- * meta → lead → single-column SECTION blocks) + a sticky right sidebar (More
- * from the blog + CTA). */
+ * blog post template. The article markup lives in BlogArticle.astro (shared
+ * with the draft-preview route /preview/blog/[slug]); this page owns the data
+ * fetch, SEO head, and chrome. */
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import Footer from '../../components/Footer.astro';
-import BlogCTA from '../../components/blog/BlogCTA.astro';
-import { getBlogSlugs, getBlog, getBlogList, formatDate } from '../../lib/blog';
-import { richBodyHtml } from '../../lib/richTextHtml';
-import { imgUrl } from '../../lib/sanityImage';
+import BlogArticle from '../../components/blog/BlogArticle.astro';
+import { getBlogSlugs, getBlog, getBlogList } from '../../lib/blog';
 import '../../styles/resources.css';
 import '../../styles/blog.css';
 import '../../styles/blog-article.css';
-
-/* The live template wraps the cover image in the same "Schedule a Call" link
- * used site-wide (Navbar / BlogCTA). */
-const CALENDLY_URL =
-  'https://calendly.com/d/5j7-3xv-p5k/global-talent-hiring-consultation?utm_source=saganpassportdotcom&utm_term=talent';
 
 export async function getStaticPaths() {
   const slugs = await getBlogSlugs();
@@ -28,17 +20,10 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const coverImage = imgUrl(post.image);
 const showSidebar = post.showSidebar !== false;
 const more = showSidebar
   ? (await getBlogList()).filter((p) => p.slug !== post.slug).slice(0, 3)
   : [];
-const metaBits = [post.date ? formatDate(post.date) : null, post.author, post.readTime].filter(Boolean);
-const introHtml = richBodyHtml(post.intro);
-
-/* Section titles render as H2 by default; the Framer "Use H2 Headings" flag
- * turns them into H3 (visually identical — .bp__sectitle carries the style). */
-const HeadingTag = post.useH2Headings === false ? 'h3' : 'h2';
 
 /* JSON-LD from the Studio "Schema Markup" field. The parse/stringify round-trip
  * rejects invalid JSON and neutralizes any </script> breakout before set:html. */
@@ -60,81 +45,7 @@ if (post.schemaMarkup) {
   {jsonLd && <script is:inline type="application/ld+json" set:html={jsonLd} slot="head" />}
   <Navbar />
   <div class="home">
-    <article class="bp">
-      <div class="bp__container">
-        {coverImage && (
-          <a class="bp__cover" href={CALENDLY_URL} target="_blank" rel="noreferrer">
-            <img src={coverImage} alt={post.imageAlt || post.title} loading="eager" />
-          </a>
-        )}
-
-        <div class={showSidebar ? 'bp__wrap' : 'bp__wrap bp__wrap--full'}>
-          <!-- main content -->
-          <div class="bp__main">
-            <p class="bp__crumb"><a href="/blog">BLOG POST</a> <span>› {post.title}</span></p>
-            <h1 class="bp__title">{post.title}</h1>
-            <p class="bp__meta">{metaBits.join('  •  ')}</p>
-
-            {introHtml && <div class="bp__lead article-content" set:html={introHtml}></div>}
-
-            {post.costCards && post.costCards.length > 0 && (
-              <div class="blog-costcards" style="margin-top:32px">
-                {post.costCards.map((c) => (
-                  <div class="blog-costcard">
-                    <span class="blog-costcard__title">{c.title}</span>
-                    <span class="blog-costcard__price">{c.price}</span>
-                    <span class="blog-costcard__unit">{c.unit}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-            {post.costNote && <p class="blog-costnote" style="margin-top:16px">{post.costNote}</p>}
-
-            <div class="bp__sections">
-              {(post.sections ?? []).map((s) => (
-                <section class="bp__sec">
-                  {s.label && <p class="bp__seclabel">{s.label}</p>}
-                  {s.title && <HeadingTag class="bp__sectitle">{s.title}</HeadingTag>}
-                  {s.intro && <p class="bp__sec-intro">{s.intro}</p>}
-                  <div class="bp__sec-body article-content" set:html={richBodyHtml(s.content)}></div>
-                  {s.quote && (
-                    <div class="article-content">
-                      <blockquote><p>{s.quote}</p></blockquote>
-                    </div>
-                  )}
-                  {s.content2 && s.content2.length > 0 && (
-                    <div class="bp__sec-body article-content" set:html={richBodyHtml(s.content2)}></div>
-                  )}
-                </section>
-              ))}
-            </div>
-          </div>
-
-          {/* sticky sidebar */}
-          {showSidebar && (
-            <aside class="bp__aside">
-              {more.length > 0 && (
-                <div class="bp__more">
-                  <h3 class="bp__more-title">More from the blog</h3>
-                  <div class="bp__more-line"></div>
-                  {more.map((p) => (
-                    <a class="bp__pc" href={`/blog/${p.slug}`}>
-                      <span class="bp__pc-thumb" style={imgUrl(p.image) ? `background-image:url(${imgUrl(p.image)})` : undefined}></span>
-                      <span class="bp__pc-body">
-                        <span class="bp__pc-cat">{p.category}</span>
-                        <span class="bp__pc-title">{p.title}</span>
-                        {p.readTime && <span class="bp__pc-read">{p.readTime}</span>}
-                      </span>
-                    </a>
-                  ))}
-                </div>
-              )}
-              <BlogCTA cta={post.cta} />
-            </aside>
-          )}
-        </div>
-      </div>
-    </article>
+    <BlogArticle post={post} more={more} />
   </div>
   <Footer />
 </Layout>
