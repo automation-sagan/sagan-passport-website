@@ -87,6 +87,10 @@ export default defineConfig({
               .id('footer')
               .child(S.document().schemaType('footer').documentId('footer')),
             S.listItem()
+              .title('Redirects')
+              .id('redirect')
+              .child(S.documentTypeList('redirect').title('Redirects')),
+            S.listItem()
               .title('Site settings')
               .id('siteSettings')
               .child(S.document().schemaType('siteSettings').documentId('siteSettings')),
@@ -111,6 +115,7 @@ export default defineConfig({
                   'landingPage',
                   'navigation',
                   'footer',
+                  'redirect',
                 ].includes(li.getId()!),
             ),
           ]),

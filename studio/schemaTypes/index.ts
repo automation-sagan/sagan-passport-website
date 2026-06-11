@@ -2,6 +2,7 @@ import {navigation} from './navigation'
 import {navItem} from './navItem'
 import {navCard} from './navCard'
 import {footer, footerColumn, footerSection, footerLink} from './footer'
+import {redirect} from './redirect'
 import {homepage} from './homepage'
 import {button} from './button'
 import {person} from './person'
@@ -56,6 +57,7 @@ export const schemaTypes = [
   footerColumn,
   footerSection,
   footerLink,
+  redirect,
   homepage,
   button,
   person,

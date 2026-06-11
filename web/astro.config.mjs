@@ -4,6 +4,41 @@ import { defineConfig } from 'astro/config';
 import sanity from '@sanity/astro';
 import netlify from '@astrojs/netlify';
 
+/* Redirects are content: the SEO team manages `redirect` documents in the
+ * Studio (from/to/permanent). Fetched here at config-load time and handed to
+ * Astro's native `redirects`, which the Netlify adapter compiles into the
+ * platform redirect engine. Publishing a redirect triggers the Sanity→Netlify
+ * build webhook, so it goes live on that build with no developer involved. */
+async function fetchSanityRedirects() {
+  const query = encodeURIComponent(
+    '*[_type == "redirect" && defined(from) && defined(to)]{from, to, permanent}',
+  );
+  const url = `https://3ofs1zkm.api.sanity.io/v2026-03-01/data/query/production?query=${query}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    const { result } = await res.json();
+    /** @type {Record<string, {status: 301 | 302, destination: string}>} */
+    const redirects = {};
+    for (const r of result ?? []) {
+      if (!r.from?.startsWith('/') || r.from === r.to) continue;
+      redirects[r.from] = {
+        status: r.permanent === false ? 302 : 301,
+        destination: r.to,
+      };
+    }
+    if (Object.keys(redirects).length) {
+      console.log(`[redirects] ${Object.keys(redirects).length} redirect(s) loaded from Sanity`);
+    }
+    return redirects;
+  } catch (err) {
+    console.warn(`[redirects] could not fetch from Sanity (${err.message}) — building without CMS redirects`);
+    return {};
+  }
+}
+
+const sanityRedirects = await fetchSanityRedirects();
+
 // https://astro.build/config
 export default defineConfig({
   // Static by default. The Netlify adapter is here only so the handful of
@@ -12,6 +47,9 @@ export default defineConfig({
   // adapter does NOT make pages dynamic — every page stays prerendered at build
   // time unless it explicitly opts out.
   adapter: netlify(),
+
+  // CMS-managed redirects (see fetchSanityRedirects above).
+  redirects: sanityRedirects,
 
   // Serve clean URLs with NO trailing slash (/how-it-works, not /how-it-works/).
   // build.format: 'file' emits each page as a flat <page>.html file (instead of
