@@ -148,3 +148,11 @@
   .bp__container { padding: 28px 20px 56px; }
   .bp__cover { border-radius: 16px; margin-bottom: 28px; }
 }
+
+/* HTML Embed blocks (Studio "HTML Embed" in rich text) — keep third-party
+   iframes/widgets inside the article column. Margins are conservative
+   defaults; tune after the SEO team embeds real content. */
+.rt-embed { margin: 24px 0; }
+.rt-embed iframe { max-width: 100%; }
+.rt-embed figcaption { margin-top: 8px; font-family: var(--pp); font-size: 13px; color: var(--text-muted); }
+figure.rt-embed { margin-left: 0; margin-right: 0; }

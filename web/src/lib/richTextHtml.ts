@@ -25,8 +25,22 @@ const linkComponent = ({ children, value }: { children: string; value?: { href?:
   return `<a href="${href}"${attrs}>${children}</a>`;
 };
 
+const escapeHtml = (s: string) =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/* htmlEmbed blocks (the Studio "HTML Embed" toolbar item) render their pasted
+ * code verbatim — same trust model as Framer's HTML embed element. Only the
+ * caption is escaped; the embed code itself must pass through untouched. */
+const htmlEmbedComponent = ({ value }: { value?: { code?: string; caption?: string } }) => {
+  if (!value?.code) return '';
+  return value.caption
+    ? `<figure class="rt-embed">${value.code}<figcaption>${escapeHtml(value.caption)}</figcaption></figure>`
+    : `<div class="rt-embed">${value.code}</div>`;
+};
+
 const blockComponents: PortableTextComponents = {
   marks: { link: linkComponent },
+  types: { htmlEmbed: htmlEmbedComponent },
 };
 
 /** Long-form body (richBody): paragraphs, headings, lists, quotes, links. */

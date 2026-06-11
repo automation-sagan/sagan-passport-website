@@ -92,3 +92,10 @@
   .res-video-sec { padding: 0 20px 40px; }
   .res-cta { padding: 64px 20px; }
 }
+
+/* HTML Embed blocks (Studio "HTML Embed" in rich text) — same rules as
+   blog-article.css; keep embeds inside the article column. */
+.rt-embed { margin: 24px 0; }
+.rt-embed iframe { max-width: 100%; }
+.rt-embed figcaption { margin-top: 8px; font-family: var(--pp); font-size: 13px; color: var(--text-muted); }
+figure.rt-embed { margin-left: 0; margin-right: 0; }

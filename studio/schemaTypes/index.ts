@@ -30,7 +30,7 @@ import {resource} from './resource'
 import {resourceSection} from './resourceSection'
 import {resourceTestimonial} from './resourceTestimonial'
 import {blog} from './blog'
-import {richBody} from './richBody'
+import {richBody, htmlEmbed} from './richBody'
 import {inlineBody} from './inlineBody'
 import {blogSection} from './blogSection'
 import {blogCostCard} from './blogCostCard'
@@ -85,6 +85,7 @@ export const schemaTypes = [
   resourceTestimonial,
   blog,
   richBody,
+  htmlEmbed,
   inlineBody,
   blogSection,
   blogCostCard,
