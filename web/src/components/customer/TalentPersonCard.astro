@@ -1,19 +1,19 @@
 ---
 /* TalentPersonCard — Astro port of the Framer `talent-person-card`. A photo with
  * a centered glassy "Play" badge and a dandelion rate pill, then role + origin
- * below. Photo is a shared default (the data is text-only). */
+ * below. Photo comes from the customer doc in Sanity (every talent person has
+ * one); if it's ever missing the card just shows its background color. */
 interface Props {
   role: string;
   from: string;
   rate: string;
   photo?: string;
 }
-const DEFAULT_PHOTO = 'https://framerusercontent.com/images/Cf7oDzBLWbRK8JBnTkI71VVGPo.png';
-const { role, from, rate, photo = DEFAULT_PHOTO } = Astro.props;
+const { role, from, rate, photo } = Astro.props;
 ---
 
 <div class="tpc">
-  <div class="tpc__photo" style={`background-image:url(${photo})`}>
+  <div class="tpc__photo" style={photo ? `background-image:url(${photo})` : undefined}>
     <span class="tpc__play" aria-hidden="true">Play</span>
     <span class="tpc__rate">{rate}</span>
   </div>

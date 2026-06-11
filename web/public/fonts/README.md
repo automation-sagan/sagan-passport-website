@@ -11,8 +11,4 @@ in `src/layouts/Layout.astro`. Drop the `.woff2` files here with these exact nam
 
 Until these files exist, PP Mori falls back to `system-ui`.
 
-If you'd rather not self-host yet, you can temporarily point the `@font-face`
-`src` URLs in `Layout.astro` at the `framerusercontent.com` font URLs from the
-original site instead.
-
 **Space Grotesk** needs no file — it's loaded from Google Fonts in `Layout.astro`.
