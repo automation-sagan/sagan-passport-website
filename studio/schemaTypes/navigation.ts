@@ -7,6 +7,12 @@ export const navigation = defineType({
   type: 'document',
   fields: [
     defineField({
+      name: 'logoIcon',
+      title: 'Logo icon',
+      type: 'image',
+      description: 'Small square mark next to the "Sagan" logo text (rendered at 24×24).',
+    }),
+    defineField({
       name: 'items',
       title: 'Menu items',
       description: 'Top-level navbar entries, in display order.',

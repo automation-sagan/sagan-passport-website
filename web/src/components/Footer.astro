@@ -11,11 +11,16 @@
  *
  * Shared tokens (--dandelion, --glacier, --grotesk, --pp) come from
  * src/styles/global.css — this component declares no design tokens of its own.
+ *
+ * Content comes from the `footer` singleton in Sanity; the hardcoded values
+ * below are the fallback when Sanity is unreachable or the doc is missing.
  * ------------------------------------------------------------------------- */
+import { sanityClient } from 'sanity:client';
+import { imgUrl } from '../lib/sanityImage';
 
 // Full-width "Sagan" wordmark (4165×983, ~4.24:1) at the footer bottom.
-const WORDMARK =
-  'https://framerusercontent.com/images/jBgV1WJ5AIUfSz7porI87LWTNXk.png?width=4165&height=983';
+const DEFAULT_WORDMARK = '/images/footer-wordmark.png';
+const DEFAULT_TAGLINE = 'Source and scale with Sagan.';
 
 const PORTAL_URL = 'https://portal.saganpassport.com';
 const CALENDLY_URL =
@@ -101,16 +106,48 @@ const COLUMNS: FooterCol[] = [
     },
   ],
 ];
+
+const FOOTER_QUERY = `*[_type == "footer"][0]{
+  tagline, wordmark,
+  columns[]{ sections[]{ heading, links[]{ label, href, external } } }
+}`;
+
+// Fetch from Sanity, fall back to the hardcoded content above.
+let tagline = DEFAULT_TAGLINE;
+let wordmark = DEFAULT_WORDMARK;
+let columns: FooterCol[] = COLUMNS;
+try {
+  const data = await sanityClient.fetch(FOOTER_QUERY);
+  if (data) {
+    if (data.tagline) tagline = data.tagline;
+    if (data.wordmark) wordmark = imgUrl(data.wordmark);
+    if (data.columns?.length) {
+      columns = data.columns.map(
+        (col: any): FooterCol =>
+          (col.sections ?? []).map(
+            (s: any): FooterSection => ({
+              heading: s.heading,
+              links: (s.links ?? []).map(
+                (l: any): FooterLink => ({ label: l.label, href: l.href, external: l.external }),
+              ),
+            }),
+          ),
+      );
+    }
+  }
+} catch {
+  // Sanity unreachable (e.g. wrong dataset / offline) → keep the defaults.
+}
 ---
 
 <footer class="footerx">
   <div class="footerx__content">
     <div class="footerx__brand">
-      <h3 class="footerx__tagline">Source and scale with Sagan.</h3>
+      <h3 class="footerx__tagline">{tagline}</h3>
     </div>
 
     <div class="footerx__cols">
-      {COLUMNS.map((col) => (
+      {columns.map((col) => (
         <div class="footerx__col">
           {col.map((section) => (
             <div class="footerx__group">
@@ -134,7 +171,7 @@ const COLUMNS: FooterCol[] = [
   </div>
 
   <div class="footerx__wordmark">
-    <img src={WORDMARK} alt="Sagan" loading="lazy" />
+    <img src={wordmark} alt="Sagan" loading="lazy" />
   </div>
 </footer>
 

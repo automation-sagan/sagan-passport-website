@@ -40,6 +40,8 @@ const btn = bigCard?.button;
   </div>
 
   <Appear class="feature-grid">
-    {(features ?? []).map((f) => <FeatureCard title={f.title} description={f.description ?? ''} />)}
+    {(features ?? []).map((f) => (
+      <FeatureCard title={f.title} description={f.description ?? ''} icon={imgUrl(f.icon) || undefined} />
+    ))}
   </Appear>
 </section>

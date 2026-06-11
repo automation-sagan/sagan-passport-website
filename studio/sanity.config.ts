@@ -83,6 +83,10 @@ export default defineConfig({
               .id('navigation')
               .child(S.document().schemaType('navigation').documentId('navigation')),
             S.listItem()
+              .title('Footer')
+              .id('footer')
+              .child(S.document().schemaType('footer').documentId('footer')),
+            S.listItem()
               .title('Site settings')
               .id('siteSettings')
               .child(S.document().schemaType('siteSettings').documentId('siteSettings')),
@@ -106,6 +110,7 @@ export default defineConfig({
                   'agentDemo',
                   'landingPage',
                   'navigation',
+                  'footer',
                 ].includes(li.getId()!),
             ),
           ]),
@@ -135,6 +140,7 @@ export default defineConfig({
                 'saganUniversity',
                 'notFound',
                 'navigation',
+                'footer',
               ].includes(t.templateId),
           )
         : prev,
@@ -150,6 +156,7 @@ export default defineConfig({
         'saganUniversity',
         'notFound',
         'navigation',
+        'footer',
       ].includes(context.schemaType)
         ? input.filter(({action}) =>
             ['publish', 'discardChanges', 'restore'].includes(action!),

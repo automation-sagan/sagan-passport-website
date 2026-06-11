@@ -1,13 +1,12 @@
 ---
 /* FeatureCard — feature grid item (Astro port). Icon + title + description,
- * left-aligned. Falls back to the Framer default icon. */
+ * left-aligned. Falls back to the self-hosted default icon. */
 interface Props {
   title: string;
   description: string;
   icon?: string;
 }
-const DEFAULT_ICON =
-  'https://framerusercontent.com/images/tcVzccaJoexsAP6OlrjoixmE1Q.png?width=40&height=40';
+const DEFAULT_ICON = '/images/feature-icon-default.png';
 const { title, description, icon = DEFAULT_ICON } = Astro.props;
 ---
 

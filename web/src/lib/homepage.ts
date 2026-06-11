@@ -27,7 +27,7 @@ export interface HomepageData {
     button?: SanityButton;
     image?: SanityImageSource;
   };
-  features?: { title: string; description?: string }[];
+  features?: { title: string; description?: string; icon?: SanityImageSource }[];
   slides?: { image?: SanityImageSource; quote: string; name: string; title?: string }[];
   testimonials?: {
     name: string;
@@ -49,7 +49,7 @@ const HOMEPAGE_QUERY = `*[_type == "homepage"][0]{
   logos[],
   infoRows[]{ heading, body },
   bigCard{ heading, body, button{ label, href, external, variant }, image },
-  features[]{ title, description },
+  features[]{ title, description, icon },
   slides[]{ image, quote, name, title },
   testimonials[]{ name, subtitle, quote, avatar, logo },
   cta{ heading, body }

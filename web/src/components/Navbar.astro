@@ -19,11 +19,9 @@
 import { sanityClient } from 'sanity:client';
 import { urlFor } from '../lib/sanityImage';
 
-const IMG = (id: string) =>
-  `https://framerusercontent.com/images/${id}.png?width=128&height=64`;
+const IMG = (name: string) => `/images/nav-icon-${name}.png`;
 
-const LOGO_ICON =
-  'https://framerusercontent.com/images/ECyEDC4V3Il9rjq10opn3xtlDPY.png?width=80&height=80';
+const DEFAULT_LOGO_ICON = '/images/navbar-logo-icon.png';
 const PORTAL_URL = 'https://portal.saganpassport.com';
 const CALENDLY_URL =
   'https://calendly.com/d/5j7-3xv-p5k/global-talent-hiring-consultation?utm_source=saganpassportdotcom&utm_term=talent';
@@ -59,21 +57,21 @@ const DEFAULT_NAV: Nav = {
       label: 'Customers',
       wide: true,
       cards: [
-        { title: 'Home Services', description: 'HVAC, plumbing, electrical, roofing, pest control, landscaping.', iconUrl: IMG('uKBwntodT6pL8Ai2USI8OEankI'), href: '/customers/home-services' },
-        { title: 'Private Equity & Holding', description: 'For firms that acquire and manage a portfolio of operating companies.', iconUrl: IMG('A4dG60ci5LvA56LHtpOvNCuX9w'), href: '/customers/private-equity' },
-        { title: 'Small Businesses', description: 'Startups, local agencies, solo consultants, healthcare.', iconUrl: IMG('1ctNdpChGVPeIxUTpCLgdC47cE'), href: '/customers/small-businesses' },
-        { title: 'Health & Wellness', description: 'Medical practices, dental groups, clinics, pharmacies, and functional medicine.', iconUrl: IMG('vG1caR7Bgv2rjPhqoLkdbJczNCI'), href: '/customers/health-wellness' },
-        { title: 'Franchises', description: 'Multi-location QSR, fitness, retail, and service franchisors and franchisees.', iconUrl: IMG('h7BbveyJKxZ20DQ801S3HEdSew0'), href: '/customers/franchises' },
-        { title: 'Professional Services', description: 'Law firms, accounting firms, and consulting practices.', iconUrl: IMG('9oc7eYSkrWdsdqOsLTdGftSuRw'), href: '/customers/professional-services' },
-        { title: 'Real Estate', description: 'Residential, commercial, property management, and real estate investment firms.', iconUrl: IMG('mzgeP6gU2LhstP9gfiR22xEn3Nc'), href: '/customers/real-estate' },
+        { title: 'Home Services', description: 'HVAC, plumbing, electrical, roofing, pest control, landscaping.', iconUrl: IMG('generic'), href: '/customers/home-services' },
+        { title: 'Private Equity & Holding', description: 'For firms that acquire and manage a portfolio of operating companies.', iconUrl: IMG('private-equity'), href: '/customers/private-equity' },
+        { title: 'Small Businesses', description: 'Startups, local agencies, solo consultants, healthcare.', iconUrl: IMG('small-businesses'), href: '/customers/small-businesses' },
+        { title: 'Health & Wellness', description: 'Medical practices, dental groups, clinics, pharmacies, and functional medicine.', iconUrl: IMG('health-wellness'), href: '/customers/health-wellness' },
+        { title: 'Franchises', description: 'Multi-location QSR, fitness, retail, and service franchisors and franchisees.', iconUrl: IMG('franchises'), href: '/customers/franchises' },
+        { title: 'Professional Services', description: 'Law firms, accounting firms, and consulting practices.', iconUrl: IMG('professional-services'), href: '/customers/professional-services' },
+        { title: 'Real Estate', description: 'Residential, commercial, property management, and real estate investment firms.', iconUrl: IMG('real-estate'), href: '/customers/real-estate' },
       ],
     },
     { label: 'Sagan University', href: '/sagan-university' },
     {
       label: 'Resources',
       cards: [
-        { title: 'Resources', description: 'Case studies, guides, and thought leadership from our team.', iconUrl: IMG('uKBwntodT6pL8Ai2USI8OEankI'), href: '/resources' },
-        { title: 'Blog', description: 'Hiring insights, guides, and updates from Sagan Passport.', iconUrl: IMG('uKBwntodT6pL8Ai2USI8OEankI'), href: '/blog' },
+        { title: 'Resources', description: 'Case studies, guides, and thought leadership from our team.', iconUrl: IMG('generic'), href: '/resources' },
+        { title: 'Blog', description: 'Hiring insights, guides, and updates from Sagan Passport.', iconUrl: IMG('generic'), href: '/blog' },
       ],
     },
     { label: 'AI Agents', href: AI_AGENTS_URL, external: true },
@@ -83,14 +81,17 @@ const DEFAULT_NAV: Nav = {
 };
 
 const NAV_QUERY = `*[_type == "navigation"][0]{
+  logoIcon,
   items[]{ label, type, href, external, wide, cards[]{ title, description, href, external, icon } },
   signIn, scheduleCall
 }`;
 
 // Fetch from Sanity, normalize into the render model, fall back to defaults.
 let nav: Nav = DEFAULT_NAV;
+let logoIcon = DEFAULT_LOGO_ICON;
 try {
   const data = await sanityClient.fetch(NAV_QUERY);
+  if (data?.logoIcon) logoIcon = urlFor(data.logoIcon).width(80).height(80).url();
   if (data?.items?.length) {
     nav = {
       items: data.items.map((it: any): Item => ({
@@ -127,7 +128,7 @@ const half = (n: number) => Math.ceil(n / 2);
   <div class="navx__bar">
     {/* Logo */}
     <a class="navx__logo" href="/" aria-label="Sagan — home">
-      <img class="navx__logo-icon" src={LOGO_ICON} alt="" width="24" height="24" />
+      <img class="navx__logo-icon" src={logoIcon} alt="" width="24" height="24" />
       <span class="navx__logo-text">Sagan</span>
     </a>
 

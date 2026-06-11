@@ -1,6 +1,7 @@
 import {navigation} from './navigation'
 import {navItem} from './navItem'
 import {navCard} from './navCard'
+import {footer, footerColumn, footerSection, footerLink} from './footer'
 import {homepage} from './homepage'
 import {button} from './button'
 import {person} from './person'
@@ -51,6 +52,10 @@ export const schemaTypes = [
   navigation,
   navItem,
   navCard,
+  footer,
+  footerColumn,
+  footerSection,
+  footerLink,
   homepage,
   button,
   person,
