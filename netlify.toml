@@ -4,6 +4,10 @@
 
 [build.environment]
   NODE_VERSION = "22"
+  # SANITY_STUDIO_PREVIEW_ORIGIN is the public staging URL (used only by the
+  # Studio deploy, not this site). Its value naturally appears in repo code,
+  # so exclude it from Netlify's secrets scanner — it is not a secret.
+  SECRETS_SCAN_OMIT_KEYS = "SANITY_STUDIO_PREVIEW_ORIGIN"
 
 [[headers]]
   for = "/*"
